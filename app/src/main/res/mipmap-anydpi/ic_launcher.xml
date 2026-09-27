@@ -3,7 +3,7 @@
     The launcher icon, as separate layers so the launcher can mask it to whatever shape the device
     uses and parallax the foreground.
 
-    The monochrome layer is what Android 13+ themed icons draw; without it, Dizdar would be the one
+    The monochrome layer is what Android 13+ themed icons draw; without it, Killit would be the one
     icon on the home screen that ignores the user's wallpaper colours. Generated along with the
     other densities by tools/icon/generate.py.
 -->

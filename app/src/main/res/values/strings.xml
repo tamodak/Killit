@@ -1,7 +1,7 @@
 <!--
     Every user-visible string in the app.
 
-    Grouped by the screen that shows it, in roughly the order a user meets them. Dizdar is not
+    Grouped by the screen that shows it, in roughly the order a user meets them. Killit is not
     translated yet, so this is the only values/ folder — but the strings live here rather than in
     code so that adding a language later is a matter of adding a folder, not rewriting the screens.
 
@@ -9,7 +9,16 @@
     in code, so those unit letters are not localisable.
 -->
 <resources>
-    <string name="app_name">Dizdar</string>
+    <string name="app_name">Killit</string>
+
+    <!--
+        Countdown formats, used by ui/Durations.kt. Whole formats rather than bare unit letters, so
+        a language that puts the unit before the number, or needs no space, can say so here.
+    -->
+    <string name="duration_d_h">%1$dd %2$dh</string>
+    <string name="duration_h_m">%1$dh %2$dm</string>
+    <string name="duration_m_s">%1$dm %2$ds</string>
+    <string name="duration_s">%1$ds</string>
 
     <!-- Generic -->
     <string name="cancel">Cancel</string>
@@ -25,14 +34,14 @@
 
     <!-- Auth gate -->
     <string name="gate_title">Enter your passkey</string>
-    <string name="gate_subtitle">Dizdar can unblock every app you have blocked, so it stays locked.</string>
+    <string name="gate_subtitle">Killit can unblock every app you have blocked, so it stays locked.</string>
     <string name="gate_wrong">Wrong passkey. %1$d attempts left before a lockout.</string>
     <string name="gate_wrong_generic">Wrong passkey.</string>
     <string name="gate_locked_out">Too many attempts. Try again in %1$s.</string>
 
     <!-- Credential setup -->
     <string name="setup_title">Choose a lock method</string>
-    <string name="setup_subtitle">This passkey protects Dizdar itself. Anyone who gets past it can unblock your apps.</string>
+    <string name="setup_subtitle">This passkey protects Killit itself. Anyone who gets past it can unblock your apps.</string>
     <string name="setup_method_pin">PIN</string>
     <string name="setup_method_pin_desc">4 to 8 digits</string>
     <string name="setup_method_password">Password</string>
@@ -51,25 +60,27 @@
     <!-- Home -->
     <string name="home_status_owner_yes">Device Owner active</string>
     <string name="home_status_owner_no">Not a Device Owner</string>
-    <string name="home_status_owner_yes_desc">Dizdar can block and unblock apps.</string>
-    <string name="home_status_owner_no_desc">Dizdar cannot block anything until it is provisioned as Device Owner. Pick one of the three ways below.</string>
+    <string name="home_status_owner_yes_desc">Killit can block and unblock apps.</string>
+    <string name="home_status_owner_no_desc">Killit cannot block anything until it is provisioned as Device Owner. Pick one of the three ways below.</string>
     <string name="home_blocked_count">%1$d apps blocked</string>
     <string name="home_manage_apps">Choose apps to block</string>
     <string name="home_manage_apps_locked">Set up below first</string>
     <string name="home_change_passkey">Change passkey</string>
+    <string name="home_language">Language</string>
+    <string name="language_system">System default</string>
     <string name="home_hardening">Tamper protection</string>
     <string name="home_release">Unblock all &amp; remove admin</string>
     <string name="home_release_confirm_title">Start the waiting period?</string>
-    <string name="home_release_confirm_body">Removing Dizdar is not immediate. Pressing this starts a countdown; only once it has finished can the apps be unblocked and Dizdar give up Device Owner. You can cancel at any point during the wait.</string>
+    <string name="home_release_confirm_body">Removing Killit is not immediate. Pressing this starts a countdown; only once it has finished can the apps be unblocked and Killit give up Device Owner. You can cancel at any point during the wait.</string>
     <string name="home_release_start">Start the countdown</string>
     <string name="home_release_pending_title">Removal pending</string>
-    <string name="home_release_pending_body">Dizdar can be removed in %1$s. Until then everything stays blocked.</string>
+    <string name="home_release_pending_body">Killit can be removed in %1$s. Until then everything stays blocked.</string>
     <string name="home_release_cancel">Cancel removal</string>
     <string name="home_release_ready_title">Ready to remove</string>
-    <string name="home_release_ready_body">The waiting period is over. Dizdar can now unblock everything and give up Device Owner.</string>
+    <string name="home_release_ready_body">The waiting period is over. Killit can now unblock everything and give up Device Owner.</string>
     <string name="home_release_now">Remove now</string>
-    <string name="home_release_now_confirm_title">Remove Dizdar as Device Owner?</string>
-    <string name="home_release_now_confirm_body">Every blocked app will be unblocked first, then Dizdar gives up its Device Owner privileges. Re-provisioning needs a factory reset. Continue?</string>
+    <string name="home_release_now_confirm_title">Remove Killit as Device Owner?</string>
+    <string name="home_release_now_confirm_body">Every blocked app will be unblocked first, then Killit gives up its Device Owner privileges. Re-provisioning needs a factory reset. Continue?</string>
 
     <!-- Provisioning -->
     <string name="prov_section_title">Turn on protection</string>
@@ -99,7 +110,7 @@
     <string name="prov_qr_intro">Provision this phone from the Android setup wizard.</string>
     <string name="prov_qr_step_1">Factory reset this phone.</string>
     <string name="prov_qr_step_2">On the welcome screen, tap the same spot 6 times to open the QR scanner.</string>
-    <string name="prov_qr_step_3">Scan the code from the Dizdar website. The phone downloads and provisions Dizdar in one step.</string>
+    <string name="prov_qr_step_3">Scan the code from the Killit website. The phone downloads and provisions Killit in one step.</string>
 
     <string name="prov_result_title">Provisioning result</string>
     <string name="prov_refresh">Refresh status</string>
@@ -117,19 +128,19 @@
     <string name="apps_discard_body">You have unsaved changes. Leave without applying them?</string>
     <string name="apps_failed_title">These apps can\'t be blocked</string>
     <string name="apps_failed_body">Android refused to suspend the following packages, so they were left unblocked:</string>
-    <string name="apps_needs_owner">Dizdar needs Device Owner privileges before it can block anything.</string>
+    <string name="apps_needs_owner">Killit needs Device Owner privileges before it can block anything.</string>
 
     <!-- Hardening -->
-    <string name="harden_uninstall">Block uninstalling Dizdar</string>
-    <string name="harden_uninstall_desc">Stops Dizdar being removed to escape the block.</string>
-    <string name="harden_force_stop">Block force-stopping Dizdar</string>
-    <string name="harden_force_stop_desc">Greys out Force stop in Settings. Needs Android 11 or newer.</string>
+    <string name="harden_uninstall">Block uninstalling Killit</string>
+    <string name="harden_uninstall_desc">Stops Killit being removed to escape the block.</string>
+    <string name="harden_force_stop">Block force-stopping Killit</string>
+    <string name="harden_force_stop_desc">Greys out Force stop in Settings, and blocks Clear data too on Android 13 or newer. Needs Android 11 or newer.</string>
     <string name="harden_safe_boot">Block safe mode</string>
     <string name="harden_safe_boot_desc">Safe mode would otherwise disable third-party apps on reboot.</string>
     <string name="harden_factory_reset">Block factory reset and new users</string>
     <string name="harden_factory_reset_desc">Closes the last bypass routes. adb stays available as the only way out.</string>
     <string name="harden_apps_control">Block managing apps in Settings</string>
-    <string name="harden_apps_control_desc">The only thing that stops Clear data wiping your passkey. Also stops you managing any other app from Settings.</string>
+    <string name="harden_apps_control_desc">Off by default, because it applies to every app on the device: you would not be able to uninstall, force-stop or clear data for any of them, not just the blocked ones. Killit\'s own data is already protected without it.</string>
     <string name="harden_date_time">Block changing date and time</string>
     <string name="harden_date_time_desc">The removal countdown is measured against the clock. Without this it can be skipped by moving the date forward.</string>
 
@@ -153,7 +164,7 @@
     <string name="pair_remove_scan_body">Point the camera at the approval code on their screen. %1$s left.</string>
     <string name="pair_remove_code_description">Removal request code</string>
     <string name="pair_warning_title">This cannot be undone on your own</string>
-    <string name="pair_warning_body">Once this device has a companion:\n\n• Your PIN, pattern or password stops working. The only way in is a companion approving from their phone, in person.\n• Every companion must approve — not just one.\n• Removing Dizdar becomes unavailable until all companions are removed.\n• Removing a companion needs that companion\'s approval.\n\nIf a companion phone is lost, wiped or reinstalled, this device can no longer be opened and Dizdar can no longer be removed. The only remaining option is a factory reset from Recovery Mode, which erases everything on it.</string>
+    <string name="pair_warning_body">Once this device has a companion:\n\n• Your PIN, pattern or password stops working. The only way in is a companion approving from their phone, in person.\n• Every companion must approve — not just one.\n• Removing Killit becomes unavailable until all companions are removed.\n• Removing a companion needs that companion\'s approval.\n\nIf a companion phone is lost, wiped or reinstalled, this device can no longer be opened and Killit can no longer be removed. The only remaining option is a factory reset from Recovery Mode, which erases everything on it.</string>
     <string name="pair_warning_accept">I understand, continue</string>
 
     <!-- Pairing flow -->
@@ -174,7 +185,7 @@
     <string name="pair_locks_other_phone">This phone is not locked</string>
     <string name="pair_locks_other_phone_desc">The phone that scans this code is the one that gets locked. Nothing on this phone changes.</string>
     <string name="pair_add_ready_title">Get the other phone ready</string>
-    <string name="pair_add_ready_body">On the other phone open Dizdar, go to Companion devices and tap “Show my code”. Then come back here.</string>
+    <string name="pair_add_ready_body">On the other phone open Killit, go to Companion devices and tap “Show my code”. Then come back here.</string>
     <string name="pair_add_ready_action">Ready — open camera</string>
     <string name="pair_add_scan_title">Scan their code</string>
     <string name="pair_add_scan_body">Point the camera at the code on the other phone\'s screen.</string>
@@ -195,7 +206,7 @@
     <string name="qr_unlock_progress">%1$d of %2$d approved · %3$s left</string>
     <string name="qr_unlock_waiting_on">Still waiting on</string>
     <string name="qr_unlock_show_title">Show this to %1$s</string>
-    <string name="qr_unlock_show_body">On their phone: Dizdar → Approve another phone. Once they have scanned it, tap below.</string>
+    <string name="qr_unlock_show_body">On their phone: Killit → Approve another phone. Once they have scanned it, tap below.</string>
     <string name="qr_unlock_scan_title">Scan what %1$s shows back</string>
     <string name="qr_unlock_scan_body">Point the camera at the approval code on their screen.</string>
     <string name="qr_session_expired">This request ran out of time.</string>
@@ -206,7 +217,7 @@
     <string name="qr_approve_code_description">Your approval code</string>
 
     <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">That is a Dizdar code, but not the one this screen is waiting for.</string>
+    <string name="scan_wrong_kind">That is a Killit code, but not the one this screen is waiting for.</string>
     <string name="scan_expired">That request has expired. Start a new one.</string>
     <string name="scan_bad_signature">That approval did not check out.</string>
     <string name="scan_unknown_peer">That phone is not a companion of this device.</string>
@@ -217,14 +228,14 @@
     <string name="scan_self_pairing">A device cannot be its own companion.</string>
 
     <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">%1$d device(s) can only be opened with this phone\'s approval, and the key that gives it lives here and nowhere else. Removing Dizdar, uninstalling it or clearing its data would destroy that key and leave those devices unopenable — a factory reset from Recovery Mode would be all they had left. Those devices have to remove this phone as a companion first.</string>
+    <string name="home_guardian_release_blocked">%1$d device(s) can only be opened with this phone\'s approval, and the key that gives it lives here and nowhere else. Removing Killit, uninstalling it or clearing its data would destroy that key and leave those devices unopenable — a factory reset from Recovery Mode would be all they had left. Those devices have to remove this phone as a companion first.</string>
 
     <!-- Tamper recovery -->
-    <string name="tamper_title">Dizdar data was cleared</string>
-    <string name="tamper_body">Apps are still blocked, but the passkey is gone, so Dizdar cannot verify who you are. It will not unblock anything in this state.\n\nTo recover, remove Dizdar as Device Owner from a computer. That releases every blocked app:</string>
+    <string name="tamper_title">Killit data was cleared</string>
+    <string name="tamper_body">Apps are still blocked, but the passkey is gone, so Killit cannot verify who you are. It will not unblock anything in this state.\n\nTo recover, remove Killit as Device Owner from a computer. That releases every blocked app:</string>
 
     <!-- Provisioning success -->
-    <string name="compliance_title">Dizdar is ready</string>
-    <string name="compliance_body">Dizdar is now the Device Owner of this device.</string>
+    <string name="compliance_title">Killit is ready</string>
+    <string name="compliance_body">Killit is now the Device Owner of this device.</string>
     <string name="compliance_continue">Continue</string>
 </resources>

@@ -1,0 +1,231 @@
+<!--
+    German. Translated from values/strings.xml; the names and the order match it one for one, so
+    the two can be diffed side by side when a string changes.
+
+    "Killit", "Shizuku", "adb", "QR" and "Android" are left as they are: they are names, not words.
+-->
+<resources>
+    <string name="app_name">Killit</string>
+
+    <string name="duration_d_h">%1$dT %2$dStd</string>
+    <string name="duration_h_m">%1$dStd %2$dMin</string>
+    <string name="duration_m_s">%1$dMin %2$dSek</string>
+    <string name="duration_s">%1$dSek</string>
+
+    <!-- Generic -->
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">OK</string>
+    <string name="back">Zurück</string>
+    <string name="done">Fertig</string>
+    <string name="save">Speichern</string>
+    <string name="discard">Verwerfen</string>
+    <string name="copy">Kopieren</string>
+    <string name="copied">In die Zwischenablage kopiert</string>
+    <string name="show">Anzeigen</string>
+    <string name="hide">Ausblenden</string>
+
+    <!-- Auth gate -->
+    <string name="gate_title">Schlüssel eingeben</string>
+    <string name="gate_subtitle">Killit kann jede von dir blockierte App wieder freigeben — deshalb bleibt es selbst gesperrt.</string>
+    <string name="gate_wrong">Falscher Schlüssel. Verbleibende Versuche bis zur Sperre: %1$d.</string>
+    <string name="gate_wrong_generic">Falscher Schlüssel.</string>
+    <string name="gate_locked_out">Zu viele Versuche. Versuche es in %1$s erneut.</string>
+
+    <!-- Credential setup -->
+    <string name="setup_title">Sperrmethode wählen</string>
+    <string name="setup_subtitle">Dieser Schlüssel schützt Killit selbst. Wer daran vorbeikommt, kann deine Apps freigeben.</string>
+    <string name="setup_method_pin">PIN</string>
+    <string name="setup_method_pin_desc">4 bis 8 Ziffern</string>
+    <string name="setup_method_password">Passwort</string>
+    <string name="setup_method_password_desc">Mindestens 4 Zeichen</string>
+    <string name="setup_method_pattern">Muster</string>
+    <string name="setup_method_pattern_desc">Mindestens 4 Punkte verbinden</string>
+    <string name="setup_enter">%1$s festlegen</string>
+    <string name="setup_confirm">%1$s bestätigen</string>
+    <string name="setup_mismatch">Die beiden stimmen nicht überein. Fang noch einmal an.</string>
+    <string name="setup_too_short_pin">Verwende mindestens 4 Ziffern.</string>
+    <string name="setup_too_short_password">Verwende mindestens 4 Zeichen.</string>
+    <string name="setup_too_short_pattern">Verbinde mindestens 4 Punkte.</string>
+    <string name="setup_change_title">Schlüssel ändern</string>
+    <string name="setup_saved">Schlüssel festgelegt.</string>
+
+    <!-- Home -->
+    <string name="home_status_owner_yes">Geräteeigentümer aktiv</string>
+    <string name="home_status_owner_no">Kein Geräteeigentümer</string>
+    <string name="home_status_owner_yes_desc">Killit kann Apps blockieren und freigeben.</string>
+    <string name="home_status_owner_no_desc">Killit kann nichts blockieren, solange es nicht als Geräteeigentümer eingerichtet ist. Wähle einen der drei Wege unten.</string>
+    <string name="home_blocked_count">Blockierte Apps: %1$d</string>
+    <string name="home_manage_apps">Apps zum Blockieren wählen</string>
+    <string name="home_manage_apps_locked">Zuerst unten einrichten</string>
+    <string name="home_change_passkey">Schlüssel ändern</string>
+    <string name="home_language">Sprache</string>
+    <string name="language_system">Systemstandard</string>
+    <string name="home_hardening">Manipulationsschutz</string>
+    <string name="home_release">Alles freigeben &amp; Admin entfernen</string>
+    <string name="home_release_confirm_title">Wartezeit starten?</string>
+    <string name="home_release_confirm_body">Killit zu entfernen geschieht nicht sofort. Ein Druck hierauf startet einen Countdown; erst wenn er abgelaufen ist, können die Apps freigegeben werden und Killit die Geräteeigentümerschaft abgeben. Während der Wartezeit kannst du jederzeit abbrechen.</string>
+    <string name="home_release_start">Countdown starten</string>
+    <string name="home_release_pending_title">Entfernung ausstehend</string>
+    <string name="home_release_pending_body">Killit kann in %1$s entfernt werden. Bis dahin bleibt alles blockiert.</string>
+    <string name="home_release_cancel">Entfernung abbrechen</string>
+    <string name="home_release_ready_title">Bereit zum Entfernen</string>
+    <string name="home_release_ready_body">Die Wartezeit ist vorbei. Killit kann jetzt alles freigeben und die Geräteeigentümerschaft abgeben.</string>
+    <string name="home_release_now">Jetzt entfernen</string>
+    <string name="home_release_now_confirm_title">Killit als Geräteeigentümer entfernen?</string>
+    <string name="home_release_now_confirm_body">Zuerst wird jede blockierte App freigegeben, dann gibt Killit seine Geräteeigentümer-Rechte ab. Eine erneute Einrichtung erfordert das Zurücksetzen auf Werkseinstellungen. Fortfahren?</string>
+
+    <!-- Provisioning -->
+    <string name="prov_section_title">Schutz einschalten</string>
+    <string name="prov_precondition">Alle drei Methoden brauchen ein Gerät ohne angemeldete Konten und ohne bestehenden Geräteeigentümer. Auf einem bereits genutzten Gerät bedeutet das ein Zurücksetzen auf Werkseinstellungen.</string>
+
+    <string name="prov_adb_name">1. Computer (adb)</string>
+    <string name="prov_adb_short">Ein USB-Kabel verwenden</string>
+    <string name="prov_adb_intro">Schließe dieses Telefon an einen Computer an, um den Schutz einzuschalten.</string>
+    <string name="prov_adb_step_1">Aktiviere USB-Debugging in den Entwickleroptionen und schließe dieses Telefon an einen Computer an.</string>
+    <string name="prov_adb_step_2">Führe diesen Befehl auf dem Computer aus:</string>
+    <string name="prov_adb_step_3">Wenn Success erscheint, komm hierher zurück und tippe auf Status aktualisieren.</string>
+
+    <string name="prov_shizuku_name">2. Shizuku-App</string>
+    <string name="prov_shizuku_short">Eine andere App nutzen, ohne Computer</string>
+    <string name="prov_shizuku_intro">Nutze die kostenlose App Shizuku, um den Schutz einzuschalten.</string>
+    <string name="prov_shizuku_step_1">Installiere Shizuku und starte es über kabelloses Debugging.</string>
+    <string name="prov_shizuku_step_2">Komm hierher zurück und tippe auf die Schaltfläche unten.</string>
+    <string name="prov_shizuku_step_3">Erteile Shizuku die Berechtigung, wenn es danach fragt.</string>
+    <string name="prov_shizuku_run">Über Shizuku zum Geräteeigentümer machen</string>
+    <string name="prov_shizuku_not_running">Shizuku läuft nicht. Starte es zuerst.</string>
+    <string name="prov_shizuku_old">Diese Shizuku-Version ist zu alt. Aktualisiere sie.</string>
+    <string name="prov_shizuku_denied">Shizuku-Berechtigung verweigert.</string>
+    <string name="prov_shizuku_working">Shizuku wird gefragt…</string>
+
+    <string name="prov_qr_name">3. QR-Code</string>
+    <string name="prov_qr_short">Von einem anderen Telefon einrichten</string>
+    <string name="prov_qr_intro">Richte dieses Telefon über den Android-Einrichtungsassistenten ein.</string>
+    <string name="prov_qr_step_1">Setze dieses Telefon auf Werkseinstellungen zurück.</string>
+    <string name="prov_qr_step_2">Tippe auf dem Willkommensbildschirm 6-mal auf dieselbe Stelle, um den QR-Scanner zu öffnen.</string>
+    <string name="prov_qr_step_3">Scanne den Code von der Killit-Website. Das Telefon lädt Killit herunter und richtet es in einem Schritt ein.</string>
+
+    <string name="prov_result_title">Einrichtungsergebnis</string>
+    <string name="prov_refresh">Status aktualisieren</string>
+
+    <!-- App list -->
+    <string name="apps_title">Apps</string>
+    <string name="apps_search">Apps suchen</string>
+    <string name="apps_tab_user">Installiert</string>
+    <string name="apps_tab_system">System</string>
+    <string name="apps_show_all">Pakete ohne Startsymbol anzeigen</string>
+    <string name="apps_empty">Keine App passt.</string>
+    <string name="apps_save_pending">Ausstehende Änderungen: %1$d</string>
+    <string name="apps_saved">Gespeichert.</string>
+    <string name="apps_discard_title">Änderungen verwerfen?</string>
+    <string name="apps_discard_body">Du hast ungespeicherte Änderungen. Verlassen, ohne sie anzuwenden?</string>
+    <string name="apps_failed_title">Diese Apps lassen sich nicht blockieren</string>
+    <string name="apps_failed_body">Android hat es abgelehnt, die folgenden Pakete zu sperren, sie bleiben daher frei:</string>
+    <string name="apps_needs_owner">Killit braucht Geräteeigentümer-Rechte, bevor es irgendetwas blockieren kann.</string>
+
+    <!-- Hardening -->
+    <string name="harden_uninstall">Deinstallation von Killit blockieren</string>
+    <string name="harden_uninstall_desc">Verhindert, dass Killit entfernt wird, um die Sperre zu umgehen.</string>
+    <string name="harden_force_stop">Beenden erzwingen für Killit blockieren</string>
+    <string name="harden_force_stop_desc">Deaktiviert „Beenden erzwingen“ in den Einstellungen und blockiert ab Android 13 auch „Daten löschen“. Erfordert Android 11 oder neuer.</string>
+    <string name="harden_safe_boot">Abgesicherten Modus blockieren</string>
+    <string name="harden_safe_boot_desc">Sonst würde der abgesicherte Modus Dritt-Apps beim Neustart deaktivieren.</string>
+    <string name="harden_factory_reset">Zurücksetzen und neue Nutzer blockieren</string>
+    <string name="harden_factory_reset_desc">Schließt die letzten Umgehungswege. adb bleibt als einziger Ausweg verfügbar.</string>
+    <string name="harden_apps_control">App-Verwaltung in den Einstellungen blockieren</string>
+    <string name="harden_apps_control_desc">Standardmäßig aus, denn es gilt für jede App auf dem Gerät: du könntest keine einzige deinstallieren, zwangsbeenden oder deren Daten löschen — nicht nur die blockierten. Killits eigene Daten sind auch ohne dies geschützt.</string>
+    <string name="harden_date_time">Ändern von Datum und Uhrzeit blockieren</string>
+    <string name="harden_date_time_desc">Der Countdown zum Entfernen wird an der Uhr gemessen. Ohne dies lässt er sich überspringen, indem man das Datum vorstellt.</string>
+
+    <!-- Pairing -->
+    <string name="pair_qr_failed">Der QR-Code konnte nicht gezeichnet werden.</string>
+    <string name="pair_camera_permission">Kamerazugriff erlauben</string>
+    <string name="scan_camera_back">Rückseite</string>
+    <string name="scan_camera_front">Vorderseite</string>
+    <string name="pair_title">Begleitgeräte</string>
+    <string name="pair_entry">Begleitgeräte</string>
+    <string name="pair_code_description">Kopplungscode dieses Geräts</string>
+    <string name="pair_list_title">Gekoppelt: %1$d</string>
+    <string name="pair_list_all_required">Jedes einzelne muss zustimmen, bevor dieses Gerät sich öffnet.</string>
+    <string name="pair_remove">Entfernen</string>
+    <string name="pair_remove_title">%1$s entfernen?</string>
+    <string name="pair_remove_body">%1$s muss der Entfernung zustimmen — du brauchst dieses Telefon vor dir. Das ist der einzige Weg, eine Kopplung rückgängig zu machen.</string>
+    <string name="pair_remove_start">Weiter</string>
+    <string name="pair_remove_show_title">Zeige dies %1$s</string>
+    <string name="pair_remove_show_body">%1$s scannt dies, um der Entfernung zuzustimmen. Noch %2$s.</string>
+    <string name="pair_remove_scan_title">Scanne, was %1$s zurückzeigt</string>
+    <string name="pair_remove_scan_body">Richte die Kamera auf den Bestätigungscode auf ihrem Bildschirm. Noch %1$s.</string>
+    <string name="pair_remove_code_description">Code der Entfernungsanfrage</string>
+    <string name="pair_warning_title">Das kannst du nicht allein rückgängig machen</string>
+    <string name="pair_warning_body">Sobald dieses Gerät ein Begleitgerät hat:\n\n• Deine PIN, dein Muster oder dein Passwort funktioniert nicht mehr. Der einzige Weg hinein ist die Zustimmung eines Begleitgeräts, persönlich von dessen Telefon aus.\n• Jedes Begleitgerät muss zustimmen — nicht nur eines.\n• Killit zu entfernen ist nicht mehr möglich, bis alle Begleitgeräte entfernt sind.\n• Ein Begleitgerät zu entfernen erfordert die Zustimmung genau dieses Geräts.\n\nGeht ein Begleittelefon verloren, wird es gelöscht oder neu installiert, lässt sich dieses Gerät nicht mehr öffnen und Killit nicht mehr entfernen. Die einzige verbleibende Möglichkeit ist ein Zurücksetzen auf Werkseinstellungen aus dem Wiederherstellungsmodus, das alles darauf löscht.</string>
+    <string name="pair_warning_accept">Verstanden, weiter</string>
+
+    <!-- Pairing flow -->
+    <string name="pair_step_indicator">Schritt %1$d von %2$d</string>
+    <string name="pair_scanned_next">Sie haben gescannt — Kamera öffnen</string>
+    <string name="pair_back_to_code">Zurück zu meinem Code</string>
+    <string name="pair_hub_subtitle">Kopplung wirkt nur in eine Richtung. Hier ein Begleitgerät hinzuzufügen ändert nichts auf dessen Telefon, und wenn es dich hinzufügt, ändert das nichts auf deinem.</string>
+
+    <string name="pair_role_lock_title">Dieses Telefon sperren</string>
+    <string name="pair_role_lock_desc">Du scannst ihren Code. Dieses Telefon öffnet sich danach nur noch mit ihrer Zustimmung.</string>
+    <string name="pair_role_companion_title">Begleitgerät eines anderen Telefons sein</string>
+    <string name="pair_role_companion_desc">Sie scannen deinen Code. Dieses Telefon wird nicht gesperrt und ändert sich nicht.</string>
+
+    <string name="pair_locks_this_phone">Dieses Telefon wird gesperrt</string>
+    <string name="pair_locks_this_phone_desc">Sobald du ihren Code scannst, braucht dieses Telefon bei jedem Öffnen ihre Zustimmung. Das andere Telefon ändert sich nicht.</string>
+    <string name="pair_locks_other_phone">Dieses Telefon wird nicht gesperrt</string>
+    <string name="pair_locks_other_phone_desc">Gesperrt wird das Telefon, das diesen Code scannt. Auf diesem Telefon ändert sich nichts.</string>
+    <string name="pair_add_ready_title">Das andere Telefon vorbereiten</string>
+    <string name="pair_add_ready_body">Öffne auf dem anderen Telefon Killit, geh zu Begleitgeräte und tippe auf „Meinen Code anzeigen“. Komm dann hierher zurück.</string>
+    <string name="pair_add_ready_action">Bereit — Kamera öffnen</string>
+    <string name="pair_add_scan_title">Ihren Code scannen</string>
+    <string name="pair_add_scan_body">Richte die Kamera auf den Code auf dem Bildschirm des anderen Telefons.</string>
+    <string name="pair_add_done_title">%1$s ist jetzt ein Begleitgerät</string>
+    <string name="pair_add_done_body">Dieses Telefon öffnet sich von nun an nur mit der Zustimmung eines Begleitgeräts.</string>
+    <string name="pair_add_another">Weiteres Begleitgerät hinzufügen</string>
+    <string name="pair_show_title">Dein Code</string>
+    <string name="pair_show_body">Lass das andere Telefon dies scannen. Auf diesem Telefon ändert sich nichts.</string>
+
+    <!-- QR gate -->
+    <string name="qr_gate_title">Zustimmung eines Begleitgeräts nötig</string>
+    <string name="qr_choose_unlock">Dieses Telefon entsperren</string>
+    <string name="qr_choose_unlock_desc">Zeige deinen Begleitgeräten einen Code und scanne, was sie zurückzeigen. Alle müssen zustimmen (%1$d).</string>
+    <string name="qr_choose_approve">Ein anderes Telefon freigeben</string>
+    <string name="qr_choose_approve_desc">Jemand anderes braucht deine Zustimmung, um sein Telefon zu öffnen. Deines öffnet das nicht.</string>
+    <string name="qr_unlock_restart">Neu beginnen</string>
+    <string name="qr_unlock_code_description">Code der Zustimmungsanfrage</string>
+    <string name="qr_unlock_progress">Zugestimmt: %1$d von %2$d · noch %3$s</string>
+    <string name="qr_unlock_waiting_on">Es fehlt noch</string>
+    <string name="qr_unlock_show_title">Zeige dies %1$s</string>
+    <string name="qr_unlock_show_body">Auf ihrem Telefon: Killit → Ein anderes Telefon freigeben. Sobald sie gescannt haben, tippe unten.</string>
+    <string name="qr_unlock_scan_title">Scanne, was %1$s zurückzeigt</string>
+    <string name="qr_unlock_scan_body">Richte die Kamera auf den Bestätigungscode auf ihrem Bildschirm.</string>
+    <string name="qr_session_expired">Für diese Anfrage ist die Zeit abgelaufen.</string>
+    <string name="qr_approve_scan_title">Ihren Code scannen</string>
+    <string name="qr_approve_intro">Richte die Kamera auf den Code des Telefons, das geöffnet werden soll. Die Zustimmung öffnet dieses Telefon nicht.</string>
+    <string name="qr_approve_show_title">Dies zurückzeigen</string>
+    <string name="qr_approve_ready">Halte dies vor das Telefon, das geöffnet werden soll.</string>
+    <string name="qr_approve_code_description">Dein Zustimmungscode</string>
+
+    <!-- Scan outcomes -->
+    <string name="scan_wrong_kind">Das ist ein Killit-Code, aber nicht der, auf den dieser Bildschirm wartet.</string>
+    <string name="scan_expired">Diese Anfrage ist abgelaufen. Starte eine neue.</string>
+    <string name="scan_bad_signature">Diese Zustimmung hat die Prüfung nicht bestanden.</string>
+    <string name="scan_unknown_peer">Dieses Telefon ist kein Begleitgerät dieses Geräts.</string>
+    <string name="scan_already_approved">Dieses Begleitgerät hat bereits zugestimmt.</string>
+    <string name="scan_no_key">Dieses Gerät hat keine Kopplungsidentität. Möglicherweise wurden seine Daten gelöscht.</string>
+    <string name="scan_not_device_owner">Kopplung erfordert Geräteeigentümer und lässt sich daher nicht durch Löschen der App-Daten rückgängig machen.</string>
+    <string name="scan_already_paired">Dieses Telefon ist bereits ein Begleitgerät.</string>
+    <string name="scan_self_pairing">Ein Gerät kann nicht sein eigenes Begleitgerät sein.</string>
+
+    <!-- Home, pairing entry -->
+    <string name="home_guardian_release_blocked">Geräte, die sich nur mit der Zustimmung dieses Telefons öffnen lassen: %1$d. Der Schlüssel dafür liegt hier und sonst nirgends. Killit zu entfernen, zu deinstallieren oder seine Daten zu löschen würde diesen Schlüssel vernichten und jene Geräte unöffenbar machen — ihnen bliebe nur ein Zurücksetzen auf Werkseinstellungen aus dem Wiederherstellungsmodus. Diese Geräte müssen dieses Telefon zuerst als Begleitgerät entfernen.</string>
+
+    <!-- Tamper recovery -->
+    <string name="tamper_title">Killit-Daten wurden gelöscht</string>
+    <string name="tamper_body">Die Apps sind weiterhin blockiert, aber der Schlüssel ist weg, sodass Killit nicht überprüfen kann, wer du bist. In diesem Zustand gibt es nichts frei.\n\nZum Wiederherstellen entferne Killit von einem Computer aus als Geräteeigentümer. Das gibt jede blockierte App frei:</string>
+
+    <!-- Provisioning success -->
+    <string name="compliance_title">Killit ist bereit</string>
+    <string name="compliance_body">Killit ist jetzt der Geräteeigentümer dieses Geräts.</string>
+    <string name="compliance_continue">Weiter</string>
+</resources>

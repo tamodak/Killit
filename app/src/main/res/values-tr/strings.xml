@@ -1,0 +1,231 @@
+<!--
+    Turkish. Translated from values/strings.xml; the names and the order match it one for one, so
+    the two can be diffed side by side when a string changes.
+
+    "Killit", "Shizuku", "adb", "QR" and "Android" are left as they are: they are names, not words.
+-->
+<resources>
+    <string name="app_name">Killit</string>
+
+    <string name="duration_d_h">%1$dg %2$dsa</string>
+    <string name="duration_h_m">%1$dsa %2$ddk</string>
+    <string name="duration_m_s">%1$ddk %2$dsn</string>
+    <string name="duration_s">%1$dsn</string>
+
+    <!-- Generic -->
+    <string name="cancel">İptal</string>
+    <string name="ok">Tamam</string>
+    <string name="back">Geri</string>
+    <string name="done">Bitti</string>
+    <string name="save">Kaydet</string>
+    <string name="discard">Vazgeç</string>
+    <string name="copy">Kopyala</string>
+    <string name="copied">Panoya kopyalandı</string>
+    <string name="show">Göster</string>
+    <string name="hide">Gizle</string>
+
+    <!-- Auth gate -->
+    <string name="gate_title">Şifreni gir</string>
+    <string name="gate_subtitle">Killit engellediğin her uygulamanın engelini kaldırabilir, bu yüzden kilitli kalır.</string>
+    <string name="gate_wrong">Yanlış şifre. Kilitlenmeden önce %1$d deneme hakkın kaldı.</string>
+    <string name="gate_wrong_generic">Yanlış şifre.</string>
+    <string name="gate_locked_out">Çok fazla deneme. %1$s sonra tekrar dene.</string>
+
+    <!-- Credential setup -->
+    <string name="setup_title">Bir kilit yöntemi seç</string>
+    <string name="setup_subtitle">Bu şifre Killit\'in kendisini korur. Bunu geçen herkes uygulamalarının engelini kaldırabilir.</string>
+    <string name="setup_method_pin">PIN</string>
+    <string name="setup_method_pin_desc">4 ila 8 rakam</string>
+    <string name="setup_method_password">Parola</string>
+    <string name="setup_method_password_desc">En az 4 karakter</string>
+    <string name="setup_method_pattern">Desen</string>
+    <string name="setup_method_pattern_desc">En az 4 noktayı birleştir</string>
+    <string name="setup_enter">%1$s belirle</string>
+    <string name="setup_confirm">%1$s tekrar gir</string>
+    <string name="setup_mismatch">Bunlar eşleşmedi. Baştan başla.</string>
+    <string name="setup_too_short_pin">En az 4 rakam kullan.</string>
+    <string name="setup_too_short_password">En az 4 karakter kullan.</string>
+    <string name="setup_too_short_pattern">En az 4 noktayı birleştir.</string>
+    <string name="setup_change_title">Şifreyi değiştir</string>
+    <string name="setup_saved">Şifre belirlendi.</string>
+
+    <!-- Home -->
+    <string name="home_status_owner_yes">Cihaz Sahibi etkin</string>
+    <string name="home_status_owner_no">Cihaz Sahibi değil</string>
+    <string name="home_status_owner_yes_desc">Killit uygulamaları engelleyip engelini kaldırabilir.</string>
+    <string name="home_status_owner_no_desc">Killit, Cihaz Sahibi olarak kurulmadan hiçbir şeyi engelleyemez. Aşağıdaki üç yoldan birini seç.</string>
+    <string name="home_blocked_count">%1$d uygulama engellendi</string>
+    <string name="home_manage_apps">Engellenecek uygulamaları seç</string>
+    <string name="home_manage_apps_locked">Önce aşağıdan kurulum yap</string>
+    <string name="home_change_passkey">Şifreyi değiştir</string>
+    <string name="home_language">Dil</string>
+    <string name="language_system">Sistem varsayılanı</string>
+    <string name="home_hardening">Kurcalama koruması</string>
+    <string name="home_release">Tümünün engelini kaldır ve yöneticiyi sil</string>
+    <string name="home_release_confirm_title">Bekleme süresi başlatılsın mı?</string>
+    <string name="home_release_confirm_body">Killit\'i kaldırmak anında olmaz. Buna basmak bir geri sayım başlatır; ancak süre dolduğunda uygulamaların engeli kaldırılabilir ve Killit Cihaz Sahipliğinden çıkabilir. Bekleme sırasında istediğin an iptal edebilirsin.</string>
+    <string name="home_release_start">Geri sayımı başlat</string>
+    <string name="home_release_pending_title">Kaldırma bekliyor</string>
+    <string name="home_release_pending_body">Killit %1$s sonra kaldırılabilir. O zamana kadar her şey engelli kalır.</string>
+    <string name="home_release_cancel">Kaldırmayı iptal et</string>
+    <string name="home_release_ready_title">Kaldırmaya hazır</string>
+    <string name="home_release_ready_body">Bekleme süresi doldu. Killit artık her şeyin engelini kaldırıp Cihaz Sahipliğinden çıkabilir.</string>
+    <string name="home_release_now">Şimdi kaldır</string>
+    <string name="home_release_now_confirm_title">Killit Cihaz Sahipliğinden çıkarılsın mı?</string>
+    <string name="home_release_now_confirm_body">Önce engellenen her uygulamanın engeli kaldırılır, sonra Killit Cihaz Sahibi yetkilerinden vazgeçer. Yeniden kurmak için fabrika ayarlarına dönmek gerekir. Devam edilsin mi?</string>
+
+    <!-- Provisioning -->
+    <string name="prov_section_title">Korumayı aç</string>
+    <string name="prov_precondition">Üç yöntem de, hiçbir hesabın oturum açmadığı ve mevcut bir cihaz sahibinin bulunmadığı bir cihaz gerektirir. Halihazırda kullanılan bir cihazda bu, fabrika ayarlarına dönmek demektir.</string>
+
+    <string name="prov_adb_name">1. Bilgisayar (adb)</string>
+    <string name="prov_adb_short">USB kablosu kullan</string>
+    <string name="prov_adb_intro">Korumayı açmak için bu telefonu bir bilgisayara bağla.</string>
+    <string name="prov_adb_step_1">Geliştirici seçeneklerinden USB hata ayıklamayı aç, sonra bu telefonu bir bilgisayara tak.</string>
+    <string name="prov_adb_step_2">Bu komutu bilgisayarda çalıştır:</string>
+    <string name="prov_adb_step_3">Success yazdığında buraya dön ve Durumu yenile\'ye dokun.</string>
+
+    <string name="prov_shizuku_name">2. Shizuku uygulaması</string>
+    <string name="prov_shizuku_short">Başka bir uygulama kullan, bilgisayar gerekmez</string>
+    <string name="prov_shizuku_intro">Korumayı açmak için ücretsiz Shizuku uygulamasını kullan.</string>
+    <string name="prov_shizuku_step_1">Shizuku\'yu kur ve kablosuz hata ayıklama ile başlat.</string>
+    <string name="prov_shizuku_step_2">Buraya dön ve aşağıdaki düğmeye dokun.</string>
+    <string name="prov_shizuku_step_3">Shizuku izin istediğinde izin ver.</string>
+    <string name="prov_shizuku_run">Shizuku ile Cihaz Sahibi yap</string>
+    <string name="prov_shizuku_not_running">Shizuku çalışmıyor. Önce onu başlat.</string>
+    <string name="prov_shizuku_old">Bu Shizuku sürümü çok eski. Güncelle.</string>
+    <string name="prov_shizuku_denied">Shizuku izni reddedildi.</string>
+    <string name="prov_shizuku_working">Shizuku\'ya soruluyor…</string>
+
+    <string name="prov_qr_name">3. QR kodu</string>
+    <string name="prov_qr_short">Başka bir telefondan kur</string>
+    <string name="prov_qr_intro">Bu telefonu Android kurulum sihirbazından hazırla.</string>
+    <string name="prov_qr_step_1">Bu telefonu fabrika ayarlarına döndür.</string>
+    <string name="prov_qr_step_2">Karşılama ekranında QR tarayıcıyı açmak için aynı noktaya 6 kez dokun.</string>
+    <string name="prov_qr_step_3">Killit web sitesindeki kodu tara. Telefon Killit\'i tek adımda indirip kurar.</string>
+
+    <string name="prov_result_title">Kurulum sonucu</string>
+    <string name="prov_refresh">Durumu yenile</string>
+
+    <!-- App list -->
+    <string name="apps_title">Uygulamalar</string>
+    <string name="apps_search">Uygulama ara</string>
+    <string name="apps_tab_user">Yüklü</string>
+    <string name="apps_tab_system">Sistem</string>
+    <string name="apps_show_all">Başlatıcı simgesi olmayan paketleri göster</string>
+    <string name="apps_empty">Eşleşen uygulama yok.</string>
+    <string name="apps_save_pending">%1$d bekleyen değişiklik</string>
+    <string name="apps_saved">Kaydedildi.</string>
+    <string name="apps_discard_title">Değişiklikler atılsın mı?</string>
+    <string name="apps_discard_body">Kaydedilmemiş değişikliklerin var. Uygulamadan çıkılsın mı?</string>
+    <string name="apps_failed_title">Bu uygulamalar engellenemiyor</string>
+    <string name="apps_failed_body">Android aşağıdaki paketleri askıya almayı reddetti, bu yüzden engellenmeden bırakıldılar:</string>
+    <string name="apps_needs_owner">Killit\'in bir şeyi engelleyebilmesi için önce Cihaz Sahibi yetkisi gerekir.</string>
+
+    <!-- Hardening -->
+    <string name="harden_uninstall">Killit\'in kaldırılmasını engelle</string>
+    <string name="harden_uninstall_desc">Engeli aşmak için Killit\'in silinmesini önler.</string>
+    <string name="harden_force_stop">Killit\'in zorla durdurulmasını engelle</string>
+    <string name="harden_force_stop_desc">Ayarlar\'da Zorla durdur\'u devre dışı bırakır, Android 13 ve üzerinde Verileri temizle\'yi de engeller. Android 11 veya üzeri gerekir.</string>
+    <string name="harden_safe_boot">Güvenli modu engelle</string>
+    <string name="harden_safe_boot_desc">Güvenli mod aksi halde yeniden başlatmada üçüncü taraf uygulamaları devre dışı bırakır.</string>
+    <string name="harden_factory_reset">Fabrika ayarlarını ve yeni kullanıcıları engelle</string>
+    <string name="harden_factory_reset_desc">Son atlatma yollarını kapatır. Tek çıkış yolu olarak adb açık kalır.</string>
+    <string name="harden_apps_control">Ayarlar\'da uygulama yönetimini engelle</string>
+    <string name="harden_apps_control_desc">Varsayılan olarak kapalı, çünkü cihazdaki her uygulama için geçerlidir: yalnızca engellenenler değil, hiçbirini kaldıramaz, zorla durduramaz veya verilerini temizleyemezsin. Killit\'in kendi verileri bu olmadan da korunuyor.</string>
+    <string name="harden_date_time">Tarih ve saat değişikliğini engelle</string>
+    <string name="harden_date_time_desc">Kaldırma geri sayımı saate göre ölçülür. Bu olmadan tarihi ileri alarak atlanabilir.</string>
+
+    <!-- Pairing -->
+    <string name="pair_qr_failed">QR kodu çizilemedi.</string>
+    <string name="pair_camera_permission">Kamera erişimine izin ver</string>
+    <string name="scan_camera_back">Arka</string>
+    <string name="scan_camera_front">Ön</string>
+    <string name="pair_title">Eş cihazlar</string>
+    <string name="pair_entry">Eş cihazlar</string>
+    <string name="pair_code_description">Bu cihazın eşleşme kodu</string>
+    <string name="pair_list_title">%1$d eşleşme</string>
+    <string name="pair_list_all_required">Bu cihaz açılmadan önce her birinin onaylaması gerekir.</string>
+    <string name="pair_remove">Kaldır</string>
+    <string name="pair_remove_title">%1$s kaldırılsın mı?</string>
+    <string name="pair_remove_body">%1$s kaldırılmayı onaylamalı — o telefonun yanında olması gerekir. Bir eşleşmeyi geri almanın tek yolu budur.</string>
+    <string name="pair_remove_start">Devam</string>
+    <string name="pair_remove_show_title">Bunu %1$s cihazına göster</string>
+    <string name="pair_remove_show_body">%1$s kaldırılmayı onaylamak için bunu tarar. %2$s kaldı.</string>
+    <string name="pair_remove_scan_title">%1$s cihazının gösterdiğini tara</string>
+    <string name="pair_remove_scan_body">Kamerayı ekranlarındaki onay koduna doğrult. %1$s kaldı.</string>
+    <string name="pair_remove_code_description">Kaldırma isteği kodu</string>
+    <string name="pair_warning_title">Bunu tek başına geri alamazsın</string>
+    <string name="pair_warning_body">Bu cihazın bir eş cihazı olduğunda:\n\n• PIN\'in, desenin veya parolan artık çalışmaz. Tek giriş yolu, bir eş cihazın kendi telefonundan, yüz yüze onay vermesidir.\n• Her eş cihaz onaylamalıdır — yalnızca biri değil.\n• Tüm eş cihazlar kaldırılana kadar Killit kaldırılamaz.\n• Bir eş cihazı kaldırmak, o eş cihazın onayını gerektirir.\n\nBir eş cihaz kaybolur, silinir veya yeniden kurulursa bu cihaz bir daha açılamaz ve Killit bir daha kaldırılamaz. Geriye kalan tek seçenek, her şeyi silen Kurtarma Modu\'ndan fabrika ayarlarına dönüştür.</string>
+    <string name="pair_warning_accept">Anladım, devam et</string>
+
+    <!-- Pairing flow -->
+    <string name="pair_step_indicator">Adım %1$d / %2$d</string>
+    <string name="pair_scanned_next">Taradılar — kamerayı aç</string>
+    <string name="pair_back_to_code">Koduma dön</string>
+    <string name="pair_hub_subtitle">Eşleşme tek yönlüdür. Buradan bir eş cihaz eklemek onların telefonunda hiçbir şeyi değiştirmez, onların seni eklemesi de seninkinde.</string>
+
+    <string name="pair_role_lock_title">Bu telefonu kilitle</string>
+    <string name="pair_role_lock_desc">Sen onların kodunu tararsın. Bu telefon bundan sonra yalnızca onların onayıyla açılır.</string>
+    <string name="pair_role_companion_title">Başka bir telefonun eş cihazı ol</string>
+    <string name="pair_role_companion_desc">Onlar senin kodunu tarar. Bu telefon kilitlenmez ve değişmez.</string>
+
+    <string name="pair_locks_this_phone">Kilitlenen bu telefon</string>
+    <string name="pair_locks_this_phone_desc">Onların kodunu taradığında bu telefon her açılışta onların onayına ihtiyaç duyar. Diğer telefon değişmez.</string>
+    <string name="pair_locks_other_phone">Bu telefon kilitlenmez</string>
+    <string name="pair_locks_other_phone_desc">Bu kodu tarayan telefon, kilitlenen telefondur. Bu telefonda hiçbir şey değişmez.</string>
+    <string name="pair_add_ready_title">Diğer telefonu hazırla</string>
+    <string name="pair_add_ready_body">Diğer telefonda Killit\'i aç, Eş cihazlar\'a git ve “Kodumu göster”e dokun. Sonra buraya dön.</string>
+    <string name="pair_add_ready_action">Hazır — kamerayı aç</string>
+    <string name="pair_add_scan_title">Onların kodunu tara</string>
+    <string name="pair_add_scan_body">Kamerayı diğer telefonun ekranındaki koda doğrult.</string>
+    <string name="pair_add_done_title">%1$s artık bir eş cihaz</string>
+    <string name="pair_add_done_body">Bu telefon bundan sonra yalnızca eş cihaz onayıyla açılır.</string>
+    <string name="pair_add_another">Başka bir eş cihaz ekle</string>
+    <string name="pair_show_title">Senin kodun</string>
+    <string name="pair_show_body">Diğer telefona bunu taratın. Bu telefonda hiçbir şey değişmez.</string>
+
+    <!-- QR gate -->
+    <string name="qr_gate_title">Eş cihaz onayı gerekiyor</string>
+    <string name="qr_choose_unlock">Bu telefonun kilidini aç</string>
+    <string name="qr_choose_unlock_desc">Eş cihazlarına bir kod göster ve gösterdiklerini tara. %1$d cihazın tamamı onaylamalı.</string>
+    <string name="qr_choose_approve">Başka bir telefonu onayla</string>
+    <string name="qr_choose_approve_desc">Bir başkası kendi telefonunu açmak için onayına ihtiyaç duyuyor. Bu, seninkini açmaz.</string>
+    <string name="qr_unlock_restart">Baştan başla</string>
+    <string name="qr_unlock_code_description">Onay isteği kodu</string>
+    <string name="qr_unlock_progress">%1$d / %2$d onaylandı · %3$s kaldı</string>
+    <string name="qr_unlock_waiting_on">Hâlâ bekleniyor</string>
+    <string name="qr_unlock_show_title">Bunu %1$s cihazına göster</string>
+    <string name="qr_unlock_show_body">Onların telefonunda: Killit → Başka bir telefonu onayla. Taradıktan sonra aşağıya dokun.</string>
+    <string name="qr_unlock_scan_title">%1$s cihazının gösterdiğini tara</string>
+    <string name="qr_unlock_scan_body">Kamerayı ekranlarındaki onay koduna doğrult.</string>
+    <string name="qr_session_expired">Bu isteğin süresi doldu.</string>
+    <string name="qr_approve_scan_title">Onların kodunu tara</string>
+    <string name="qr_approve_intro">Kamerayı açılması gereken telefondaki koda doğrult. Onaylamak bu telefonu açmaz.</string>
+    <string name="qr_approve_show_title">Bunu geri göster</string>
+    <string name="qr_approve_ready">Bunu açılması gereken telefona doğru tut.</string>
+    <string name="qr_approve_code_description">Onay kodun</string>
+
+    <!-- Scan outcomes -->
+    <string name="scan_wrong_kind">Bu bir Killit kodu, ama bu ekranın beklediği kod değil.</string>
+    <string name="scan_expired">Bu isteğin süresi dolmuş. Yenisini başlat.</string>
+    <string name="scan_bad_signature">Bu onay doğrulanamadı.</string>
+    <string name="scan_unknown_peer">O telefon bu cihazın eş cihazı değil.</string>
+    <string name="scan_already_approved">O eş cihaz zaten onayladı.</string>
+    <string name="scan_no_key">Bu cihazın eşleşme kimliği yok. Verileri temizlenmiş olabilir.</string>
+    <string name="scan_not_device_owner">Eşleşme Cihaz Sahibi gerektirir, bu yüzden uygulama verileri temizlenerek geri alınamaz.</string>
+    <string name="scan_already_paired">O telefon zaten bir eş cihaz.</string>
+    <string name="scan_self_pairing">Bir cihaz kendi eş cihazı olamaz.</string>
+
+    <!-- Home, pairing entry -->
+    <string name="home_guardian_release_blocked">%1$d cihaz yalnızca bu telefonun onayıyla açılabilir ve bunu veren anahtar burada, başka hiçbir yerde değil. Killit\'i kaldırmak, silmek veya verilerini temizlemek o anahtarı yok eder ve o cihazları bir daha açılamaz hale getirir — geriye yalnızca Kurtarma Modu\'ndan fabrika ayarlarına dönmek kalır. Önce o cihazların bu telefonu eş cihaz olmaktan çıkarması gerekir.</string>
+
+    <!-- Tamper recovery -->
+    <string name="tamper_title">Killit verileri temizlendi</string>
+    <string name="tamper_body">Uygulamalar hâlâ engelli, ama şifre kayboldu, bu yüzden Killit kim olduğunu doğrulayamıyor. Bu durumda hiçbir şeyin engelini kaldırmaz.\n\nKurtarmak için Killit\'i bir bilgisayardan Cihaz Sahipliğinden çıkar. Bu, engellenen her uygulamayı serbest bırakır:</string>
+
+    <!-- Provisioning success -->
+    <string name="compliance_title">Killit hazır</string>
+    <string name="compliance_body">Killit artık bu cihazın Cihaz Sahibi.</string>
+    <string name="compliance_continue">Devam</string>
+</resources>

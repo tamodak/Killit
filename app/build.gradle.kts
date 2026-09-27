@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "org.tamodak.dizdar"
+    namespace = "org.tamodak.killit"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.tamodak.dizdar"
+        applicationId = "org.tamodak.killit"
         // 26 is what the pairing design costs: ECDSA P-256 is Keystore-native from 23, but the
         // rest of the app assumes API 26 platform behaviour. A few features degrade below their
         // ceiling here — force-stop blocking needs 30, StrongBox needs 28 — and each is guarded at
@@ -22,7 +22,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        // Dizdar's meaningful tests are instrumented: the Keystore, DataStore and the device policy
+        // Killit's meaningful tests are instrumented: the Keystore, DataStore and the device policy
         // service have no JVM equivalent worth faking.
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -53,9 +53,9 @@ android {
     }
     buildFeatures {
         compose = true
-        // For IDizdarPrivilegedService, the binder interface to the Shizuku user service.
+        // For IKillitPrivilegedService, the binder interface to the Shizuku user service.
         aidl = true
-        // DizdarPrivilegedService rebuilds the admin component from BuildConfig.APPLICATION_ID
+        // KillitPrivilegedService rebuilds the admin component from BuildConfig.APPLICATION_ID
         // rather than trusting one passed over binder.
         buildConfig = true
     }

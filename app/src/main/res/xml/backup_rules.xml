@@ -7,7 +7,7 @@
     and the attribute is kept so that turning backup on later is a one-line change made deliberately
     rather than by deleting a reference.
 
-    Nothing in Dizdar should ever be backed up. The credential record and the peer list would go to
+    Nothing in Killit should ever be backed up. The credential record and the peer list would go to
     the cloud and come back on a different handset, where the Keystore key they were written against
     does not exist — restoring a lock nobody can open.
 

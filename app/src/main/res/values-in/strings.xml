@@ -1,0 +1,234 @@
+<!--
+    Indonesian. Translated from values/strings.xml; the names and the order match it one for one, so
+    the two can be diffed side by side when a string changes.
+
+    The folder is values-in, not values-id: Android's resource qualifier still uses the legacy ISO
+    code for Indonesian, and values-id would never be selected.
+
+    "Killit", "Shizuku", "adb", "QR" and "Android" are left as they are: they are names, not words.
+-->
+<resources>
+    <string name="app_name">Killit</string>
+
+    <string name="duration_d_h">%1$dh %2$dj</string>
+    <string name="duration_h_m">%1$dj %2$dmnt</string>
+    <string name="duration_m_s">%1$dmnt %2$ddtk</string>
+    <string name="duration_s">%1$ddtk</string>
+
+    <!-- Generic -->
+    <string name="cancel">Batal</string>
+    <string name="ok">OK</string>
+    <string name="back">Kembali</string>
+    <string name="done">Selesai</string>
+    <string name="save">Simpan</string>
+    <string name="discard">Buang</string>
+    <string name="copy">Salin</string>
+    <string name="copied">Disalin ke papan klip</string>
+    <string name="show">Tampilkan</string>
+    <string name="hide">Sembunyikan</string>
+
+    <!-- Auth gate -->
+    <string name="gate_title">Masukkan kunci kamu</string>
+    <string name="gate_subtitle">Killit bisa membuka blokir semua aplikasi yang kamu blokir, jadi Killit sendiri tetap terkunci.</string>
+    <string name="gate_wrong">Kunci salah. Sisa %1$d percobaan sebelum terkunci.</string>
+    <string name="gate_wrong_generic">Kunci salah.</string>
+    <string name="gate_locked_out">Terlalu banyak percobaan. Coba lagi dalam %1$s.</string>
+
+    <!-- Credential setup -->
+    <string name="setup_title">Pilih metode kunci</string>
+    <string name="setup_subtitle">Kunci ini melindungi Killit itu sendiri. Siapa pun yang melewatinya bisa membuka blokir aplikasimu.</string>
+    <string name="setup_method_pin">PIN</string>
+    <string name="setup_method_pin_desc">4 sampai 8 digit</string>
+    <string name="setup_method_password">Kata sandi</string>
+    <string name="setup_method_password_desc">Minimal 4 karakter</string>
+    <string name="setup_method_pattern">Pola</string>
+    <string name="setup_method_pattern_desc">Hubungkan minimal 4 titik</string>
+    <string name="setup_enter">Tetapkan %1$s kamu</string>
+    <string name="setup_confirm">Konfirmasi %1$s kamu</string>
+    <string name="setup_mismatch">Tidak cocok. Mulai lagi.</string>
+    <string name="setup_too_short_pin">Gunakan minimal 4 digit.</string>
+    <string name="setup_too_short_password">Gunakan minimal 4 karakter.</string>
+    <string name="setup_too_short_pattern">Hubungkan minimal 4 titik.</string>
+    <string name="setup_change_title">Ubah kunci</string>
+    <string name="setup_saved">Kunci ditetapkan.</string>
+
+    <!-- Home -->
+    <string name="home_status_owner_yes">Pemilik Perangkat aktif</string>
+    <string name="home_status_owner_no">Bukan Pemilik Perangkat</string>
+    <string name="home_status_owner_yes_desc">Killit bisa memblokir dan membuka blokir aplikasi.</string>
+    <string name="home_status_owner_no_desc">Killit tidak bisa memblokir apa pun sebelum disiapkan sebagai Pemilik Perangkat. Pilih salah satu dari tiga cara di bawah.</string>
+    <string name="home_blocked_count">%1$d aplikasi diblokir</string>
+    <string name="home_manage_apps">Pilih aplikasi untuk diblokir</string>
+    <string name="home_manage_apps_locked">Siapkan dulu di bawah</string>
+    <string name="home_change_passkey">Ubah kunci</string>
+    <string name="home_language">Bahasa</string>
+    <string name="language_system">Bawaan sistem</string>
+    <string name="home_hardening">Perlindungan dari gangguan</string>
+    <string name="home_release">Buka blokir semua &amp; hapus admin</string>
+    <string name="home_release_confirm_title">Mulai masa tunggu?</string>
+    <string name="home_release_confirm_body">Menghapus Killit tidak langsung terjadi. Menekan ini memulai hitung mundur; baru setelah selesai aplikasi bisa dibuka blokirnya dan Killit melepas Pemilik Perangkat. Kamu bisa membatalkan kapan saja selama masa tunggu.</string>
+    <string name="home_release_start">Mulai hitung mundur</string>
+    <string name="home_release_pending_title">Penghapusan tertunda</string>
+    <string name="home_release_pending_body">Killit bisa dihapus dalam %1$s. Sampai saat itu semuanya tetap diblokir.</string>
+    <string name="home_release_cancel">Batalkan penghapusan</string>
+    <string name="home_release_ready_title">Siap dihapus</string>
+    <string name="home_release_ready_body">Masa tunggu sudah selesai. Killit sekarang bisa membuka blokir semuanya dan melepas Pemilik Perangkat.</string>
+    <string name="home_release_now">Hapus sekarang</string>
+    <string name="home_release_now_confirm_title">Hapus Killit sebagai Pemilik Perangkat?</string>
+    <string name="home_release_now_confirm_body">Setiap aplikasi yang diblokir akan dibuka blokirnya dulu, lalu Killit melepas hak Pemilik Perangkat. Menyiapkannya lagi perlu reset pabrik. Lanjutkan?</string>
+
+    <!-- Provisioning -->
+    <string name="prov_section_title">Aktifkan perlindungan</string>
+    <string name="prov_precondition">Ketiga metode memerlukan perangkat tanpa akun yang masuk dan tanpa pemilik perangkat yang sudah ada. Pada perangkat yang sudah dipakai, itu berarti reset pabrik.</string>
+
+    <string name="prov_adb_name">1. Komputer (adb)</string>
+    <string name="prov_adb_short">Pakai kabel USB</string>
+    <string name="prov_adb_intro">Hubungkan ponsel ini ke komputer untuk mengaktifkan perlindungan.</string>
+    <string name="prov_adb_step_1">Aktifkan USB debugging di Opsi pengembang, lalu hubungkan ponsel ini ke komputer.</string>
+    <string name="prov_adb_step_2">Jalankan perintah ini di komputer:</string>
+    <string name="prov_adb_step_3">Saat muncul Success, kembali ke sini dan ketuk Segarkan status.</string>
+
+    <string name="prov_shizuku_name">2. Aplikasi Shizuku</string>
+    <string name="prov_shizuku_short">Pakai aplikasi lain, tanpa komputer</string>
+    <string name="prov_shizuku_intro">Gunakan aplikasi gratis Shizuku untuk mengaktifkan perlindungan.</string>
+    <string name="prov_shizuku_step_1">Pasang Shizuku dan jalankan lewat wireless debugging.</string>
+    <string name="prov_shizuku_step_2">Kembali ke sini dan ketuk tombol di bawah.</string>
+    <string name="prov_shizuku_step_3">Berikan izin ke Shizuku saat diminta.</string>
+    <string name="prov_shizuku_run">Jadikan Pemilik Perangkat lewat Shizuku</string>
+    <string name="prov_shizuku_not_running">Shizuku tidak berjalan. Jalankan dulu.</string>
+    <string name="prov_shizuku_old">Versi Shizuku ini terlalu lama. Perbarui.</string>
+    <string name="prov_shizuku_denied">Izin Shizuku ditolak.</string>
+    <string name="prov_shizuku_working">Menanyakan Shizuku…</string>
+
+    <string name="prov_qr_name">3. Kode QR</string>
+    <string name="prov_qr_short">Siapkan dari ponsel lain</string>
+    <string name="prov_qr_intro">Siapkan ponsel ini dari wizard penyiapan Android.</string>
+    <string name="prov_qr_step_1">Reset pabrik ponsel ini.</string>
+    <string name="prov_qr_step_2">Di layar sambutan, ketuk titik yang sama 6 kali untuk membuka pemindai QR.</string>
+    <string name="prov_qr_step_3">Pindai kode dari situs web Killit. Ponsel akan mengunduh dan menyiapkan Killit dalam satu langkah.</string>
+
+    <string name="prov_result_title">Hasil penyiapan</string>
+    <string name="prov_refresh">Segarkan status</string>
+
+    <!-- App list -->
+    <string name="apps_title">Aplikasi</string>
+    <string name="apps_search">Cari aplikasi</string>
+    <string name="apps_tab_user">Terpasang</string>
+    <string name="apps_tab_system">Sistem</string>
+    <string name="apps_show_all">Tampilkan paket tanpa ikon peluncur</string>
+    <string name="apps_empty">Tidak ada aplikasi yang cocok.</string>
+    <string name="apps_save_pending">%1$d perubahan tertunda</string>
+    <string name="apps_saved">Tersimpan.</string>
+    <string name="apps_discard_title">Buang perubahan?</string>
+    <string name="apps_discard_body">Ada perubahan yang belum disimpan. Keluar tanpa menerapkannya?</string>
+    <string name="apps_failed_title">Aplikasi ini tidak bisa diblokir</string>
+    <string name="apps_failed_body">Android menolak menangguhkan paket berikut, jadi semuanya dibiarkan tidak diblokir:</string>
+    <string name="apps_needs_owner">Killit memerlukan hak Pemilik Perangkat sebelum bisa memblokir apa pun.</string>
+
+    <!-- Hardening -->
+    <string name="harden_uninstall">Blokir pencopotan Killit</string>
+    <string name="harden_uninstall_desc">Mencegah Killit dihapus untuk lolos dari blokir.</string>
+    <string name="harden_force_stop">Blokir penghentian paksa Killit</string>
+    <string name="harden_force_stop_desc">Menonaktifkan Paksa berhenti di Setelan, dan juga memblokir Hapus data di Android 13 atau lebih baru. Perlu Android 11 atau lebih baru.</string>
+    <string name="harden_safe_boot">Blokir mode aman</string>
+    <string name="harden_safe_boot_desc">Kalau tidak, mode aman akan menonaktifkan aplikasi pihak ketiga saat perangkat dinyalakan ulang.</string>
+    <string name="harden_factory_reset">Blokir reset pabrik dan pengguna baru</string>
+    <string name="harden_factory_reset_desc">Menutup jalur pengelakan terakhir. adb tetap tersedia sebagai satu-satunya jalan keluar.</string>
+    <string name="harden_apps_control">Blokir pengelolaan aplikasi di Setelan</string>
+    <string name="harden_apps_control_desc">Nonaktif secara bawaan, karena berlaku untuk semua aplikasi di perangkat: kamu tidak akan bisa mencopot, menghentikan paksa, atau menghapus data aplikasi mana pun, bukan hanya yang diblokir. Data Killit sendiri sudah terlindungi tanpa ini.</string>
+    <string name="harden_date_time">Blokir perubahan tanggal dan waktu</string>
+    <string name="harden_date_time_desc">Hitung mundur penghapusan diukur dengan jam. Tanpa ini, hitung mundur bisa dilewati dengan memajukan tanggal.</string>
+
+    <!-- Pairing -->
+    <string name="pair_qr_failed">Tidak bisa menggambar kode QR.</string>
+    <string name="pair_camera_permission">Izinkan akses kamera</string>
+    <string name="scan_camera_back">Belakang</string>
+    <string name="scan_camera_front">Depan</string>
+    <string name="pair_title">Perangkat pendamping</string>
+    <string name="pair_entry">Perangkat pendamping</string>
+    <string name="pair_code_description">Kode penyandingan perangkat ini</string>
+    <string name="pair_list_title">%1$d tersanding</string>
+    <string name="pair_list_all_required">Setiap satu dari mereka harus menyetujui sebelum perangkat ini terbuka.</string>
+    <string name="pair_remove">Hapus</string>
+    <string name="pair_remove_title">Hapus %1$s?</string>
+    <string name="pair_remove_body">%1$s harus menyetujui penghapusannya — kamu perlu ponsel itu ada di depanmu. Ini satu-satunya cara membatalkan penyandingan.</string>
+    <string name="pair_remove_start">Lanjutkan</string>
+    <string name="pair_remove_show_title">Tunjukkan ini ke %1$s</string>
+    <string name="pair_remove_show_body">%1$s memindai ini untuk menyetujui penghapusannya. Sisa %2$s.</string>
+    <string name="pair_remove_scan_title">Pindai yang ditampilkan %1$s</string>
+    <string name="pair_remove_scan_body">Arahkan kamera ke kode persetujuan di layar mereka. Sisa %1$s.</string>
+    <string name="pair_remove_code_description">Kode permintaan penghapusan</string>
+    <string name="pair_warning_title">Ini tidak bisa dibatalkan sendirian</string>
+    <string name="pair_warning_body">Begitu perangkat ini punya pendamping:\n\n• PIN, pola, atau kata sandimu berhenti berfungsi. Satu-satunya jalan masuk adalah pendamping yang menyetujui dari ponsel mereka, secara langsung.\n• Setiap pendamping harus menyetujui — bukan hanya satu.\n• Menghapus Killit tidak tersedia sampai semua pendamping dihapus.\n• Menghapus seorang pendamping memerlukan persetujuan pendamping itu.\n\nJika ponsel pendamping hilang, dihapus, atau dipasang ulang, perangkat ini tidak bisa dibuka lagi dan Killit tidak bisa dihapus lagi. Satu-satunya pilihan yang tersisa adalah reset pabrik dari Mode Pemulihan, yang menghapus semua isinya.</string>
+    <string name="pair_warning_accept">Saya mengerti, lanjutkan</string>
+
+    <!-- Pairing flow -->
+    <string name="pair_step_indicator">Langkah %1$d dari %2$d</string>
+    <string name="pair_scanned_next">Mereka sudah memindainya — buka kamera</string>
+    <string name="pair_back_to_code">Kembali ke kode saya</string>
+    <string name="pair_hub_subtitle">Penyandingan berjalan satu arah. Menambahkan pendamping di sini tidak mengubah apa pun di ponsel mereka, dan mereka menambahkanmu tidak mengubah apa pun di ponselmu.</string>
+
+    <string name="pair_role_lock_title">Kunci ponsel ini</string>
+    <string name="pair_role_lock_desc">Kamu memindai kode mereka. Ponsel ini lalu hanya terbuka dengan persetujuan mereka.</string>
+    <string name="pair_role_companion_title">Jadi pendamping ponsel lain</string>
+    <string name="pair_role_companion_desc">Mereka memindai kodemu. Ponsel ini tidak terkunci dan tidak berubah.</string>
+
+    <string name="pair_locks_this_phone">Ponsel ini yang terkunci</string>
+    <string name="pair_locks_this_phone_desc">Begitu kamu memindai kode mereka, ponsel ini akan memerlukan persetujuan mereka setiap kali dibuka. Ponsel yang satunya tidak berubah.</string>
+    <string name="pair_locks_other_phone">Ponsel ini tidak terkunci</string>
+    <string name="pair_locks_other_phone_desc">Ponsel yang memindai kode ini adalah yang terkunci. Tidak ada yang berubah di ponsel ini.</string>
+    <string name="pair_add_ready_title">Siapkan ponsel yang satunya</string>
+    <string name="pair_add_ready_body">Di ponsel yang satunya buka Killit, masuk ke Perangkat pendamping, lalu ketuk “Tampilkan kode saya”. Setelah itu kembali ke sini.</string>
+    <string name="pair_add_ready_action">Siap — buka kamera</string>
+    <string name="pair_add_scan_title">Pindai kode mereka</string>
+    <string name="pair_add_scan_body">Arahkan kamera ke kode di layar ponsel yang satunya.</string>
+    <string name="pair_add_done_title">%1$s sekarang menjadi pendamping</string>
+    <string name="pair_add_done_body">Mulai sekarang ponsel ini hanya terbuka dengan persetujuan pendamping.</string>
+    <string name="pair_add_another">Tambah pendamping lain</string>
+    <string name="pair_show_title">Kode kamu</string>
+    <string name="pair_show_body">Minta ponsel yang satunya memindai ini. Tidak ada yang berubah di ponsel ini.</string>
+
+    <!-- QR gate -->
+    <string name="qr_gate_title">Perlu persetujuan pendamping</string>
+    <string name="qr_choose_unlock">Buka kunci ponsel ini</string>
+    <string name="qr_choose_unlock_desc">Tunjukkan kode ke pendampingmu dan pindai yang mereka tunjukkan kembali. Semua %1$d harus menyetujui.</string>
+    <string name="qr_choose_approve">Setujui ponsel lain</string>
+    <string name="qr_choose_approve_desc">Orang lain memerlukan persetujuanmu untuk membuka ponsel mereka. Ini tidak membuka ponselmu.</string>
+    <string name="qr_unlock_restart">Mulai lagi</string>
+    <string name="qr_unlock_code_description">Kode permintaan persetujuan</string>
+    <string name="qr_unlock_progress">%1$d dari %2$d disetujui · sisa %3$s</string>
+    <string name="qr_unlock_waiting_on">Masih menunggu</string>
+    <string name="qr_unlock_show_title">Tunjukkan ini ke %1$s</string>
+    <string name="qr_unlock_show_body">Di ponsel mereka: Killit → Setujui ponsel lain. Setelah mereka memindainya, ketuk di bawah.</string>
+    <string name="qr_unlock_scan_title">Pindai yang ditampilkan %1$s</string>
+    <string name="qr_unlock_scan_body">Arahkan kamera ke kode persetujuan di layar mereka.</string>
+    <string name="qr_session_expired">Permintaan ini kehabisan waktu.</string>
+    <string name="qr_approve_scan_title">Pindai kode mereka</string>
+    <string name="qr_approve_intro">Arahkan kamera ke kode di ponsel yang perlu dibuka. Menyetujui tidak membuka ponsel ini.</string>
+    <string name="qr_approve_show_title">Tunjukkan ini kembali</string>
+    <string name="qr_approve_ready">Hadapkan ini ke ponsel yang perlu dibuka.</string>
+    <string name="qr_approve_code_description">Kode persetujuanmu</string>
+
+    <!-- Scan outcomes -->
+    <string name="scan_wrong_kind">Itu kode Killit, tapi bukan yang ditunggu layar ini.</string>
+    <string name="scan_expired">Permintaan itu sudah kedaluwarsa. Mulai yang baru.</string>
+    <string name="scan_bad_signature">Persetujuan itu tidak lolos pemeriksaan.</string>
+    <string name="scan_unknown_peer">Ponsel itu bukan pendamping perangkat ini.</string>
+    <string name="scan_already_approved">Pendamping itu sudah menyetujui.</string>
+    <string name="scan_no_key">Perangkat ini tidak punya identitas penyandingan. Datanya mungkin sudah dihapus.</string>
+    <string name="scan_not_device_owner">Penyandingan memerlukan Pemilik Perangkat, jadi tidak bisa dibatalkan dengan menghapus data aplikasi.</string>
+    <string name="scan_already_paired">Ponsel itu sudah menjadi pendamping.</string>
+    <string name="scan_self_pairing">Sebuah perangkat tidak bisa menjadi pendamping dirinya sendiri.</string>
+
+    <!-- Home, pairing entry -->
+    <string name="home_guardian_release_blocked">%1$d perangkat hanya bisa dibuka dengan persetujuan ponsel ini, dan kunci yang memberikannya ada di sini dan tidak di tempat lain. Menghapus Killit, mencopotnya, atau menghapus datanya akan memusnahkan kunci itu dan membuat perangkat-perangkat tersebut tidak bisa dibuka lagi — yang tersisa bagi mereka hanya reset pabrik dari Mode Pemulihan. Perangkat-perangkat itu harus menghapus ponsel ini sebagai pendamping terlebih dahulu.</string>
+
+    <!-- Tamper recovery -->
+    <string name="tamper_title">Data Killit telah dihapus</string>
+    <string name="tamper_body">Aplikasi masih diblokir, tetapi kuncinya hilang, jadi Killit tidak bisa memverifikasi siapa kamu. Dalam keadaan ini Killit tidak akan membuka blokir apa pun.\n\nUntuk memulihkan, hapus Killit sebagai Pemilik Perangkat dari komputer. Itu akan melepaskan semua aplikasi yang diblokir:</string>
+
+    <!-- Provisioning success -->
+    <string name="compliance_title">Killit siap</string>
+    <string name="compliance_body">Killit sekarang menjadi Pemilik Perangkat pada perangkat ini.</string>
+    <string name="compliance_continue">Lanjutkan</string>
+</resources>

@@ -1,9 +1,9 @@
 # Shizuku starts the user service in a separate, shell-privileged process and resolves it by the
-# class name Dizdar hands over in UserServiceArgs. R8 would otherwise rename or strip it, and the
+# class name Killit hands over in UserServiceArgs. R8 would otherwise rename or strip it, and the
 # failure only shows up at provisioning time on a real device.
--keep class org.tamodak.dizdar.admin.provisioning.DizdarPrivilegedService { *; }
+-keep class org.tamodak.killit.admin.provisioning.KillitPrivilegedService { *; }
 
 # Both ends of the binder call live in this APK, but the AIDL stub is matched by its descriptor
 # string and fixed transaction ids — including destroy() = 16777114, which Shizuku itself calls.
--keep interface org.tamodak.dizdar.admin.provisioning.IDizdarPrivilegedService { *; }
--keep class org.tamodak.dizdar.admin.provisioning.IDizdarPrivilegedService$* { *; }
+-keep interface org.tamodak.killit.admin.provisioning.IKillitPrivilegedService { *; }
+-keep class org.tamodak.killit.admin.provisioning.IKillitPrivilegedService$* { *; }

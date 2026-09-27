@@ -6,7 +6,7 @@
         its first frame — around a third of a second on a budget device. Without a matching
         windowBackground that gap is a white flash before the app appears.
     -->
-    <style name="Theme.Dizdar" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Killit" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/window_background</item>
     </style>
 </resources>

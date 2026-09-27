@@ -1,0 +1,231 @@
+<!--
+    Russian. Translated from values/strings.xml; the names and the order match it one for one, so
+    the two can be diffed side by side when a string changes.
+
+    "Killit", "Shizuku", "adb", "QR" and "Android" are left as they are: they are names, not words.
+-->
+<resources>
+    <string name="app_name">Killit</string>
+
+    <string name="duration_d_h">%1$dд %2$dч</string>
+    <string name="duration_h_m">%1$dч %2$dм</string>
+    <string name="duration_m_s">%1$dм %2$dс</string>
+    <string name="duration_s">%1$dс</string>
+
+    <!-- Generic -->
+    <string name="cancel">Отмена</string>
+    <string name="ok">ОК</string>
+    <string name="back">Назад</string>
+    <string name="done">Готово</string>
+    <string name="save">Сохранить</string>
+    <string name="discard">Отклонить</string>
+    <string name="copy">Копировать</string>
+    <string name="copied">Скопировано в буфер обмена</string>
+    <string name="show">Показать</string>
+    <string name="hide">Скрыть</string>
+
+    <!-- Auth gate -->
+    <string name="gate_title">Введите ключ</string>
+    <string name="gate_subtitle">Killit может разблокировать любое заблокированное вами приложение, поэтому сам остаётся под замком.</string>
+    <string name="gate_wrong">Неверный ключ. Осталось попыток до блокировки: %1$d.</string>
+    <string name="gate_wrong_generic">Неверный ключ.</string>
+    <string name="gate_locked_out">Слишком много попыток. Повторите через %1$s.</string>
+
+    <!-- Credential setup -->
+    <string name="setup_title">Выберите способ блокировки</string>
+    <string name="setup_subtitle">Этот ключ защищает сам Killit. Любой, кто его пройдёт, сможет разблокировать ваши приложения.</string>
+    <string name="setup_method_pin">PIN-код</string>
+    <string name="setup_method_pin_desc">От 4 до 8 цифр</string>
+    <string name="setup_method_password">Пароль</string>
+    <string name="setup_method_password_desc">Не менее 4 символов</string>
+    <string name="setup_method_pattern">Графический ключ</string>
+    <string name="setup_method_pattern_desc">Соедините не менее 4 точек</string>
+    <string name="setup_enter">Задайте %1$s</string>
+    <string name="setup_confirm">Подтвердите %1$s</string>
+    <string name="setup_mismatch">Не совпадают. Начните заново.</string>
+    <string name="setup_too_short_pin">Используйте не менее 4 цифр.</string>
+    <string name="setup_too_short_password">Используйте не менее 4 символов.</string>
+    <string name="setup_too_short_pattern">Соедините не менее 4 точек.</string>
+    <string name="setup_change_title">Сменить ключ</string>
+    <string name="setup_saved">Ключ задан.</string>
+
+    <!-- Home -->
+    <string name="home_status_owner_yes">Владелец устройства активен</string>
+    <string name="home_status_owner_no">Не владелец устройства</string>
+    <string name="home_status_owner_yes_desc">Killit может блокировать и разблокировать приложения.</string>
+    <string name="home_status_owner_no_desc">Killit ничего не сможет заблокировать, пока не будет назначен владельцем устройства. Выберите один из трёх способов ниже.</string>
+    <string name="home_blocked_count">Заблокировано приложений: %1$d</string>
+    <string name="home_manage_apps">Выбрать приложения для блокировки</string>
+    <string name="home_manage_apps_locked">Сначала настройте ниже</string>
+    <string name="home_change_passkey">Сменить ключ</string>
+    <string name="home_language">Язык</string>
+    <string name="language_system">Системный по умолчанию</string>
+    <string name="home_hardening">Защита от вмешательства</string>
+    <string name="home_release">Разблокировать всё и снять админа</string>
+    <string name="home_release_confirm_title">Начать период ожидания?</string>
+    <string name="home_release_confirm_body">Удаление Killit происходит не сразу. Нажатие запускает обратный отсчёт; только когда он закончится, приложения можно будет разблокировать, а Killit сможет отказаться от прав владельца устройства. Во время ожидания можно отменить в любой момент.</string>
+    <string name="home_release_start">Запустить отсчёт</string>
+    <string name="home_release_pending_title">Удаление ожидается</string>
+    <string name="home_release_pending_body">Killit можно будет удалить через %1$s. До этого всё остаётся заблокированным.</string>
+    <string name="home_release_cancel">Отменить удаление</string>
+    <string name="home_release_ready_title">Готов к удалению</string>
+    <string name="home_release_ready_body">Период ожидания закончился. Killit теперь может всё разблокировать и отказаться от прав владельца устройства.</string>
+    <string name="home_release_now">Удалить сейчас</string>
+    <string name="home_release_now_confirm_title">Снять Killit с роли владельца устройства?</string>
+    <string name="home_release_now_confirm_body">Сначала будут разблокированы все заблокированные приложения, затем Killit откажется от прав владельца устройства. Повторная настройка потребует сброса к заводским настройкам. Продолжить?</string>
+
+    <!-- Provisioning -->
+    <string name="prov_section_title">Включить защиту</string>
+    <string name="prov_precondition">Для всех трёх способов нужно устройство без вошедших аккаунтов и без уже назначенного владельца устройства. На устройстве, которым уже пользуются, это означает сброс к заводским настройкам.</string>
+
+    <string name="prov_adb_name">1. Компьютер (adb)</string>
+    <string name="prov_adb_short">Через USB-кабель</string>
+    <string name="prov_adb_intro">Подключите этот телефон к компьютеру, чтобы включить защиту.</string>
+    <string name="prov_adb_step_1">Включите отладку по USB в параметрах разработчика и подключите телефон к компьютеру.</string>
+    <string name="prov_adb_step_2">Выполните эту команду на компьютере:</string>
+    <string name="prov_adb_step_3">Когда появится Success, вернитесь сюда и нажмите «Обновить статус».</string>
+
+    <string name="prov_shizuku_name">2. Приложение Shizuku</string>
+    <string name="prov_shizuku_short">Через другое приложение, без компьютера</string>
+    <string name="prov_shizuku_intro">Используйте бесплатное приложение Shizuku, чтобы включить защиту.</string>
+    <string name="prov_shizuku_step_1">Установите Shizuku и запустите его через беспроводную отладку.</string>
+    <string name="prov_shizuku_step_2">Вернитесь сюда и нажмите кнопку ниже.</string>
+    <string name="prov_shizuku_step_3">Выдайте Shizuku разрешение, когда он его запросит.</string>
+    <string name="prov_shizuku_run">Назначить владельцем устройства через Shizuku</string>
+    <string name="prov_shizuku_not_running">Shizuku не запущен. Сначала запустите его.</string>
+    <string name="prov_shizuku_old">Эта версия Shizuku слишком старая. Обновите её.</string>
+    <string name="prov_shizuku_denied">Разрешение Shizuku отклонено.</string>
+    <string name="prov_shizuku_working">Запрос к Shizuku…</string>
+
+    <string name="prov_qr_name">3. QR-код</string>
+    <string name="prov_qr_short">Настроить с другого телефона</string>
+    <string name="prov_qr_intro">Настройте этот телефон через мастер первоначальной настройки Android.</string>
+    <string name="prov_qr_step_1">Сбросьте этот телефон к заводским настройкам.</string>
+    <string name="prov_qr_step_2">На экране приветствия шесть раз коснитесь одного и того же места, чтобы открыть сканер QR.</string>
+    <string name="prov_qr_step_3">Отсканируйте код с сайта Killit. Телефон скачает и настроит Killit за один шаг.</string>
+
+    <string name="prov_result_title">Результат настройки</string>
+    <string name="prov_refresh">Обновить статус</string>
+
+    <!-- App list -->
+    <string name="apps_title">Приложения</string>
+    <string name="apps_search">Поиск приложений</string>
+    <string name="apps_tab_user">Установленные</string>
+    <string name="apps_tab_system">Системные</string>
+    <string name="apps_show_all">Показывать пакеты без значка запуска</string>
+    <string name="apps_empty">Нет подходящих приложений.</string>
+    <string name="apps_save_pending">Несохранённых изменений: %1$d</string>
+    <string name="apps_saved">Сохранено.</string>
+    <string name="apps_discard_title">Отменить изменения?</string>
+    <string name="apps_discard_body">Есть несохранённые изменения. Выйти, не применяя их?</string>
+    <string name="apps_failed_title">Эти приложения нельзя заблокировать</string>
+    <string name="apps_failed_body">Android отказался приостановить следующие пакеты, поэтому они остались незаблокированными:</string>
+    <string name="apps_needs_owner">Killit нужны права владельца устройства, прежде чем он сможет что-либо блокировать.</string>
+
+    <!-- Hardening -->
+    <string name="harden_uninstall">Запретить удаление Killit</string>
+    <string name="harden_uninstall_desc">Не даёт удалить Killit, чтобы обойти блокировку.</string>
+    <string name="harden_force_stop">Запретить принудительную остановку Killit</string>
+    <string name="harden_force_stop_desc">Отключает «Остановить» в настройках, а на Android 13 и новее блокирует и «Очистить данные». Требуется Android 11 или новее.</string>
+    <string name="harden_safe_boot">Запретить безопасный режим</string>
+    <string name="harden_safe_boot_desc">Иначе безопасный режим отключил бы сторонние приложения при перезагрузке.</string>
+    <string name="harden_factory_reset">Запретить сброс и новых пользователей</string>
+    <string name="harden_factory_reset_desc">Закрывает последние пути обхода. adb остаётся единственным выходом.</string>
+    <string name="harden_apps_control">Запретить управление приложениями в настройках</string>
+    <string name="harden_apps_control_desc">По умолчанию выключено, потому что действует на все приложения устройства: вы не сможете удалить, принудительно остановить или очистить данные ни одного из них, а не только заблокированных. Данные самого Killit защищены и без этого.</string>
+    <string name="harden_date_time">Запретить изменение даты и времени</string>
+    <string name="harden_date_time_desc">Обратный отсчёт до удаления измеряется по часам. Без этого его можно пропустить, переведя дату вперёд.</string>
+
+    <!-- Pairing -->
+    <string name="pair_qr_failed">Не удалось построить QR-код.</string>
+    <string name="pair_camera_permission">Разрешить доступ к камере</string>
+    <string name="scan_camera_back">Задняя</string>
+    <string name="scan_camera_front">Фронтальная</string>
+    <string name="pair_title">Устройства-компаньоны</string>
+    <string name="pair_entry">Устройства-компаньоны</string>
+    <string name="pair_code_description">Код сопряжения этого устройства</string>
+    <string name="pair_list_title">Сопряжено: %1$d</string>
+    <string name="pair_list_all_required">Каждое из них должно подтвердить, прежде чем это устройство откроется.</string>
+    <string name="pair_remove">Удалить</string>
+    <string name="pair_remove_title">Удалить %1$s?</string>
+    <string name="pair_remove_body">%1$s должен подтвердить своё удаление — этот телефон понадобится вам под рукой. Это единственный способ отменить сопряжение.</string>
+    <string name="pair_remove_start">Продолжить</string>
+    <string name="pair_remove_show_title">Покажите это устройству %1$s</string>
+    <string name="pair_remove_show_body">%1$s сканирует это, чтобы подтвердить своё удаление. Осталось %2$s.</string>
+    <string name="pair_remove_scan_title">Отсканируйте то, что покажет %1$s</string>
+    <string name="pair_remove_scan_body">Наведите камеру на код подтверждения на их экране. Осталось %1$s.</string>
+    <string name="pair_remove_code_description">Код запроса на удаление</string>
+    <string name="pair_warning_title">В одиночку это не отменить</string>
+    <string name="pair_warning_body">Как только у этого устройства появится компаньон:\n\n• Ваш PIN-код, графический ключ или пароль перестанут работать. Единственный способ войти — подтверждение компаньона с его телефона, лично.\n• Подтвердить должны все компаньоны, а не один.\n• Удалить Killit будет нельзя, пока не удалены все компаньоны.\n• Удаление компаньона требует подтверждения именно этого компаньона.\n\nЕсли телефон-компаньон потерян, очищен или переустановлен, это устройство больше не удастся открыть, а Killit — удалить. Останется только сброс к заводским настройкам из режима восстановления, который стирает на нём всё.</string>
+    <string name="pair_warning_accept">Понимаю, продолжить</string>
+
+    <!-- Pairing flow -->
+    <string name="pair_step_indicator">Шаг %1$d из %2$d</string>
+    <string name="pair_scanned_next">Они отсканировали — открыть камеру</string>
+    <string name="pair_back_to_code">Назад к моему коду</string>
+    <string name="pair_hub_subtitle">Сопряжение работает в одну сторону. Добавление компаньона здесь ничего не меняет на его телефоне, а то, что он добавит вас, ничего не изменит на вашем.</string>
+
+    <string name="pair_role_lock_title">Заблокировать этот телефон</string>
+    <string name="pair_role_lock_desc">Вы сканируете их код. После этого телефон будет открываться только с их подтверждения.</string>
+    <string name="pair_role_companion_title">Стать компаньоном другого телефона</string>
+    <string name="pair_role_companion_desc">Они сканируют ваш код. Этот телефон не блокируется и не меняется.</string>
+
+    <string name="pair_locks_this_phone">Блокируется именно этот телефон</string>
+    <string name="pair_locks_this_phone_desc">Как только вы отсканируете их код, этому телефону при каждом открытии будет нужно их подтверждение. Другой телефон не изменится.</string>
+    <string name="pair_locks_other_phone">Этот телефон не блокируется</string>
+    <string name="pair_locks_other_phone_desc">Блокируется тот телефон, который сканирует этот код. На этом телефоне ничего не меняется.</string>
+    <string name="pair_add_ready_title">Подготовьте другой телефон</string>
+    <string name="pair_add_ready_body">На другом телефоне откройте Killit, перейдите в «Устройства-компаньоны» и нажмите «Показать мой код». Затем вернитесь сюда.</string>
+    <string name="pair_add_ready_action">Готово — открыть камеру</string>
+    <string name="pair_add_scan_title">Отсканируйте их код</string>
+    <string name="pair_add_scan_body">Наведите камеру на код на экране другого телефона.</string>
+    <string name="pair_add_done_title">%1$s теперь компаньон</string>
+    <string name="pair_add_done_body">С этого момента телефон открывается только с подтверждения компаньона.</string>
+    <string name="pair_add_another">Добавить ещё компаньона</string>
+    <string name="pair_show_title">Ваш код</string>
+    <string name="pair_show_body">Дайте другому телефону отсканировать это. На этом телефоне ничего не изменится.</string>
+
+    <!-- QR gate -->
+    <string name="qr_gate_title">Нужно подтверждение компаньона</string>
+    <string name="qr_choose_unlock">Разблокировать этот телефон</string>
+    <string name="qr_choose_unlock_desc">Покажите код своим компаньонам и отсканируйте то, что они покажут в ответ. Подтвердить должны все, а их %1$d.</string>
+    <string name="qr_choose_approve">Подтвердить другой телефон</string>
+    <string name="qr_choose_approve_desc">Кому-то нужно ваше подтверждение, чтобы открыть свой телефон. Ваш при этом не откроется.</string>
+    <string name="qr_unlock_restart">Начать заново</string>
+    <string name="qr_unlock_code_description">Код запроса на подтверждение</string>
+    <string name="qr_unlock_progress">Подтверждено %1$d из %2$d · осталось %3$s</string>
+    <string name="qr_unlock_waiting_on">Всё ещё ожидается</string>
+    <string name="qr_unlock_show_title">Покажите это устройству %1$s</string>
+    <string name="qr_unlock_show_body">На их телефоне: Killit → «Подтвердить другой телефон». После того как они отсканируют, нажмите ниже.</string>
+    <string name="qr_unlock_scan_title">Отсканируйте то, что покажет %1$s</string>
+    <string name="qr_unlock_scan_body">Наведите камеру на код подтверждения на их экране.</string>
+    <string name="qr_session_expired">Время этого запроса истекло.</string>
+    <string name="qr_approve_scan_title">Отсканируйте их код</string>
+    <string name="qr_approve_intro">Наведите камеру на код телефона, который нужно открыть. Подтверждение не откроет этот телефон.</string>
+    <string name="qr_approve_show_title">Покажите это в ответ</string>
+    <string name="qr_approve_ready">Поднесите это к телефону, который нужно открыть.</string>
+    <string name="qr_approve_code_description">Ваш код подтверждения</string>
+
+    <!-- Scan outcomes -->
+    <string name="scan_wrong_kind">Это код Killit, но не тот, который ждёт этот экран.</string>
+    <string name="scan_expired">Этот запрос устарел. Создайте новый.</string>
+    <string name="scan_bad_signature">Это подтверждение не прошло проверку.</string>
+    <string name="scan_unknown_peer">Этот телефон не является компаньоном данного устройства.</string>
+    <string name="scan_already_approved">Этот компаньон уже подтвердил.</string>
+    <string name="scan_no_key">У этого устройства нет ключа сопряжения. Возможно, его данные были очищены.</string>
+    <string name="scan_not_device_owner">Для сопряжения нужны права владельца устройства, поэтому его нельзя отменить очисткой данных приложения.</string>
+    <string name="scan_already_paired">Этот телефон уже является компаньоном.</string>
+    <string name="scan_self_pairing">Устройство не может быть компаньоном самому себе.</string>
+
+    <!-- Home, pairing entry -->
+    <string name="home_guardian_release_blocked">Устройств, которые открываются только с подтверждения этого телефона: %1$d, и ключ, дающий это подтверждение, хранится здесь и больше нигде. Удаление Killit, его деинсталляция или очистка его данных уничтожат этот ключ и сделают те устройства неоткрываемыми — им останется только сброс к заводским настройкам из режима восстановления. Сначала те устройства должны удалить этот телефон из компаньонов.</string>
+
+    <!-- Tamper recovery -->
+    <string name="tamper_title">Данные Killit были очищены</string>
+    <string name="tamper_body">Приложения по-прежнему заблокированы, но ключ утрачен, поэтому Killit не может подтвердить, кто вы. В таком состоянии он ничего не разблокирует.\n\nЧтобы восстановить, снимите Killit с роли владельца устройства с компьютера. Это освободит все заблокированные приложения:</string>
+
+    <!-- Provisioning success -->
+    <string name="compliance_title">Killit готов</string>
+    <string name="compliance_body">Killit теперь владелец этого устройства.</string>
+    <string name="compliance_continue">Продолжить</string>
+</resources>

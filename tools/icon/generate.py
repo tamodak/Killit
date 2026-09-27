@@ -11,32 +11,65 @@ SS = 4
 INK = (177, 177, 177)
 TILE = (44, 44, 44)
 
-SQUIRCLE_N = 5.0
+SQUIRCLE_N = 4.0
 ART_FRAC = 0.72
 SAFE_SCALE = 72.0 / 108.0
 
-ARTWORK = Path(__file__).with_name('artwork.png')
+# The padlock, in units of its own height: the shackle's apex sits at y=0, the body's base
+# at y=1, and x runs from 0 to MOTIF_W. Drawn rather than traced from a bitmap so that every
+# density gets clean edges, and built from solid shapes rather than strokes because the
+# launcher draws this 35px tall at mdpi, where an outline would disappear.
+MOTIF_W = 0.72
+BODY_TOP = 0.47
+BODY_R = 0.11
+SHACKLE_A = 0.270     # outer semi-axis across the arch
+SHACKLE_B = 0.430     # outer semi-axis up it, and the height the arch springs from
+SHACKLE_W = 0.100
+SHACKLE_FOOT = 0.56   # where the legs stop, far enough under the body to stay hidden
+CELL = 0.15
+CELL_GAP = 0.05
+CELL_R = 0.035
 
 LEGACY_SIZES = {'mdpi': 48, 'hdpi': 72, 'xhdpi': 96, 'xxhdpi': 144, 'xxxhdpi': 192}
 ADAPTIVE_SIZES = {'mdpi': 108, 'hdpi': 162, 'xhdpi': 216, 'xxhdpi': 324, 'xxxhdpi': 432}
 
-_art = None
-
-
-def artwork():
-    global _art
-    if _art is None:
-        _art = Image.open(ARTWORK).convert('L')
-    return _art
-
 
 def ink_mask(size):
-    art = artwork()
-    k = size * ART_FRAC / max(art.width, art.height)
-    w, h = max(1, round(art.width * k)), max(1, round(art.height * k))
-    canvas = Image.new('L', (size, size), 0)
-    canvas.paste(art.resize((w, h), Image.LANCZOS), ((size - w) // 2, (size - h) // 2))
-    return np.asarray(canvas, np.float32) / 255.0
+    n = size * SS
+    h = n * ART_FRAC
+    ox, oy = (n - h * MOTIF_W) / 2.0, (n - h) / 2.0
+
+    def at(x, y):
+        return ox + x * h, oy + y * h
+
+    img = Image.new('L', (n, n), 0)
+    d = ImageDraw.Draw(img)
+    cx = MOTIF_W / 2.0
+
+    # The shackle is the band between two concentric ellipses, closed off below the body's
+    # top edge. Filled as one polygon rather than stroked along its centre line, which PIL
+    # renders with ragged joins at this width.
+    ai, bi = SHACKLE_A - SHACKLE_W, SHACKLE_B - SHACKLE_W
+    sweep = np.linspace(math.pi, 0.0, 400)
+    arch = [at(cx - SHACKLE_A, SHACKLE_FOOT)]
+    arch += [at(cx + SHACKLE_A * math.cos(a), SHACKLE_B - SHACKLE_B * math.sin(a)) for a in sweep]
+    arch += [at(cx + SHACKLE_A, SHACKLE_FOOT), at(cx + ai, SHACKLE_FOOT)]
+    arch += [at(cx + ai * math.cos(a), SHACKLE_B - bi * math.sin(a)) for a in sweep[::-1]]
+    arch += [at(cx - ai, SHACKLE_FOOT)]
+    d.polygon(arch, fill=255)
+
+    d.rounded_rectangle([*at(0, BODY_TOP), *at(MOTIF_W, 1.0)], radius=BODY_R * h, fill=255)
+
+    # The 2x2 grid is knocked back out of the body, so the apps being locked read as part of
+    # the lock rather than as four separate marks floating on it.
+    cy = (BODY_TOP + 1.0) / 2.0
+    off = (CELL + CELL_GAP) / 2.0
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            x, y = cx + sx * off - CELL / 2, cy + sy * off - CELL / 2
+            d.rounded_rectangle([*at(x, y), *at(x + CELL, y + CELL)], radius=CELL_R * h, fill=0)
+
+    return np.asarray(img.resize((size, size), Image.LANCZOS), np.float32) / 255.0
 
 
 def superellipse(exponent, size, n=4000):
@@ -104,8 +137,8 @@ def main(root):
         save(render(size, tile=None, scale=SAFE_SCALE, color=(255, 255, 255)),
              res / f'mipmap-{density}/ic_launcher_monochrome.webp')
 
-    save(render(1024), root / 'dizdar_icon.png')
-    save(render(512, tile='square', opaque=True), root / 'dizdar_icon_play_512.png')
+    save(render(1024), root / 'killit_icon.png')
+    save(render(512, tile='square', opaque=True), root / 'killit_icon_play_512.png')
 
 
 if __name__ == '__main__':

@@ -30,5 +30,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Dizdar"
+rootProject.name = "Killit"
 include(":app")

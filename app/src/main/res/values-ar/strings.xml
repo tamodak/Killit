@@ -1,0 +1,234 @@
+<!--
+    Arabic. Translated from values/strings.xml; the names and the order match it one for one, so
+    the two can be diffed side by side when a string changes.
+
+    This is the one right-to-left locale Killit ships, so it is the one to check layout mirroring
+    against: ProvideAppLanguage flips LocalLayoutDirection, and ArrowLeft/ChevronRight auto-mirror.
+
+    "Killit", "Shizuku", "adb", "QR" and "Android" are left as they are: they are names, not words.
+-->
+<resources>
+    <string name="app_name">Killit</string>
+
+    <string name="duration_d_h">%1$d ي %2$d س</string>
+    <string name="duration_h_m">%1$d س %2$d د</string>
+    <string name="duration_m_s">%1$d د %2$d ث</string>
+    <string name="duration_s">%1$d ث</string>
+
+    <!-- Generic -->
+    <string name="cancel">إلغاء</string>
+    <string name="ok">حسنًا</string>
+    <string name="back">رجوع</string>
+    <string name="done">تم</string>
+    <string name="save">حفظ</string>
+    <string name="discard">تجاهل</string>
+    <string name="copy">نسخ</string>
+    <string name="copied">تم النسخ إلى الحافظة</string>
+    <string name="show">إظهار</string>
+    <string name="hide">إخفاء</string>
+
+    <!-- Auth gate -->
+    <string name="gate_title">أدخل مفتاحك</string>
+    <string name="gate_subtitle">يستطيع Killit رفع الحظر عن كل تطبيق حظرته، ولهذا يبقى هو نفسه مقفلًا.</string>
+    <string name="gate_wrong">مفتاح خاطئ. المحاولات المتبقية قبل القفل: %1$d.</string>
+    <string name="gate_wrong_generic">مفتاح خاطئ.</string>
+    <string name="gate_locked_out">محاولات كثيرة جدًا. أعد المحاولة بعد %1$s.</string>
+
+    <!-- Credential setup -->
+    <string name="setup_title">اختر طريقة القفل</string>
+    <string name="setup_subtitle">هذا المفتاح يحمي Killit نفسه. من يتجاوزه يستطيع رفع الحظر عن تطبيقاتك.</string>
+    <string name="setup_method_pin">رمز PIN</string>
+    <string name="setup_method_pin_desc">من 4 إلى 8 أرقام</string>
+    <string name="setup_method_password">كلمة المرور</string>
+    <string name="setup_method_password_desc">4 أحرف على الأقل</string>
+    <string name="setup_method_pattern">نمط</string>
+    <string name="setup_method_pattern_desc">صِل 4 نقاط على الأقل</string>
+    <string name="setup_enter">عيّن %1$s</string>
+    <string name="setup_confirm">أكّد %1$s</string>
+    <string name="setup_mismatch">غير متطابقين. ابدأ من جديد.</string>
+    <string name="setup_too_short_pin">استخدم 4 أرقام على الأقل.</string>
+    <string name="setup_too_short_password">استخدم 4 أحرف على الأقل.</string>
+    <string name="setup_too_short_pattern">صِل 4 نقاط على الأقل.</string>
+    <string name="setup_change_title">تغيير المفتاح</string>
+    <string name="setup_saved">تم تعيين المفتاح.</string>
+
+    <!-- Home -->
+    <string name="home_status_owner_yes">مالك الجهاز مُفعّل</string>
+    <string name="home_status_owner_no">ليس مالك الجهاز</string>
+    <string name="home_status_owner_yes_desc">يستطيع Killit حظر التطبيقات ورفع الحظر عنها.</string>
+    <string name="home_status_owner_no_desc">لا يستطيع Killit حظر أي شيء حتى يُعيَّن مالكًا للجهاز. اختر إحدى الطرق الثلاث أدناه.</string>
+    <string name="home_blocked_count">التطبيقات المحظورة: %1$d</string>
+    <string name="home_manage_apps">اختر التطبيقات المراد حظرها</string>
+    <string name="home_manage_apps_locked">أعدّ الإعداد أدناه أولًا</string>
+    <string name="home_change_passkey">تغيير المفتاح</string>
+    <string name="home_language">اللغة</string>
+    <string name="language_system">افتراضي النظام</string>
+    <string name="home_hardening">الحماية من العبث</string>
+    <string name="home_release">رفع الحظر عن الكل وإزالة المشرف</string>
+    <string name="home_release_confirm_title">بدء فترة الانتظار؟</string>
+    <string name="home_release_confirm_body">إزالة Killit ليست فورية. الضغط هنا يبدأ عدًّا تنازليًا؛ وبعد انتهائه فقط يمكن رفع الحظر عن التطبيقات وتنازُل Killit عن ملكية الجهاز. يمكنك الإلغاء في أي وقت أثناء الانتظار.</string>
+    <string name="home_release_start">ابدأ العدّ التنازلي</string>
+    <string name="home_release_pending_title">الإزالة قيد الانتظار</string>
+    <string name="home_release_pending_body">يمكن إزالة Killit بعد %1$s. حتى ذلك الحين يبقى كل شيء محظورًا.</string>
+    <string name="home_release_cancel">إلغاء الإزالة</string>
+    <string name="home_release_ready_title">جاهز للإزالة</string>
+    <string name="home_release_ready_body">انتهت فترة الانتظار. يستطيع Killit الآن رفع الحظر عن كل شيء والتنازل عن ملكية الجهاز.</string>
+    <string name="home_release_now">أزِل الآن</string>
+    <string name="home_release_now_confirm_title">إزالة Killit كمالك للجهاز؟</string>
+    <string name="home_release_now_confirm_body">سيُرفع الحظر أولًا عن كل تطبيق محظور، ثم يتنازل Killit عن صلاحيات مالك الجهاز. تتطلب إعادة الإعداد إعادة ضبط المصنع. هل تريد المتابعة؟</string>
+
+    <!-- Provisioning -->
+    <string name="prov_section_title">تفعيل الحماية</string>
+    <string name="prov_precondition">تتطلب الطرق الثلاث جهازًا بلا حسابات مسجَّلة الدخول وبلا مالك جهاز موجود مسبقًا. على جهاز قيد الاستعمال، يعني ذلك إعادة ضبط المصنع.</string>
+
+    <string name="prov_adb_name">‏1. حاسوب (adb)</string>
+    <string name="prov_adb_short">استخدم كابل USB</string>
+    <string name="prov_adb_intro">وصّل هذا الهاتف بحاسوب لتفعيل الحماية.</string>
+    <string name="prov_adb_step_1">فعّل تصحيح أخطاء USB في خيارات المطوّر، ثم وصّل هذا الهاتف بحاسوب.</string>
+    <string name="prov_adb_step_2">نفّذ هذا الأمر على الحاسوب:</string>
+    <string name="prov_adb_step_3">عندما يظهر Success، عُد إلى هنا واضغط «تحديث الحالة».</string>
+
+    <string name="prov_shizuku_name">‏2. تطبيق Shizuku</string>
+    <string name="prov_shizuku_short">استخدم تطبيقًا آخر، بلا حاسوب</string>
+    <string name="prov_shizuku_intro">استخدم تطبيق Shizuku المجاني لتفعيل الحماية.</string>
+    <string name="prov_shizuku_step_1">ثبّت Shizuku وشغّله عبر التصحيح اللاسلكي.</string>
+    <string name="prov_shizuku_step_2">عُد إلى هنا واضغط الزر أدناه.</string>
+    <string name="prov_shizuku_step_3">امنح Shizuku الإذن عندما يطلبه.</string>
+    <string name="prov_shizuku_run">التعيين كمالك للجهاز عبر Shizuku</string>
+    <string name="prov_shizuku_not_running">‏Shizuku غير مُشغَّل. شغّله أولًا.</string>
+    <string name="prov_shizuku_old">إصدار Shizuku هذا قديم جدًا. حدّثه.</string>
+    <string name="prov_shizuku_denied">تم رفض إذن Shizuku.</string>
+    <string name="prov_shizuku_working">جارٍ سؤال Shizuku…</string>
+
+    <string name="prov_qr_name">‏3. رمز QR</string>
+    <string name="prov_qr_short">الإعداد من هاتف آخر</string>
+    <string name="prov_qr_intro">أعدّ هذا الهاتف من معالج إعداد Android.</string>
+    <string name="prov_qr_step_1">أعد ضبط هذا الهاتف إلى إعدادات المصنع.</string>
+    <string name="prov_qr_step_2">في شاشة الترحيب، اضغط الموضع نفسه 6 مرات لفتح ماسح QR.</string>
+    <string name="prov_qr_step_3">امسح الرمز من موقع Killit. سيُنزّل الهاتف Killit ويُعدّه في خطوة واحدة.</string>
+
+    <string name="prov_result_title">نتيجة الإعداد</string>
+    <string name="prov_refresh">تحديث الحالة</string>
+
+    <!-- App list -->
+    <string name="apps_title">التطبيقات</string>
+    <string name="apps_search">ابحث عن تطبيقات</string>
+    <string name="apps_tab_user">المثبَّتة</string>
+    <string name="apps_tab_system">النظام</string>
+    <string name="apps_show_all">إظهار الحزم التي بلا أيقونة تشغيل</string>
+    <string name="apps_empty">لا يوجد تطبيق مطابق.</string>
+    <string name="apps_save_pending">تغييرات غير محفوظة: %1$d</string>
+    <string name="apps_saved">تم الحفظ.</string>
+    <string name="apps_discard_title">تجاهل التغييرات؟</string>
+    <string name="apps_discard_body">لديك تغييرات غير محفوظة. الخروج دون تطبيقها؟</string>
+    <string name="apps_failed_title">هذه التطبيقات لا يمكن حظرها</string>
+    <string name="apps_failed_body">رفض Android تعليق الحزم التالية، لذا تُركت بلا حظر:</string>
+    <string name="apps_needs_owner">يحتاج Killit إلى صلاحيات مالك الجهاز قبل أن يتمكن من حظر أي شيء.</string>
+
+    <!-- Hardening -->
+    <string name="harden_uninstall">منع إلغاء تثبيت Killit</string>
+    <string name="harden_uninstall_desc">يمنع حذف Killit للهروب من الحظر.</string>
+    <string name="harden_force_stop">منع الإيقاف القسري لـ Killit</string>
+    <string name="harden_force_stop_desc">يُعطّل «إيقاف قسري» في الإعدادات، ويمنع أيضًا «مسح البيانات» على Android 13 أو أحدث. يتطلب Android 11 أو أحدث.</string>
+    <string name="harden_safe_boot">منع الوضع الآمن</string>
+    <string name="harden_safe_boot_desc">لولا ذلك لعطّل الوضع الآمن تطبيقات الطرف الثالث عند إعادة التشغيل.</string>
+    <string name="harden_factory_reset">منع إعادة ضبط المصنع والمستخدمين الجدد</string>
+    <string name="harden_factory_reset_desc">يغلق آخر طرق الالتفاف. يبقى adb متاحًا بوصفه المخرج الوحيد.</string>
+    <string name="harden_apps_control">منع إدارة التطبيقات في الإعدادات</string>
+    <string name="harden_apps_control_desc">مُعطَّل افتراضيًا، لأنه ينطبق على كل تطبيق في الجهاز: لن تتمكن من إلغاء تثبيت أي تطبيق أو إيقافه قسريًا أو مسح بياناته، وليس المحظورة فقط. بيانات Killit نفسها محمية من دونه.</string>
+    <string name="harden_date_time">منع تغيير التاريخ والوقت</string>
+    <string name="harden_date_time_desc">يُقاس العدّ التنازلي للإزالة بالساعة. من دون هذا يمكن تخطّيه بتقديم التاريخ.</string>
+
+    <!-- Pairing -->
+    <string name="pair_qr_failed">تعذّر رسم رمز QR.</string>
+    <string name="pair_camera_permission">السماح بالوصول إلى الكاميرا</string>
+    <string name="scan_camera_back">الخلفية</string>
+    <string name="scan_camera_front">الأمامية</string>
+    <string name="pair_title">الأجهزة المرافِقة</string>
+    <string name="pair_entry">الأجهزة المرافِقة</string>
+    <string name="pair_code_description">رمز اقتران هذا الجهاز</string>
+    <string name="pair_list_title">مقترنة: %1$d</string>
+    <string name="pair_list_all_required">على كل واحد منها أن يوافق قبل أن يُفتح هذا الجهاز.</string>
+    <string name="pair_remove">إزالة</string>
+    <string name="pair_remove_title">إزالة %1$s؟</string>
+    <string name="pair_remove_body">على %1$s أن يوافق على إزالته — ستحتاج إلى ذلك الهاتف أمامك. هذه هي الطريقة الوحيدة للتراجع عن الاقتران.</string>
+    <string name="pair_remove_start">متابعة</string>
+    <string name="pair_remove_show_title">اعرض هذا على %1$s</string>
+    <string name="pair_remove_show_body">يمسح %1$s هذا ليوافق على إزالته. بقي %2$s.</string>
+    <string name="pair_remove_scan_title">امسح ما يعرضه %1$s بالمقابل</string>
+    <string name="pair_remove_scan_body">وجّه الكاميرا إلى رمز الموافقة على شاشتهم. بقي %1$s.</string>
+    <string name="pair_remove_code_description">رمز طلب الإزالة</string>
+    <string name="pair_warning_title">لا يمكنك التراجع عن هذا بمفردك</string>
+    <string name="pair_warning_body">بمجرد أن يصبح لهذا الجهاز مرافِق:\n\n• يتوقف رمز PIN أو النمط أو كلمة المرور عن العمل. السبيل الوحيد للدخول هو موافقة مرافِق من هاتفه، شخصيًا.\n• على كل المرافِقين أن يوافقوا، لا واحد فقط.\n• تصبح إزالة Killit غير متاحة حتى تُزال كل الأجهزة المرافِقة.\n• تتطلب إزالة مرافِق موافقة ذلك المرافِق نفسه.\n\nإذا فُقد هاتف مرافِق أو مُسح أو أُعيد تثبيته، فلن يمكن فتح هذا الجهاز بعد ذلك ولن يمكن إزالة Killit. الخيار الوحيد المتبقي هو إعادة ضبط المصنع من وضع الاسترداد، وهو يمحو كل ما عليه.</string>
+    <string name="pair_warning_accept">فهمت، تابع</string>
+
+    <!-- Pairing flow -->
+    <string name="pair_step_indicator">الخطوة %1$d من %2$d</string>
+    <string name="pair_scanned_next">لقد مسحوه — افتح الكاميرا</string>
+    <string name="pair_back_to_code">العودة إلى رمزي</string>
+    <string name="pair_hub_subtitle">الاقتران يعمل في اتجاه واحد. إضافة مرافِق هنا لا تغيّر شيئًا في هاتفه، وإضافتهم لك لا تغيّر شيئًا في هاتفك.</string>
+
+    <string name="pair_role_lock_title">اقفل هذا الهاتف</string>
+    <string name="pair_role_lock_desc">أنت من يمسح رمزهم. عندئذٍ لن يُفتح هذا الهاتف إلا بموافقتهم.</string>
+    <string name="pair_role_companion_title">كن مرافِقًا لهاتف آخر</string>
+    <string name="pair_role_companion_desc">هم من يمسحون رمزك. هذا الهاتف لا يُقفل ولا يتغير.</string>
+
+    <string name="pair_locks_this_phone">هذا الهاتف هو الذي يُقفل</string>
+    <string name="pair_locks_this_phone_desc">بمجرد مسحك لرمزهم، سيحتاج هذا الهاتف إلى موافقتهم في كل مرة يُفتح فيها. الهاتف الآخر لا يتغير.</string>
+    <string name="pair_locks_other_phone">هذا الهاتف لا يُقفل</string>
+    <string name="pair_locks_other_phone_desc">الهاتف الذي يمسح هذا الرمز هو الذي يُقفل. لا يتغير شيء في هذا الهاتف.</string>
+    <string name="pair_add_ready_title">جهّز الهاتف الآخر</string>
+    <string name="pair_add_ready_body">على الهاتف الآخر افتح Killit، واذهب إلى «الأجهزة المرافِقة» واضغط «اعرض رمزي». ثم عُد إلى هنا.</string>
+    <string name="pair_add_ready_action">جاهز — افتح الكاميرا</string>
+    <string name="pair_add_scan_title">امسح رمزهم</string>
+    <string name="pair_add_scan_body">وجّه الكاميرا إلى الرمز على شاشة الهاتف الآخر.</string>
+    <string name="pair_add_done_title">أصبح %1$s مرافِقًا الآن</string>
+    <string name="pair_add_done_body">لن يُفتح هذا الهاتف من الآن فصاعدًا إلا بموافقة مرافِق.</string>
+    <string name="pair_add_another">أضف مرافِقًا آخر</string>
+    <string name="pair_show_title">رمزك</string>
+    <string name="pair_show_body">دع الهاتف الآخر يمسح هذا. لا يتغير شيء في هذا الهاتف.</string>
+
+    <!-- QR gate -->
+    <string name="qr_gate_title">مطلوب موافقة مرافِق</string>
+    <string name="qr_choose_unlock">افتح قفل هذا الهاتف</string>
+    <string name="qr_choose_unlock_desc">اعرض رمزًا على مرافِقيك وامسح ما يعرضونه بالمقابل. يجب أن يوافق الجميع، وعددهم %1$d.</string>
+    <string name="qr_choose_approve">وافق على هاتف آخر</string>
+    <string name="qr_choose_approve_desc">شخص آخر يحتاج موافقتك ليفتح هاتفه. هذا لا يفتح هاتفك.</string>
+    <string name="qr_unlock_restart">ابدأ من جديد</string>
+    <string name="qr_unlock_code_description">رمز طلب الموافقة</string>
+    <string name="qr_unlock_progress">تمت الموافقة: %1$d من %2$d · بقي %3$s</string>
+    <string name="qr_unlock_waiting_on">ما زال بانتظار</string>
+    <string name="qr_unlock_show_title">اعرض هذا على %1$s</string>
+    <string name="qr_unlock_show_body">على هاتفهم: Killit ← «وافق على هاتف آخر». بعد أن يمسحوه، اضغط أدناه.</string>
+    <string name="qr_unlock_scan_title">امسح ما يعرضه %1$s بالمقابل</string>
+    <string name="qr_unlock_scan_body">وجّه الكاميرا إلى رمز الموافقة على شاشتهم.</string>
+    <string name="qr_session_expired">نفد وقت هذا الطلب.</string>
+    <string name="qr_approve_scan_title">امسح رمزهم</string>
+    <string name="qr_approve_intro">وجّه الكاميرا إلى الرمز على الهاتف الذي يحتاج إلى الفتح. الموافقة لا تفتح هذا الهاتف.</string>
+    <string name="qr_approve_show_title">اعرض هذا بالمقابل</string>
+    <string name="qr_approve_ready">ارفع هذا أمام الهاتف الذي يحتاج إلى الفتح.</string>
+    <string name="qr_approve_code_description">رمز موافقتك</string>
+
+    <!-- Scan outcomes -->
+    <string name="scan_wrong_kind">هذا رمز Killit، لكنه ليس الرمز الذي تنتظره هذه الشاشة.</string>
+    <string name="scan_expired">انتهت صلاحية ذلك الطلب. ابدأ طلبًا جديدًا.</string>
+    <string name="scan_bad_signature">لم تجتَز تلك الموافقة التحقق.</string>
+    <string name="scan_unknown_peer">ذلك الهاتف ليس مرافِقًا لهذا الجهاز.</string>
+    <string name="scan_already_approved">ذلك المرافِق وافق بالفعل.</string>
+    <string name="scan_no_key">لا يملك هذا الجهاز هوية اقتران. ربما مُسحت بياناته.</string>
+    <string name="scan_not_device_owner">يتطلب الاقتران صلاحية مالك الجهاز، لذا لا يمكن التراجع عنه بمسح بيانات التطبيق.</string>
+    <string name="scan_already_paired">ذلك الهاتف مرافِق بالفعل.</string>
+    <string name="scan_self_pairing">لا يمكن للجهاز أن يكون مرافِقًا لنفسه.</string>
+
+    <!-- Home, pairing entry -->
+    <string name="home_guardian_release_blocked">عدد الأجهزة التي لا تُفتح إلا بموافقة هذا الهاتف: %1$d، والمفتاح الذي يمنح تلك الموافقة موجود هنا ولا مكان سواه. إزالة Killit أو إلغاء تثبيته أو مسح بياناته ستُتلف ذلك المفتاح وتترك تلك الأجهزة بلا سبيل لفتحها — ولن يبقى لها سوى إعادة ضبط المصنع من وضع الاسترداد. على تلك الأجهزة أن تزيل هذا الهاتف من قائمة مرافِقيها أولًا.</string>
+
+    <!-- Tamper recovery -->
+    <string name="tamper_title">مُسحت بيانات Killit</string>
+    <string name="tamper_body">ما زالت التطبيقات محظورة، لكن المفتاح اختفى، فلا يستطيع Killit التحقق من هويتك. لن يرفع الحظر عن أي شيء في هذه الحالة.\n\nللاسترداد، أزِل Killit من ملكية الجهاز عبر حاسوب. سيؤدي ذلك إلى تحرير كل تطبيق محظور:</string>
+
+    <!-- Provisioning success -->
+    <string name="compliance_title">‏Killit جاهز</string>
+    <string name="compliance_body">‏Killit الآن مالك هذا الجهاز.</string>
+    <string name="compliance_continue">متابعة</string>
+</resources>

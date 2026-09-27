@@ -1,8 +1,8 @@
-# DizdarLog.verbose is never assigned inside the app — it is flipped from outside, either by an
-# instrumented test or by `adb shell setprop log.tag.DizdarVerbose DEBUG` before launch. R8 cannot
+# KillitLog.verbose is never assigned inside the app — it is flipped from outside, either by an
+# instrumented test or by `adb shell setprop log.tag.KillitVerbose DEBUG` before launch. R8 cannot
 # see either, so without this rule it proves the field is always false, constant-folds it, and
 # deletes every traced branch. The release-build tracing switch would then silently do nothing.
 #
 # Verified by checking mapping.txt: without the rule the class is reported as
-# `org.tamodak.dizdar.core.DizdarLog -> R8$$REMOVED$$CLASS$$...`.
--keep class org.tamodak.dizdar.core.DizdarLog { *; }
+# `org.tamodak.killit.core.KillitLog -> R8$$REMOVED$$CLASS$$...`.
+-keep class org.tamodak.killit.core.KillitLog { *; }

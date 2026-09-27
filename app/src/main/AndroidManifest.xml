@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--
-        Dizdar lists every installed app so the user can choose what to block, so a <queries>
+        Killit lists every installed app so the user can choose what to block, so a <queries>
         declaration cannot express what it needs. Google Play restricts this permission, but
-        Dizdar is provisioned as device owner by adb, Shizuku or QR rather than shipped on Play.
+        Killit is provisioned as device owner by adb, Shizuku or QR rather than shipped on Play.
     -->
     <uses-permission
         android:name="android.permission.QUERY_ALL_PACKAGES"
@@ -15,7 +15,7 @@
 
     <!--
         Companion pairing works by scanning QR codes off another phone's screen. As device owner
-        Dizdar grants itself this permission, so the runtime prompt is only a fallback.
+        Killit grants itself this permission, so the runtime prompt is only a fallback.
     -->
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- A device without a camera can still be a locked device; it just cannot be a companion. -->
@@ -24,7 +24,7 @@
         android:required="false" />
 
     <!--
-        allowBackup is false because Dizdar's state is meaningless off this device: the credential
+        allowBackup is false because Killit's state is meaningless off this device: the credential
         record and the peer list are verified against a Keystore key that never leaves the hardware,
         so a restored copy is a lock with no key. The two rules files are kept and point at
         all-exclude rules anyway, so the intent survives someone flipping this attribute.
@@ -33,7 +33,7 @@
         moot while backup is off entirely.
     -->
     <application
-        android:name=".DizdarApp"
+        android:name=".KillitApp"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -41,7 +41,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Dizdar"
+        android:theme="@style/Theme.Killit"
         tools:ignore="DataExtractionRules">
         <!--
             The only user-facing activity; every screen is Compose inside it.
@@ -52,7 +52,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Dizdar"
+            android:theme="@style/Theme.Killit"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -83,7 +83,7 @@
 
         <!--
             Shown once by the system after provisioning completes, so the DPC can confirm the device
-            is compliant. Dizdar has nothing to enforce at this point, so it acknowledges and hands
+            is compliant. Killit has nothing to enforce at this point, so it acknowledges and hands
             control back — reaching it is the clearest signal that QR provisioning worked end to end.
 
             Guarded by BIND_DEVICE_ADMIN so only the system can start it.
@@ -92,7 +92,7 @@
             android:name=".admin.provisioning.AdminPolicyComplianceActivity"
             android:exported="true"
             android:permission="android.permission.BIND_DEVICE_ADMIN"
-            android:theme="@style/Theme.Dizdar">
+            android:theme="@style/Theme.Killit">
             <intent-filter>
                 <action android:name="android.app.action.ADMIN_POLICY_COMPLIANCE" />
 
@@ -101,13 +101,13 @@
         </activity>
 
         <!--
-            The admin component. Dizdar uses none of the classic device-admin policies, but a device
+            The admin component. Killit uses none of the classic device-admin policies, but a device
             owner has to *be* an admin component: this receiver's flattened name is what gets passed
             to `dpm set-device-owner`, embedded in the QR payload, and handed to every
             DevicePolicyManager call as the calling admin.
         -->
         <receiver
-            android:name=".admin.DizdarDeviceAdminReceiver"
+            android:name=".admin.KillitDeviceAdminReceiver"
             android:exported="true"
             android:permission="android.permission.BIND_DEVICE_ADMIN">
             <intent-filter>
@@ -121,8 +121,8 @@
 
         <!--
             Shizuku's own provider, which brokers the connection to its server. Declared verbatim as
-            the library requires; multiprocess is false because Dizdar runs in one process — the
-            privileged user service lives in Shizuku's process, not Dizdar's.
+            the library requires; multiprocess is false because Killit runs in one process — the
+            privileged user service lives in Shizuku's process, not Killit's.
         -->
         <provider
             android:name="rikka.shizuku.ShizukuProvider"

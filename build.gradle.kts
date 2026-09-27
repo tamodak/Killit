@@ -1,6 +1,6 @@
 // Root build file.
 //
-// Dizdar is a single-module project, so there is nothing shared to configure here. The plugins are
+// Killit is a single-module project, so there is nothing shared to configure here. The plugins are
 // declared with `apply false` purely to pin their versions from the catalogue; `:app` is what
 // actually applies them.
 plugins {
