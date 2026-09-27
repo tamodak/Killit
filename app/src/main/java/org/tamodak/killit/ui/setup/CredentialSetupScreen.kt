@@ -1,5 +1,6 @@
 package org.tamodak.killit.ui.setup
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,6 +65,12 @@ fun CredentialSetupScreen(
         firstEntry = null
         error = null
     }
+
+    // The method picker and the entry step are one screen to the host, so system back has to be
+    // handled here: without it, back on the entry step closes the app during first-time setup and
+    // skips straight to Home when changing the passkey. Composed after the host's own handler, so
+    // it takes precedence while a method is chosen and hands back once the picker is showing.
+    BackHandler(enabled = type != null, onBack = ::reset)
 
     KillitScreen(
         title = when {
