@@ -8,8 +8,6 @@ import org.tamodak.killit.data.CredentialStore
 import org.tamodak.killit.data.DurableStore
 import org.tamodak.killit.data.LockPreferences
 import org.tamodak.killit.data.LockRepository
-import org.tamodak.killit.pairing.PairingManager
-import org.tamodak.killit.pairing.PeerKeyStore
 
 /**
  * Hand-rolled dependency graph.
@@ -45,10 +43,6 @@ object ServiceLocator {
     lateinit var appInventory: AppInventory
         private set
 
-    /** Companion-device pairing: key material, QR payloads, challenge/response. */
-    lateinit var pairingManager: PairingManager
-        private set
-
     /**
      * Builds the graph.
      *
@@ -75,10 +69,6 @@ object ServiceLocator {
             durable = DurableStore(devicePolicyController),
             // Salted SHA-256 of the passkey.
             credentials = CredentialStore(),
-        )
-        pairingManager = PairingManager(
-            repository = lockRepository,
-            keyStore = PeerKeyStore(),
         )
 
         initialised = true

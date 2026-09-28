@@ -15,8 +15,6 @@ kotlin = "2.2.10"
 composeBom = "2026.02.01"
 datastore = "1.2.1"
 shizuku = "13.1.5"
-zxingCore = "3.5.3"
-zxingEmbedded = "4.3.0"
 
 [libraries]
 
@@ -29,10 +27,6 @@ androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lif
 # Provisioning without a computer. `api` is the client half, `provider` the manifest component.
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
 shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
-# QR generation. zxing-android-embedded supplies the camera preview and decoder; it pulls in
-# androidx.appcompat transitively, which R8 shrinks back down.
-zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxingCore" }
-zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
 # Testing.
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

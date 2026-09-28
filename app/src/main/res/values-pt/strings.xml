@@ -16,7 +16,6 @@
     <string name="cancel">Cancelar</string>
     <string name="ok">OK</string>
     <string name="back">Voltar</string>
-    <string name="done">Concluído</string>
     <string name="save">Guardar</string>
     <string name="discard">Descartar</string>
     <string name="copy">Copiar</string>
@@ -135,90 +134,6 @@
     <string name="harden_apps_control_desc">Desativado por predefinição, porque se aplica a todas as apps do dispositivo: não conseguirias desinstalar, forçar a paragem nem limpar os dados de nenhuma, não apenas das bloqueadas. Os dados do próprio Killit já estão protegidos sem isto.</string>
     <string name="harden_date_time">Bloquear a alteração da data e hora</string>
     <string name="harden_date_time_desc">A contagem decrescente de remoção é medida pelo relógio. Sem isto, pode ser saltada adiantando a data.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">Não foi possível desenhar o código QR.</string>
-    <string name="pair_camera_permission">Permitir o acesso à câmara</string>
-    <string name="scan_camera_back">Traseira</string>
-    <string name="scan_camera_front">Frontal</string>
-    <string name="pair_title">Dispositivos acompanhantes</string>
-    <string name="pair_entry">Dispositivos acompanhantes</string>
-    <string name="pair_code_description">Código de emparelhamento deste dispositivo</string>
-    <string name="pair_list_title">Emparelhados: %1$d</string>
-    <string name="pair_list_all_required">Todos eles têm de aprovar antes de este dispositivo abrir.</string>
-    <string name="pair_remove">Remover</string>
-    <string name="pair_remove_title">Remover %1$s?</string>
-    <string name="pair_remove_body">%1$s tem de aprovar a remoção — vais precisar desse telemóvel à tua frente. Esta é a única forma de desfazer um emparelhamento.</string>
-    <string name="pair_remove_start">Continuar</string>
-    <string name="pair_remove_show_title">Mostra isto a %1$s</string>
-    <string name="pair_remove_show_body">%1$s lê isto para aprovar a remoção. Faltam %2$s.</string>
-    <string name="pair_remove_scan_title">Lê o que %1$s mostrar de volta</string>
-    <string name="pair_remove_scan_body">Aponta a câmara ao código de aprovação no ecrã deles. Faltam %1$s.</string>
-    <string name="pair_remove_code_description">Código do pedido de remoção</string>
-    <string name="pair_warning_title">Isto não pode ser desfeito sozinho</string>
-    <string name="pair_warning_body">Assim que este dispositivo tiver um acompanhante:\n\n• O teu PIN, padrão ou palavra-passe deixa de funcionar. A única forma de entrar é um acompanhante aprovar a partir do telemóvel dele, presencialmente.\n• Todos os acompanhantes têm de aprovar — não apenas um.\n• Remover o Killit deixa de estar disponível até que todos os acompanhantes sejam removidos.\n• Remover um acompanhante exige a aprovação desse acompanhante.\n\nSe um telemóvel acompanhante se perder, for apagado ou reinstalado, este dispositivo deixa de poder ser aberto e o Killit deixa de poder ser removido. A única opção restante é uma reposição de fábrica a partir do modo de recuperação, que apaga tudo o que lá está.</string>
-    <string name="pair_warning_accept">Compreendo, continuar</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">Passo %1$d de %2$d</string>
-    <string name="pair_scanned_next">Já leram — abrir a câmara</string>
-    <string name="pair_back_to_code">Voltar ao meu código</string>
-    <string name="pair_hub_subtitle">O emparelhamento funciona num só sentido. Adicionar aqui um acompanhante não muda nada no telemóvel dele, e ele adicionar-te não muda nada no teu.</string>
-
-    <string name="pair_role_lock_title">Trancar este telemóvel</string>
-    <string name="pair_role_lock_desc">És tu que lês o código deles. Este telemóvel passará a abrir apenas com a aprovação deles.</string>
-    <string name="pair_role_companion_title">Ser acompanhante de outro telemóvel</string>
-    <string name="pair_role_companion_desc">São eles que leem o teu código. Este telemóvel não fica trancado nem muda.</string>
-
-    <string name="pair_locks_this_phone">É este telemóvel que fica trancado</string>
-    <string name="pair_locks_this_phone_desc">Assim que leres o código deles, este telemóvel precisará da aprovação deles sempre que abrir. O outro telemóvel não muda.</string>
-    <string name="pair_locks_other_phone">Este telemóvel não fica trancado</string>
-    <string name="pair_locks_other_phone_desc">O telemóvel que lê este código é o que fica trancado. Neste telemóvel nada muda.</string>
-    <string name="pair_add_ready_title">Prepara o outro telemóvel</string>
-    <string name="pair_add_ready_body">No outro telemóvel abre o Killit, vai a Dispositivos acompanhantes e toca em «Mostrar o meu código». Depois volta aqui.</string>
-    <string name="pair_add_ready_action">Pronto — abrir a câmara</string>
-    <string name="pair_add_scan_title">Lê o código deles</string>
-    <string name="pair_add_scan_body">Aponta a câmara ao código no ecrã do outro telemóvel.</string>
-    <string name="pair_add_done_title">%1$s é agora um acompanhante</string>
-    <string name="pair_add_done_body">A partir de agora este telemóvel só abre com a aprovação de um acompanhante.</string>
-    <string name="pair_add_another">Adicionar outro acompanhante</string>
-    <string name="pair_show_title">O teu código</string>
-    <string name="pair_show_body">Faz com que o outro telemóvel leia isto. Neste telemóvel nada muda.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">É necessária a aprovação de um acompanhante</string>
-    <string name="qr_choose_unlock">Desbloquear este telemóvel</string>
-    <string name="qr_choose_unlock_desc">Mostra um código aos teus acompanhantes e lê o que eles mostrarem de volta. Têm de aprovar todos (%1$d).</string>
-    <string name="qr_choose_approve">Aprovar outro telemóvel</string>
-    <string name="qr_choose_approve_desc">Outra pessoa precisa da tua aprovação para abrir o telemóvel dela. Isto não abre o teu.</string>
-    <string name="qr_unlock_restart">Começar de novo</string>
-    <string name="qr_unlock_code_description">Código do pedido de aprovação</string>
-    <string name="qr_unlock_progress">Aprovados: %1$d de %2$d · faltam %3$s</string>
-    <string name="qr_unlock_waiting_on">Ainda a aguardar</string>
-    <string name="qr_unlock_show_title">Mostra isto a %1$s</string>
-    <string name="qr_unlock_show_body">No telemóvel deles: Killit → Aprovar outro telemóvel. Depois de lerem, toca abaixo.</string>
-    <string name="qr_unlock_scan_title">Lê o que %1$s mostrar de volta</string>
-    <string name="qr_unlock_scan_body">Aponta a câmara ao código de aprovação no ecrã deles.</string>
-    <string name="qr_session_expired">Este pedido ficou sem tempo.</string>
-    <string name="qr_approve_scan_title">Lê o código deles</string>
-    <string name="qr_approve_intro">Aponta a câmara ao código do telemóvel que precisa de ser aberto. Aprovar não abre este telemóvel.</string>
-    <string name="qr_approve_show_title">Mostra isto de volta</string>
-    <string name="qr_approve_ready">Levanta isto em frente ao telemóvel que precisa de ser aberto.</string>
-    <string name="qr_approve_code_description">O teu código de aprovação</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">É um código do Killit, mas não o que este ecrã está à espera.</string>
-    <string name="scan_expired">Esse pedido expirou. Inicia um novo.</string>
-    <string name="scan_bad_signature">Essa aprovação não foi validada.</string>
-    <string name="scan_unknown_peer">Esse telemóvel não é acompanhante deste dispositivo.</string>
-    <string name="scan_already_approved">Esse acompanhante já aprovou.</string>
-    <string name="scan_no_key">Este dispositivo não tem identidade de emparelhamento. Os seus dados podem ter sido limpos.</string>
-    <string name="scan_not_device_owner">O emparelhamento exige proprietário do dispositivo, por isso não pode ser desfeito limpando os dados da app.</string>
-    <string name="scan_already_paired">Esse telemóvel já é um acompanhante.</string>
-    <string name="scan_self_pairing">Um dispositivo não pode ser acompanhante de si próprio.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">Dispositivos que só podem ser abertos com a aprovação deste telemóvel: %1$d. A chave que a dá vive aqui e em mais lado nenhum. Remover o Killit, desinstalá-lo ou limpar os seus dados destruiria essa chave e deixaria esses dispositivos impossíveis de abrir — restar-lhes-ia apenas uma reposição de fábrica a partir do modo de recuperação. Esses dispositivos têm primeiro de remover este telemóvel como acompanhante.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">Os dados do Killit foram limpos</string>

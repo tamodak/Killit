@@ -24,7 +24,6 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="back">Back</string>
-    <string name="done">Done</string>
     <string name="save">Save</string>
     <string name="discard">Discard</string>
     <string name="copy">Copy</string>
@@ -143,92 +142,6 @@
     <string name="harden_apps_control_desc">Off by default, because it applies to every app on the device: you would not be able to uninstall, force-stop or clear data for any of them, not just the blocked ones. Killit\'s own data is already protected without it.</string>
     <string name="harden_date_time">Block changing date and time</string>
     <string name="harden_date_time_desc">The removal countdown is measured against the clock. Without this it can be skipped by moving the date forward.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">Could not draw the QR code.</string>
-    <string name="pair_camera_permission">Allow camera access</string>
-    <string name="scan_camera_back">Rear</string>
-    <string name="scan_camera_front">Front</string>
-    <string name="pair_title">Companion devices</string>
-    <string name="pair_entry">Companion devices</string>
-    <string name="pair_code_description">This device\'s pairing code</string>
-    <string name="pair_list_title">%1$d paired</string>
-    <string name="pair_list_all_required">Every one of them has to approve before this device opens.</string>
-    <string name="pair_remove">Remove</string>
-    <string name="pair_remove_title">Remove %1$s?</string>
-    <string name="pair_remove_body">%1$s has to approve being removed — you will need that phone in front of you. This is the only way to undo a pairing.</string>
-    <string name="pair_remove_start">Continue</string>
-    <string name="pair_remove_show_title">Show this to %1$s</string>
-    <string name="pair_remove_show_body">%1$s scans this to approve being removed. %2$s left.</string>
-    <string name="pair_remove_scan_title">Scan what %1$s shows back</string>
-    <string name="pair_remove_scan_body">Point the camera at the approval code on their screen. %1$s left.</string>
-    <string name="pair_remove_code_description">Removal request code</string>
-    <string name="pair_warning_title">This cannot be undone on your own</string>
-    <string name="pair_warning_body">Once this device has a companion:\n\n• Your PIN, pattern or password stops working. The only way in is a companion approving from their phone, in person.\n• Every companion must approve — not just one.\n• Removing Killit becomes unavailable until all companions are removed.\n• Removing a companion needs that companion\'s approval.\n\nIf a companion phone is lost, wiped or reinstalled, this device can no longer be opened and Killit can no longer be removed. The only remaining option is a factory reset from Recovery Mode, which erases everything on it.</string>
-    <string name="pair_warning_accept">I understand, continue</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">Step %1$d of %2$d</string>
-    <string name="pair_scanned_next">They scanned it — open camera</string>
-    <string name="pair_back_to_code">Back to my code</string>
-    <string name="pair_hub_subtitle">Pairing works one way. Adding a companion here changes nothing on their phone, and them adding you changes nothing on yours.</string>
-
-    <!-- Which phone ends up locked. The phone that scans is the phone that gets locked, and that
-         is the single thing users get wrong, so both roles are named by their outcome. -->
-    <string name="pair_role_lock_title">Lock this phone</string>
-    <string name="pair_role_lock_desc">You scan their code. This phone will then open only with their approval.</string>
-    <string name="pair_role_companion_title">Be another phone\'s companion</string>
-    <string name="pair_role_companion_desc">They scan your code. This phone is not locked and does not change.</string>
-
-    <string name="pair_locks_this_phone">This phone gets locked</string>
-    <string name="pair_locks_this_phone_desc">Once you scan their code, this phone will need their approval every time it opens. The other phone does not change.</string>
-    <string name="pair_locks_other_phone">This phone is not locked</string>
-    <string name="pair_locks_other_phone_desc">The phone that scans this code is the one that gets locked. Nothing on this phone changes.</string>
-    <string name="pair_add_ready_title">Get the other phone ready</string>
-    <string name="pair_add_ready_body">On the other phone open Killit, go to Companion devices and tap “Show my code”. Then come back here.</string>
-    <string name="pair_add_ready_action">Ready — open camera</string>
-    <string name="pair_add_scan_title">Scan their code</string>
-    <string name="pair_add_scan_body">Point the camera at the code on the other phone\'s screen.</string>
-    <string name="pair_add_done_title">%1$s is now a companion</string>
-    <string name="pair_add_done_body">This phone opens only with companion approval from now on.</string>
-    <string name="pair_add_another">Add another companion</string>
-    <string name="pair_show_title">Your code</string>
-    <string name="pair_show_body">Have the other phone scan this. Nothing on this phone changes.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">Companion approval needed</string>
-    <string name="qr_choose_unlock">Unlock this phone</string>
-    <string name="qr_choose_unlock_desc">Show a code to your companions and scan what they show back. All %1$d must approve.</string>
-    <string name="qr_choose_approve">Approve another phone</string>
-    <string name="qr_choose_approve_desc">Someone else needs your approval to open their phone. This does not open yours.</string>
-    <string name="qr_unlock_restart">Start again</string>
-    <string name="qr_unlock_code_description">Approval request code</string>
-    <string name="qr_unlock_progress">%1$d of %2$d approved · %3$s left</string>
-    <string name="qr_unlock_waiting_on">Still waiting on</string>
-    <string name="qr_unlock_show_title">Show this to %1$s</string>
-    <string name="qr_unlock_show_body">On their phone: Killit → Approve another phone. Once they have scanned it, tap below.</string>
-    <string name="qr_unlock_scan_title">Scan what %1$s shows back</string>
-    <string name="qr_unlock_scan_body">Point the camera at the approval code on their screen.</string>
-    <string name="qr_session_expired">This request ran out of time.</string>
-    <string name="qr_approve_scan_title">Scan their code</string>
-    <string name="qr_approve_intro">Point the camera at the code on the phone that needs opening. Approving does not open this phone.</string>
-    <string name="qr_approve_show_title">Show this back</string>
-    <string name="qr_approve_ready">Hold this up to the phone that needs opening.</string>
-    <string name="qr_approve_code_description">Your approval code</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">That is a Killit code, but not the one this screen is waiting for.</string>
-    <string name="scan_expired">That request has expired. Start a new one.</string>
-    <string name="scan_bad_signature">That approval did not check out.</string>
-    <string name="scan_unknown_peer">That phone is not a companion of this device.</string>
-    <string name="scan_already_approved">That companion has already approved.</string>
-    <string name="scan_no_key">This device has no pairing identity. Its data may have been cleared.</string>
-    <string name="scan_not_device_owner">Pairing needs Device Owner, so it cannot be undone by clearing app data.</string>
-    <string name="scan_already_paired">That phone is already a companion.</string>
-    <string name="scan_self_pairing">A device cannot be its own companion.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">%1$d device(s) can only be opened with this phone\'s approval, and the key that gives it lives here and nowhere else. Removing Killit, uninstalling it or clearing its data would destroy that key and leave those devices unopenable — a factory reset from Recovery Mode would be all they had left. Those devices have to remove this phone as a companion first.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">Killit data was cleared</string>

@@ -114,37 +114,6 @@ class DevicePolicyController(
         KillitLog.timed(KillitLog.DPC, "applyHardening") { applyHardeningBlocking(config) }
     }
 
-    // ---------------------------------------------------------------- permissions
-
-    /**
-     * Grants Killit a runtime permission to itself, which a device owner is allowed to do.
-     *
-     * Used for the camera, which pairing needs. Doing it this way keeps a system permission dialog
-     * out of the middle of the pairing flow — and that dialog is another app's window, so it would
-     * background Killit and trip the re-lock in `KillitViewModel.lockOnBackground`.
-     *
-     * @param permission the runtime permission to grant.
-     * @return true when the grant took effect; false when Killit is not device owner or the
-     *   platform refuses, in which case the caller falls back to an ordinary runtime request.
-     */
-    suspend fun grantSelfPermission(permission: String): Boolean = withContext(ioDispatcher) {
-        if (!isDeviceOwnerBlocking()) {
-            KillitLog.d(KillitLog.DPC) { "Cannot self-grant $permission: not device owner" }
-            return@withContext false
-        }
-        runCatching {
-            dpm.setPermissionGrantState(
-                admin,
-                ownPackage,
-                permission,
-                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED,
-            )
-        }
-            .onSuccess { granted -> KillitLog.i(KillitLog.DPC, "Self-granted $permission: $granted") }
-            .onFailure { KillitLog.w(KillitLog.DPC, "Could not self-grant $permission", it) }
-            .getOrDefault(false)
-    }
-
     // ---------------------------------------------------------------- durable storage
 
     /**

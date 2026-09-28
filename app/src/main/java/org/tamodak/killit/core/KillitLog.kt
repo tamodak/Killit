@@ -41,8 +41,7 @@ import java.security.MessageDigest
  *
  * ```
  * adb logcat -s Killit.App Killit.Ui Killit.Vm Killit.Repo Killit.Cred Killit.Prefs \
- *              Killit.Durable Killit.Dpc Killit.Apps Killit.Shizuku Killit.Priv Killit.Admin \
- *              Killit.Pairing
+ *              Killit.Durable Killit.Dpc Killit.Apps Killit.Shizuku Killit.Priv Killit.Admin
  * ```
  *
  * or, more simply, `adb logcat | grep Killit.`
@@ -88,9 +87,6 @@ object KillitLog {
 
     /** Device admin receiver and the provisioning activities. */
     const val ADMIN = "Killit.Admin"
-
-    /** Companion-device pairing: keys, QR payloads, challenge/response. */
-    const val PAIRING = "Killit.Pairing"
 
     // ---------------------------------------------------------------- configuration
 

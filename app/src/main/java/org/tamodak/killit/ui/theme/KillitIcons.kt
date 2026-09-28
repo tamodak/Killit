@@ -197,7 +197,7 @@ object KillitIcons {
         }
     }
 
-    /** Anything QR: the pairing routes, and the code shown to a companion. */
+    /** The QR provisioning route, in the list of ways to become device owner. */
     val QrCode: ImageVector = icon("QrCode") {
         stroke {
             rect(3f, 3f, 7f, 7f)
@@ -211,7 +211,7 @@ object KillitIcons {
     }
 
     /**
-     * The QR provisioning route.
+     * The QR provisioning page's illustration.
      *
      * Filled rather than stroked — the one deliberate exception to the outline rule, because at row
      * size a hollow version of this many small squares reads as noise instead of as a code.
@@ -231,7 +231,7 @@ object KillitIcons {
         }
     }
 
-    /** A device that ends up locked — the side of a pairing that cannot open alone. */
+    /** Giving up device owner: the red row that starts the release countdown. */
     val Lock: ImageVector = icon("Lock") {
         stroke {
             rect(5f, 11f, 14f, 10f)
@@ -321,24 +321,5 @@ object KillitIcons {
             segment(12f, 9f, 12f, 14f)
         }
         solid { rect(11f, 16f, 2f, 2f) }
-    }
-
-    /** A companion device: the side of a pairing that does the approving. */
-    val Devices: ImageVector = icon("Devices") {
-        stroke {
-            rect(2f, 3f, 9f, 18f)
-            segment(2f, 17f, 11f, 17f)
-            rect(14f, 8f, 8f, 13f)
-            segment(14f, 17f, 22f, 17f)
-        }
-    }
-
-    /** Scanning: opening the viewfinder to read another phone's code. */
-    val Camera: ImageVector = icon("Camera") {
-        stroke {
-            rect(2f, 6f, 20f, 14f)
-            rect(8f, 3f, 8f, 3f)
-            circle(12f, 13f, 4f)
-        }
     }
 }

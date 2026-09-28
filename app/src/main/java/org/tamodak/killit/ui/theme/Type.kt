@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.sp
  * Builds one text style, so the scale below reads as a table rather than a wall of named arguments.
  *
  * Line height defaults to 1.4x the size, which is what keeps the multi-line explanatory copy on the
- * pairing and provisioning screens legible. Material's ratios are tuned for shorter strings than
+ * provisioning and hardening screens legible. Material's ratios are tuned for shorter strings than
  * the ones this app has to show.
  *
  * No font is bundled: [FontFamily.Default] resolves to the device's own typeface, which is what a

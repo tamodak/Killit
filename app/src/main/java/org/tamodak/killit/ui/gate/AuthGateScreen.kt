@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -25,7 +24,6 @@ import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.data.LockType
 import org.tamodak.killit.ui.GateFeedback
 import org.tamodak.killit.ui.components.KillitBody
-import org.tamodak.killit.ui.components.KillitButton
 import org.tamodak.killit.ui.components.KillitError
 import org.tamodak.killit.ui.components.KillitGutter
 import org.tamodak.killit.ui.formatDuration
@@ -54,7 +52,6 @@ fun AuthGateScreen(
     feedback: GateFeedback?,
     onSubmit: (String) -> Unit,
     modifier: Modifier = Modifier,
-    onApproveAnother: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -123,18 +120,5 @@ fun AuthGateScreen(
                 .widthIn(max = 340.dp)
                 .padding(top = 8.dp),
         )
-
-        // Approving a companion's challenge opens nothing here, so it does not sit behind this
-        // gate — and the phone asking for approval may be the only one that is locked.
-        if (onApproveAnother != null) {
-            KillitButton(
-                text = stringResource(R.string.qr_choose_approve),
-                onClick = onApproveAnother,
-                modifier = Modifier
-                    .widthIn(max = 340.dp)
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-            )
-        }
     }
 }

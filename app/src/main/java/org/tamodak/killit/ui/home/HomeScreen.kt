@@ -92,7 +92,7 @@ private enum class SetupMethod { Adb, Shizuku, Qr }
  * read-only preview beforehand — so the user can see what Killit will manage before committing to a
  * factory reset.
  *
- * @param state supplies owner status, the hardening toggles, the release request and the peer list.
+ * @param state supplies owner status, the hardening toggles and the release request.
  * @param onManageApps opens the app picker.
  * @param onChangePasskey opens the change-passkey flow.
  * @param onHardeningChange called with the full config whenever one toggle moves.
@@ -102,11 +102,8 @@ private enum class SetupMethod { Adb, Shizuku, Qr }
  * @param onRequestRelease starts the wait before device owner can be given up.
  * @param onCancelRelease abandons that wait.
  * @param onReleaseDeviceOwner carries out the release, once the wait has elapsed.
- * @param onOpenPairing opens companion management.
  * @param onLanguageChange switches the language the whole UI is shown in.
  * @param modifier applied to the screen.
- * @param onApproveAnother switches to approving another device's challenge. Null until this device
- *   has a pairing identity of its own to sign with.
  */
 @Composable
 fun HomeScreen(
@@ -120,10 +117,8 @@ fun HomeScreen(
     onRequestRelease: () -> Unit,
     onCancelRelease: () -> Unit,
     onReleaseDeviceOwner: () -> Unit,
-    onOpenPairing: () -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     modifier: Modifier = Modifier,
-    onApproveAnother: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val adminComponent = remember(context) {
@@ -207,7 +202,6 @@ fun HomeScreen(
                 if (state.isDeviceOwner) {
                     HardeningPanel(
                         config = state.hardening,
-                        isGuardian = state.isGuardian,
                         onChange = onHardeningChange,
                     )
                 } else {
@@ -218,59 +212,19 @@ fun HomeScreen(
                     KillitRule()
 
                     if (state.isDeviceOwner) {
-                        // Gated on being somebody's companion, not on having companions. This
-                        // phone's key is the only way the devices below can open; the phone that
-                        // merely *has* companions holds nothing anyone else needs.
-                        if (state.isGuardian) {
-                            // Not merely disabled — explained. A greyed-out button with no reason
-                            // is how users conclude the app is broken.
-                            KillitPanel(borderColor = KillitRed) {
-                                KillitBody(
-                                    text = stringResource(
-                                        R.string.home_guardian_release_blocked,
-                                        state.guardianFor.size,
-                                    )
-                                )
-                            }
-                        } else {
-                            ReleaseSection(
-                                state = state,
-                                onRequestRelease = { confirmRelease = true },
-                                onCancelRelease = onCancelRelease,
-                                onReleaseNow = { confirmReleaseNow = true },
-                            )
-                        }
-                    }
-
-                    // Hidden once paired: companions replace the passkey entirely, so offering to
-                    // change one would suggest a way in that no longer exists.
-                    if (!state.isPaired) {
-                        KillitRow(
-                            title = stringResource(R.string.home_change_passkey),
-                            icon = KillitIcons.Key,
-                            onClick = onChangePasskey,
+                        ReleaseSection(
+                            state = state,
+                            onRequestRelease = { confirmRelease = true },
+                            onCancelRelease = onCancelRelease,
+                            onReleaseNow = { confirmReleaseNow = true },
                         )
                     }
 
                     KillitRow(
-                        title = if (state.isPaired) {
-                            stringResource(R.string.pair_list_title, state.peers.size)
-                        } else {
-                            stringResource(R.string.pair_entry)
-                        },
-                        icon = KillitIcons.Devices,
-                        onClick = onOpenPairing,
+                        title = stringResource(R.string.home_change_passkey),
+                        icon = KillitIcons.Key,
+                        onClick = onChangePasskey,
                     )
-
-                    // Shown whether or not this phone has companions of its own: pairing is
-                    // one-directional, so being somebody's companion is independent of having one.
-                    if (onApproveAnother != null) {
-                        KillitRow(
-                            title = stringResource(R.string.qr_choose_approve),
-                            icon = KillitIcons.QrCode,
-                            onClick = onApproveAnother,
-                        )
-                    }
                 }
             }
         }
@@ -578,7 +532,7 @@ private fun MonospaceBlock(text: String) {
  * countdown rather than a disabled button — the user should be able to see exactly how long is
  * left, and that cancelling is available at any time.
  *
- * @param state supplies the pending request, and whether other devices depend on this phone's key.
+ * @param state supplies the pending request, and whether an action is already in flight.
  * @param onRequestRelease starts the wait.
  * @param onCancelRelease abandons it.
  * @param onReleaseNow carries out the release, once the wait has elapsed.
@@ -656,14 +610,11 @@ private fun ReleaseSection(
  * The anti-tamper toggles.
  *
  * @param config the toggles as stored.
- * @param isGuardian true when other devices depend on this phone's key, which locks two of the
- *   toggles on — see `KillitViewModel.setHardening` for why they cannot be given up.
  * @param onChange called with the full config whenever one toggle moves.
  */
 @Composable
 private fun HardeningPanel(
     config: HardeningConfig,
-    isGuardian: Boolean,
     onChange: (HardeningConfig) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -674,7 +625,6 @@ private fun HardeningPanel(
                 title = stringResource(R.string.harden_uninstall),
                 description = stringResource(R.string.harden_uninstall_desc),
                 checked = config.blockUninstall,
-                enabled = !isGuardian,
                 onCheckedChange = { onChange(config.copy(blockUninstall = it)) },
             )
             KillitRule(color = KillitRowDivider)
@@ -682,7 +632,7 @@ private fun HardeningPanel(
                 title = stringResource(R.string.harden_force_stop),
                 description = stringResource(R.string.harden_force_stop_desc),
                 checked = config.blockForceStop,
-                enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !isGuardian,
+                enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
                 onCheckedChange = { onChange(config.copy(blockForceStop = it)) },
             )
             KillitRule(color = KillitRowDivider)

@@ -22,13 +22,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.tamodak.killit.R
 import org.tamodak.killit.core.KillitLog
-import org.tamodak.killit.pairing.ChallengePurpose
 import org.tamodak.killit.ui.apps.AppListScreen
 import org.tamodak.killit.ui.gate.AuthGateScreen
 import org.tamodak.killit.ui.home.HomeScreen
-import org.tamodak.killit.ui.pairing.ApprovalScreen
-import org.tamodak.killit.ui.pairing.PairingScreen
-import org.tamodak.killit.ui.pairing.QrUnlockScreen
 import org.tamodak.killit.ui.setup.CredentialSetupScreen
 import org.tamodak.killit.ui.tamper.TamperedScreen
 import org.tamodak.killit.ui.theme.KillitGreen
@@ -139,60 +135,22 @@ private fun KillitAppContent(state: KillitUiState, viewModel: KillitViewModel) {
 
             Screen.Gate -> {
                 val lockType = state.lockType
-                when {
-                    // A paired device opens only with companion approval. The passkey is not
-                    // offered at all — and the ViewModel refuses it too, so this is presentation
-                    // of a rule rather than the rule itself.
-                    state.isPaired -> QrUnlockScreen(
-                        state = state,
-                        onStartChallenge = { viewModel.startChallenge(ChallengePurpose.UNLOCK) },
-                        onCancelChallenge = viewModel::cancelChallenge,
-                        onResponseScanned = viewModel::onApprovalResponseScanned,
-                        onOpenApproval = viewModel::openApproval,
-                        onDismissScanOutcome = viewModel::dismissScanOutcome,
-                        onCameraFacingChange = viewModel::setCameraFacing,
-                    )
-
-                    lockType != null -> AuthGateScreen(
+                if (lockType != null) {
+                    AuthGateScreen(
                         lockType = lockType,
                         enabled = !state.busy,
                         feedback = state.gateFeedback,
                         onSubmit = viewModel::submitGate,
-                        // An unpaired phone can still be somebody else's companion, but only once
-                        // it has an identity of its own to sign with.
-                        onApproveAnother = if (state.ownPublicKey != null) {
-                            { viewModel.openApproval() }
-                        } else {
-                            null
-                        },
                     )
-
+                } else {
                     // Nothing to check against; fall through to setting a passkey. Renders nothing
                     // for the one frame it takes the effect to run.
-                    else -> LaunchedEffect(Unit) {
+                    LaunchedEffect(Unit) {
                         KillitLog.w(KillitLog.UI, "Gate reached with no lock type; redirecting to Setup")
                         viewModel.navigateTo(Screen.Setup)
                     }
                 }
             }
-
-            Screen.Pairing -> PairingScreen(
-                state = state,
-                onPairingCodeScanned = viewModel::onPairingCodeScanned,
-                onStartPeerRemoval = viewModel::startPeerRemoval,
-                onCancelPeerRemoval = viewModel::cancelPeerRemoval,
-                onRemovalResponseScanned = viewModel::onApprovalResponseScanned,
-                onDismissScanOutcome = viewModel::dismissScanOutcome,
-                onCameraFacingChange = viewModel::setCameraFacing,
-                onBack = viewModel::goHome,
-            )
-
-            Screen.Approve -> ApprovalScreen(
-                state = state,
-                onApprovalRequestScanned = viewModel::onApprovalRequestScanned,
-                onCameraFacingChange = viewModel::setCameraFacing,
-                onDone = viewModel::closeApproval,
-            )
 
             Screen.Home -> HomeScreen(
                 state = state,
@@ -205,13 +163,7 @@ private fun KillitAppContent(state: KillitUiState, viewModel: KillitViewModel) {
                 onRequestRelease = viewModel::requestRelease,
                 onCancelRelease = viewModel::cancelRelease,
                 onReleaseDeviceOwner = viewModel::releaseDeviceOwner,
-                onOpenPairing = viewModel::openPairing,
                 onLanguageChange = viewModel::setLanguage,
-                onApproveAnother = if (state.ownPublicKey != null) {
-                    { viewModel.openApproval() }
-                } else {
-                    null
-                },
             )
 
             Screen.Apps -> AppListScreen(

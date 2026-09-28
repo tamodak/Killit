@@ -41,9 +41,8 @@ class AdminPolicyComplianceActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         KillitLog.i(KillitLog.ADMIN, "ADMIN_POLICY_COMPLIANCE shown — QR provisioning completed")
-        // Matches MainActivity. Nothing secret is shown here, but every Killit window being
-        // screenshot-proof is what stops a challenge QR from being relayed to someone who is not
-        // in the room — the property companion pairing depends on.
+        // Matches MainActivity. Nothing secret is shown here, but a rule with no exceptions is one
+        // a later change to this screen cannot quietly forget.
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
         setContent {

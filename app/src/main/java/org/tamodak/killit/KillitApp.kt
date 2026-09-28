@@ -36,8 +36,8 @@ class KillitApp : Application() {
 
         // First line of every session. The device and build identity here is what makes a log
         // dump from someone else's phone actionable — most Killit problems are device-specific
-        // (which packages the OEM refuses to suspend, how slow key derivation is, whether
-        // StrongBox exists), so knowing the hardware is half the diagnosis.
+        // (which packages the OEM refuses to suspend, how slow hashing and binder calls are),
+        // so knowing the hardware is half the diagnosis.
         KillitLog.i(
             KillitLog.APP,
             "Killit starting: ${BuildConfig.APPLICATION_ID} v${BuildConfig.VERSION_NAME} " +

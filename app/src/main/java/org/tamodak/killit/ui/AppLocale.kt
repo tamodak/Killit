@@ -53,8 +53,8 @@ fun ProvideAppLanguage(language: AppLanguage, content: @Composable () -> Unit) {
     val locales = language.localeList()
 
     // A ContextWrapper rather than the context createConfigurationContext returns, so that the
-    // activity stays reachable down the baseContext chain — `Context.findActivity()` walks it, and
-    // the QR scanner needs a real Activity for its BeepManager.
+    // activity stays reachable down the baseContext chain: a bare configuration context would hide
+    // it from anything below that walks the chain looking for the host Activity.
     val context = remember(base, baseConfiguration, locales) {
         if (locales == null) {
             base

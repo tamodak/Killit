@@ -14,20 +14,11 @@
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
     <!--
-        Companion pairing works by scanning QR codes off another phone's screen. As device owner
-        Killit grants itself this permission, so the runtime prompt is only a fallback.
-    -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!-- A device without a camera can still be a locked device; it just cannot be a companion. -->
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-
-    <!--
-        allowBackup is false because Killit's state is meaningless off this device: the credential
-        record and the peer list are verified against a Keystore key that never leaves the hardware,
-        so a restored copy is a lock with no key. The two rules files are kept and point at
-        all-exclude rules anyway, so the intent survives someone flipping this attribute.
+        allowBackup is false because Killit's state belongs to this device: the credential record
+        carries the lockout counters, so restoring an older copy would roll back failed attempts,
+        and on another handset it would describe a device owner and a blocklist that are not there.
+        The two rules files are kept and point at all-exclude rules anyway, so the intent survives
+        someone flipping this attribute.
 
         tools:ignore="DataExtractionRules" silences lint's insistence on per-domain rules, which is
         moot while backup is off entirely.

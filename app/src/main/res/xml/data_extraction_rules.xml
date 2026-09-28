@@ -8,9 +8,9 @@
 
     Both routes are excluded wholesale, for the same reason:
 
-    - cloud-backup — the credential record and the peer list are meaningless off this device. Both
-      are verified against a Keystore key that never leaves the hardware, so a restored copy is a
-      lock with no key.
+    - cloud-backup — the credential record carries the lockout counters, so restoring an older copy
+      would roll back failed attempts, and off this device it describes a device owner and a
+      blocklist that are not there.
     - device-transfer — a direct handset-to-handset move has the same problem, and would also carry
       the durable copy's assumptions about a device owner that the new phone is not.
 
