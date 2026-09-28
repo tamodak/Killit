@@ -19,7 +19,6 @@
     <string name="cancel">إلغاء</string>
     <string name="ok">حسنًا</string>
     <string name="back">رجوع</string>
-    <string name="done">تم</string>
     <string name="save">حفظ</string>
     <string name="discard">تجاهل</string>
     <string name="copy">نسخ</string>
@@ -138,90 +137,6 @@
     <string name="harden_apps_control_desc">مُعطَّل افتراضيًا، لأنه ينطبق على كل تطبيق في الجهاز: لن تتمكن من إلغاء تثبيت أي تطبيق أو إيقافه قسريًا أو مسح بياناته، وليس المحظورة فقط. بيانات Killit نفسها محمية من دونه.</string>
     <string name="harden_date_time">منع تغيير التاريخ والوقت</string>
     <string name="harden_date_time_desc">يُقاس العدّ التنازلي للإزالة بالساعة. من دون هذا يمكن تخطّيه بتقديم التاريخ.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">تعذّر رسم رمز QR.</string>
-    <string name="pair_camera_permission">السماح بالوصول إلى الكاميرا</string>
-    <string name="scan_camera_back">الخلفية</string>
-    <string name="scan_camera_front">الأمامية</string>
-    <string name="pair_title">الأجهزة المرافِقة</string>
-    <string name="pair_entry">الأجهزة المرافِقة</string>
-    <string name="pair_code_description">رمز اقتران هذا الجهاز</string>
-    <string name="pair_list_title">مقترنة: %1$d</string>
-    <string name="pair_list_all_required">على كل واحد منها أن يوافق قبل أن يُفتح هذا الجهاز.</string>
-    <string name="pair_remove">إزالة</string>
-    <string name="pair_remove_title">إزالة %1$s؟</string>
-    <string name="pair_remove_body">على %1$s أن يوافق على إزالته — ستحتاج إلى ذلك الهاتف أمامك. هذه هي الطريقة الوحيدة للتراجع عن الاقتران.</string>
-    <string name="pair_remove_start">متابعة</string>
-    <string name="pair_remove_show_title">اعرض هذا على %1$s</string>
-    <string name="pair_remove_show_body">يمسح %1$s هذا ليوافق على إزالته. بقي %2$s.</string>
-    <string name="pair_remove_scan_title">امسح ما يعرضه %1$s بالمقابل</string>
-    <string name="pair_remove_scan_body">وجّه الكاميرا إلى رمز الموافقة على شاشتهم. بقي %1$s.</string>
-    <string name="pair_remove_code_description">رمز طلب الإزالة</string>
-    <string name="pair_warning_title">لا يمكنك التراجع عن هذا بمفردك</string>
-    <string name="pair_warning_body">بمجرد أن يصبح لهذا الجهاز مرافِق:\n\n• يتوقف رمز PIN أو النمط أو كلمة المرور عن العمل. السبيل الوحيد للدخول هو موافقة مرافِق من هاتفه، شخصيًا.\n• على كل المرافِقين أن يوافقوا، لا واحد فقط.\n• تصبح إزالة Killit غير متاحة حتى تُزال كل الأجهزة المرافِقة.\n• تتطلب إزالة مرافِق موافقة ذلك المرافِق نفسه.\n\nإذا فُقد هاتف مرافِق أو مُسح أو أُعيد تثبيته، فلن يمكن فتح هذا الجهاز بعد ذلك ولن يمكن إزالة Killit. الخيار الوحيد المتبقي هو إعادة ضبط المصنع من وضع الاسترداد، وهو يمحو كل ما عليه.</string>
-    <string name="pair_warning_accept">فهمت، تابع</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">الخطوة %1$d من %2$d</string>
-    <string name="pair_scanned_next">لقد مسحوه — افتح الكاميرا</string>
-    <string name="pair_back_to_code">العودة إلى رمزي</string>
-    <string name="pair_hub_subtitle">الاقتران يعمل في اتجاه واحد. إضافة مرافِق هنا لا تغيّر شيئًا في هاتفه، وإضافتهم لك لا تغيّر شيئًا في هاتفك.</string>
-
-    <string name="pair_role_lock_title">اقفل هذا الهاتف</string>
-    <string name="pair_role_lock_desc">أنت من يمسح رمزهم. عندئذٍ لن يُفتح هذا الهاتف إلا بموافقتهم.</string>
-    <string name="pair_role_companion_title">كن مرافِقًا لهاتف آخر</string>
-    <string name="pair_role_companion_desc">هم من يمسحون رمزك. هذا الهاتف لا يُقفل ولا يتغير.</string>
-
-    <string name="pair_locks_this_phone">هذا الهاتف هو الذي يُقفل</string>
-    <string name="pair_locks_this_phone_desc">بمجرد مسحك لرمزهم، سيحتاج هذا الهاتف إلى موافقتهم في كل مرة يُفتح فيها. الهاتف الآخر لا يتغير.</string>
-    <string name="pair_locks_other_phone">هذا الهاتف لا يُقفل</string>
-    <string name="pair_locks_other_phone_desc">الهاتف الذي يمسح هذا الرمز هو الذي يُقفل. لا يتغير شيء في هذا الهاتف.</string>
-    <string name="pair_add_ready_title">جهّز الهاتف الآخر</string>
-    <string name="pair_add_ready_body">على الهاتف الآخر افتح Killit، واذهب إلى «الأجهزة المرافِقة» واضغط «اعرض رمزي». ثم عُد إلى هنا.</string>
-    <string name="pair_add_ready_action">جاهز — افتح الكاميرا</string>
-    <string name="pair_add_scan_title">امسح رمزهم</string>
-    <string name="pair_add_scan_body">وجّه الكاميرا إلى الرمز على شاشة الهاتف الآخر.</string>
-    <string name="pair_add_done_title">أصبح %1$s مرافِقًا الآن</string>
-    <string name="pair_add_done_body">لن يُفتح هذا الهاتف من الآن فصاعدًا إلا بموافقة مرافِق.</string>
-    <string name="pair_add_another">أضف مرافِقًا آخر</string>
-    <string name="pair_show_title">رمزك</string>
-    <string name="pair_show_body">دع الهاتف الآخر يمسح هذا. لا يتغير شيء في هذا الهاتف.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">مطلوب موافقة مرافِق</string>
-    <string name="qr_choose_unlock">افتح قفل هذا الهاتف</string>
-    <string name="qr_choose_unlock_desc">اعرض رمزًا على مرافِقيك وامسح ما يعرضونه بالمقابل. يجب أن يوافق الجميع، وعددهم %1$d.</string>
-    <string name="qr_choose_approve">وافق على هاتف آخر</string>
-    <string name="qr_choose_approve_desc">شخص آخر يحتاج موافقتك ليفتح هاتفه. هذا لا يفتح هاتفك.</string>
-    <string name="qr_unlock_restart">ابدأ من جديد</string>
-    <string name="qr_unlock_code_description">رمز طلب الموافقة</string>
-    <string name="qr_unlock_progress">تمت الموافقة: %1$d من %2$d · بقي %3$s</string>
-    <string name="qr_unlock_waiting_on">ما زال بانتظار</string>
-    <string name="qr_unlock_show_title">اعرض هذا على %1$s</string>
-    <string name="qr_unlock_show_body">على هاتفهم: Killit ← «وافق على هاتف آخر». بعد أن يمسحوه، اضغط أدناه.</string>
-    <string name="qr_unlock_scan_title">امسح ما يعرضه %1$s بالمقابل</string>
-    <string name="qr_unlock_scan_body">وجّه الكاميرا إلى رمز الموافقة على شاشتهم.</string>
-    <string name="qr_session_expired">نفد وقت هذا الطلب.</string>
-    <string name="qr_approve_scan_title">امسح رمزهم</string>
-    <string name="qr_approve_intro">وجّه الكاميرا إلى الرمز على الهاتف الذي يحتاج إلى الفتح. الموافقة لا تفتح هذا الهاتف.</string>
-    <string name="qr_approve_show_title">اعرض هذا بالمقابل</string>
-    <string name="qr_approve_ready">ارفع هذا أمام الهاتف الذي يحتاج إلى الفتح.</string>
-    <string name="qr_approve_code_description">رمز موافقتك</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">هذا رمز Killit، لكنه ليس الرمز الذي تنتظره هذه الشاشة.</string>
-    <string name="scan_expired">انتهت صلاحية ذلك الطلب. ابدأ طلبًا جديدًا.</string>
-    <string name="scan_bad_signature">لم تجتَز تلك الموافقة التحقق.</string>
-    <string name="scan_unknown_peer">ذلك الهاتف ليس مرافِقًا لهذا الجهاز.</string>
-    <string name="scan_already_approved">ذلك المرافِق وافق بالفعل.</string>
-    <string name="scan_no_key">لا يملك هذا الجهاز هوية اقتران. ربما مُسحت بياناته.</string>
-    <string name="scan_not_device_owner">يتطلب الاقتران صلاحية مالك الجهاز، لذا لا يمكن التراجع عنه بمسح بيانات التطبيق.</string>
-    <string name="scan_already_paired">ذلك الهاتف مرافِق بالفعل.</string>
-    <string name="scan_self_pairing">لا يمكن للجهاز أن يكون مرافِقًا لنفسه.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">عدد الأجهزة التي لا تُفتح إلا بموافقة هذا الهاتف: %1$d، والمفتاح الذي يمنح تلك الموافقة موجود هنا ولا مكان سواه. إزالة Killit أو إلغاء تثبيته أو مسح بياناته ستُتلف ذلك المفتاح وتترك تلك الأجهزة بلا سبيل لفتحها — ولن يبقى لها سوى إعادة ضبط المصنع من وضع الاسترداد. على تلك الأجهزة أن تزيل هذا الهاتف من قائمة مرافِقيها أولًا.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">مُسحت بيانات Killit</string>

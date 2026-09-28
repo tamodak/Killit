@@ -16,7 +16,6 @@
     <string name="cancel">Abbrechen</string>
     <string name="ok">OK</string>
     <string name="back">Zurück</string>
-    <string name="done">Fertig</string>
     <string name="save">Speichern</string>
     <string name="discard">Verwerfen</string>
     <string name="copy">Kopieren</string>
@@ -135,90 +134,6 @@
     <string name="harden_apps_control_desc">Standardmäßig aus, denn es gilt für jede App auf dem Gerät: du könntest keine einzige deinstallieren, zwangsbeenden oder deren Daten löschen — nicht nur die blockierten. Killits eigene Daten sind auch ohne dies geschützt.</string>
     <string name="harden_date_time">Ändern von Datum und Uhrzeit blockieren</string>
     <string name="harden_date_time_desc">Der Countdown zum Entfernen wird an der Uhr gemessen. Ohne dies lässt er sich überspringen, indem man das Datum vorstellt.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">Der QR-Code konnte nicht gezeichnet werden.</string>
-    <string name="pair_camera_permission">Kamerazugriff erlauben</string>
-    <string name="scan_camera_back">Rückseite</string>
-    <string name="scan_camera_front">Vorderseite</string>
-    <string name="pair_title">Begleitgeräte</string>
-    <string name="pair_entry">Begleitgeräte</string>
-    <string name="pair_code_description">Kopplungscode dieses Geräts</string>
-    <string name="pair_list_title">Gekoppelt: %1$d</string>
-    <string name="pair_list_all_required">Jedes einzelne muss zustimmen, bevor dieses Gerät sich öffnet.</string>
-    <string name="pair_remove">Entfernen</string>
-    <string name="pair_remove_title">%1$s entfernen?</string>
-    <string name="pair_remove_body">%1$s muss der Entfernung zustimmen — du brauchst dieses Telefon vor dir. Das ist der einzige Weg, eine Kopplung rückgängig zu machen.</string>
-    <string name="pair_remove_start">Weiter</string>
-    <string name="pair_remove_show_title">Zeige dies %1$s</string>
-    <string name="pair_remove_show_body">%1$s scannt dies, um der Entfernung zuzustimmen. Noch %2$s.</string>
-    <string name="pair_remove_scan_title">Scanne, was %1$s zurückzeigt</string>
-    <string name="pair_remove_scan_body">Richte die Kamera auf den Bestätigungscode auf ihrem Bildschirm. Noch %1$s.</string>
-    <string name="pair_remove_code_description">Code der Entfernungsanfrage</string>
-    <string name="pair_warning_title">Das kannst du nicht allein rückgängig machen</string>
-    <string name="pair_warning_body">Sobald dieses Gerät ein Begleitgerät hat:\n\n• Deine PIN, dein Muster oder dein Passwort funktioniert nicht mehr. Der einzige Weg hinein ist die Zustimmung eines Begleitgeräts, persönlich von dessen Telefon aus.\n• Jedes Begleitgerät muss zustimmen — nicht nur eines.\n• Killit zu entfernen ist nicht mehr möglich, bis alle Begleitgeräte entfernt sind.\n• Ein Begleitgerät zu entfernen erfordert die Zustimmung genau dieses Geräts.\n\nGeht ein Begleittelefon verloren, wird es gelöscht oder neu installiert, lässt sich dieses Gerät nicht mehr öffnen und Killit nicht mehr entfernen. Die einzige verbleibende Möglichkeit ist ein Zurücksetzen auf Werkseinstellungen aus dem Wiederherstellungsmodus, das alles darauf löscht.</string>
-    <string name="pair_warning_accept">Verstanden, weiter</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">Schritt %1$d von %2$d</string>
-    <string name="pair_scanned_next">Sie haben gescannt — Kamera öffnen</string>
-    <string name="pair_back_to_code">Zurück zu meinem Code</string>
-    <string name="pair_hub_subtitle">Kopplung wirkt nur in eine Richtung. Hier ein Begleitgerät hinzuzufügen ändert nichts auf dessen Telefon, und wenn es dich hinzufügt, ändert das nichts auf deinem.</string>
-
-    <string name="pair_role_lock_title">Dieses Telefon sperren</string>
-    <string name="pair_role_lock_desc">Du scannst ihren Code. Dieses Telefon öffnet sich danach nur noch mit ihrer Zustimmung.</string>
-    <string name="pair_role_companion_title">Begleitgerät eines anderen Telefons sein</string>
-    <string name="pair_role_companion_desc">Sie scannen deinen Code. Dieses Telefon wird nicht gesperrt und ändert sich nicht.</string>
-
-    <string name="pair_locks_this_phone">Dieses Telefon wird gesperrt</string>
-    <string name="pair_locks_this_phone_desc">Sobald du ihren Code scannst, braucht dieses Telefon bei jedem Öffnen ihre Zustimmung. Das andere Telefon ändert sich nicht.</string>
-    <string name="pair_locks_other_phone">Dieses Telefon wird nicht gesperrt</string>
-    <string name="pair_locks_other_phone_desc">Gesperrt wird das Telefon, das diesen Code scannt. Auf diesem Telefon ändert sich nichts.</string>
-    <string name="pair_add_ready_title">Das andere Telefon vorbereiten</string>
-    <string name="pair_add_ready_body">Öffne auf dem anderen Telefon Killit, geh zu Begleitgeräte und tippe auf „Meinen Code anzeigen“. Komm dann hierher zurück.</string>
-    <string name="pair_add_ready_action">Bereit — Kamera öffnen</string>
-    <string name="pair_add_scan_title">Ihren Code scannen</string>
-    <string name="pair_add_scan_body">Richte die Kamera auf den Code auf dem Bildschirm des anderen Telefons.</string>
-    <string name="pair_add_done_title">%1$s ist jetzt ein Begleitgerät</string>
-    <string name="pair_add_done_body">Dieses Telefon öffnet sich von nun an nur mit der Zustimmung eines Begleitgeräts.</string>
-    <string name="pair_add_another">Weiteres Begleitgerät hinzufügen</string>
-    <string name="pair_show_title">Dein Code</string>
-    <string name="pair_show_body">Lass das andere Telefon dies scannen. Auf diesem Telefon ändert sich nichts.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">Zustimmung eines Begleitgeräts nötig</string>
-    <string name="qr_choose_unlock">Dieses Telefon entsperren</string>
-    <string name="qr_choose_unlock_desc">Zeige deinen Begleitgeräten einen Code und scanne, was sie zurückzeigen. Alle müssen zustimmen (%1$d).</string>
-    <string name="qr_choose_approve">Ein anderes Telefon freigeben</string>
-    <string name="qr_choose_approve_desc">Jemand anderes braucht deine Zustimmung, um sein Telefon zu öffnen. Deines öffnet das nicht.</string>
-    <string name="qr_unlock_restart">Neu beginnen</string>
-    <string name="qr_unlock_code_description">Code der Zustimmungsanfrage</string>
-    <string name="qr_unlock_progress">Zugestimmt: %1$d von %2$d · noch %3$s</string>
-    <string name="qr_unlock_waiting_on">Es fehlt noch</string>
-    <string name="qr_unlock_show_title">Zeige dies %1$s</string>
-    <string name="qr_unlock_show_body">Auf ihrem Telefon: Killit → Ein anderes Telefon freigeben. Sobald sie gescannt haben, tippe unten.</string>
-    <string name="qr_unlock_scan_title">Scanne, was %1$s zurückzeigt</string>
-    <string name="qr_unlock_scan_body">Richte die Kamera auf den Bestätigungscode auf ihrem Bildschirm.</string>
-    <string name="qr_session_expired">Für diese Anfrage ist die Zeit abgelaufen.</string>
-    <string name="qr_approve_scan_title">Ihren Code scannen</string>
-    <string name="qr_approve_intro">Richte die Kamera auf den Code des Telefons, das geöffnet werden soll. Die Zustimmung öffnet dieses Telefon nicht.</string>
-    <string name="qr_approve_show_title">Dies zurückzeigen</string>
-    <string name="qr_approve_ready">Halte dies vor das Telefon, das geöffnet werden soll.</string>
-    <string name="qr_approve_code_description">Dein Zustimmungscode</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">Das ist ein Killit-Code, aber nicht der, auf den dieser Bildschirm wartet.</string>
-    <string name="scan_expired">Diese Anfrage ist abgelaufen. Starte eine neue.</string>
-    <string name="scan_bad_signature">Diese Zustimmung hat die Prüfung nicht bestanden.</string>
-    <string name="scan_unknown_peer">Dieses Telefon ist kein Begleitgerät dieses Geräts.</string>
-    <string name="scan_already_approved">Dieses Begleitgerät hat bereits zugestimmt.</string>
-    <string name="scan_no_key">Dieses Gerät hat keine Kopplungsidentität. Möglicherweise wurden seine Daten gelöscht.</string>
-    <string name="scan_not_device_owner">Kopplung erfordert Geräteeigentümer und lässt sich daher nicht durch Löschen der App-Daten rückgängig machen.</string>
-    <string name="scan_already_paired">Dieses Telefon ist bereits ein Begleitgerät.</string>
-    <string name="scan_self_pairing">Ein Gerät kann nicht sein eigenes Begleitgerät sein.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">Geräte, die sich nur mit der Zustimmung dieses Telefons öffnen lassen: %1$d. Der Schlüssel dafür liegt hier und sonst nirgends. Killit zu entfernen, zu deinstallieren oder seine Daten zu löschen würde diesen Schlüssel vernichten und jene Geräte unöffenbar machen — ihnen bliebe nur ein Zurücksetzen auf Werkseinstellungen aus dem Wiederherstellungsmodus. Diese Geräte müssen dieses Telefon zuerst als Begleitgerät entfernen.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">Killit-Daten wurden gelöscht</string>

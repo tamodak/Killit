@@ -109,96 +109,6 @@ class DurableStore(private val dpc: DevicePolicyController) {
         return written
     }
 
-    // ---------------------------------------------------------------- paired peers
-
-    /**
-     * Reads the companion list as the device policy service holds it.
-     *
-     * This copy is what makes pairing binding. If peers lived only in the app's data directory,
-     * "Clear data" would erase them, the gate would fall back to the passkey, and the whole
-     * companion requirement would come apart — which is exactly the escape route pairing exists
-     * to close.
-     *
-     * @return the paired companions, or an empty list when there are none or the bundle is absent.
-     */
-    suspend fun readPeers(): List<PairedPeer> {
-        val bundle = dpc.readSelfRestrictions() ?: return emptyList()
-        return PairedPeer.deserialize(bundle.getString(KEY_PEERS))
-    }
-
-    /**
-     * Writes the companion list.
-     *
-     * @param peers the full list to persist; this replaces whatever was stored.
-     * @return true when the device policy service accepted the write.
-     */
-    suspend fun writePeers(peers: List<PairedPeer>): Boolean {
-        val existing = dpc.readSelfRestrictions() ?: Bundle()
-        existing.putString(KEY_PEERS, PairedPeer.serialize(peers))
-        return dpc.writeSelfRestrictions(existing).also { written ->
-            if (written) {
-                KillitLog.i(KillitLog.PAIRING, "Durable peer list now holds ${peers.size} companions")
-            } else {
-                KillitLog.e(KillitLog.PAIRING, "Peer list NOT written durably; Clear data could undo the pairing")
-            }
-        }
-    }
-
-    /**
-     * Reads this device's **own** public key, kept durably alongside the peer list.
-     *
-     * Not a secret, and stored for one specific reason: unlocking needs it — it goes into the
-     * challenge so companions know who they are signing for — but "Clear data" deletes the
-     * Keystore entry it would otherwise be read from. Keeping the public half here means a wiped
-     * device can still be unlocked by its companions. Only the ability to *sign for others* is
-     * lost with the private key, which no amount of storage can bring back.
-     *
-     * @return the compressed P-256 point, or null if none has been written or it is corrupt.
-     */
-    suspend fun readOwnPublicKey(): ByteArray? =
-        dpc.readSelfRestrictions()?.getString(KEY_OWN_PUBLIC_KEY)?.decodeBase64()
-
-    /**
-     * Writes this device's own public key.
-     *
-     * @param publicKey the compressed P-256 point matching the Keystore private key.
-     * @return true when the device policy service accepted the write.
-     */
-    suspend fun writeOwnPublicKey(publicKey: ByteArray): Boolean {
-        val existing = dpc.readSelfRestrictions() ?: Bundle()
-        existing.putString(KEY_OWN_PUBLIC_KEY, publicKey.encodeBase64())
-        return dpc.writeSelfRestrictions(existing)
-    }
-
-    /**
-     * Reads the set of devices this phone can open.
-     *
-     * @return Base64 fingerprints of those devices, or an empty set when there are none.
-     */
-    suspend fun readGuardianships(): Set<String> {
-        val bundle = dpc.readSelfRestrictions() ?: return emptySet()
-        return deserializeGuardianships(bundle.getString(KEY_GUARDIAN_FOR))
-    }
-
-    /**
-     * Writes the set of devices this phone can open.
-     *
-     * @param fingerprints the full set to persist; this replaces whatever was stored.
-     * @return true when the device policy service accepted the write.
-     */
-    suspend fun writeGuardianships(fingerprints: Set<String>): Boolean {
-        val existing = dpc.readSelfRestrictions() ?: Bundle()
-        existing.putString(KEY_GUARDIAN_FOR, serializeGuardianships(fingerprints))
-        return dpc.writeSelfRestrictions(existing).also { written ->
-            if (!written) {
-                KillitLog.e(
-                    KillitLog.PAIRING,
-                    "Guardianships NOT written durably; Clear data could free this phone to be wiped",
-                )
-            }
-        }
-    }
-
     // ---------------------------------------------------------------- release request
 
     /**
@@ -273,10 +183,6 @@ class DurableStore(private val dpc: DevicePolicyController) {
 
         const val KEY_RELEASE_REQUESTED_AT = "killit_release_requested_at"
         const val KEY_RELEASE_AVAILABLE_AT = "killit_release_available_at"
-
-        const val KEY_PEERS = "killit_paired_peers"
-        const val KEY_OWN_PUBLIC_KEY = "killit_own_public_key"
-        const val KEY_GUARDIAN_FOR = "killit_guardian_for"
     }
 }
 

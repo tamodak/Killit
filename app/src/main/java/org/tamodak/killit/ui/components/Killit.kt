@@ -77,8 +77,8 @@ import org.tamodak.killit.ui.theme.KillitTextStrong
  * ### Insets
  *
  * [KillitScreen] applies `safeDrawingPadding` once, which covers the status bar, the navigation
- * bar, the cutout and the IME. Screens that use it must not apply insets again. The three that
- * draw their own chrome — the gate, the QR gate and the approval flow — apply it themselves.
+ * bar, the cutout and the IME. Screens that use it must not apply insets again. The gate draws
+ * its own chrome, so it applies them itself.
  */
 
 /** Horizontal margin for screen content. Every screen uses this and nothing else. */
@@ -245,7 +245,7 @@ fun KillitPanel(
 /**
  * A centred panel announcing one state: large icon, title, explanation.
  *
- * Used where the whole screen is about a single fact — device owner or not, tampered, paired.
+ * Used where the whole screen is about a single fact — device owner or not, tampered.
  *
  * @param icon drawn large above the title.
  * @param title the state, in the accent colour.
@@ -296,12 +296,12 @@ fun KillitStatusPanel(
 /**
  * A bordered, tappable row: icon, title, optional subtitle, chevron.
  *
- * The workhorse of the app — settings entries, provisioning routes, lock methods and the pairing
- * roles are all this. The chevron is drawn only when the row actually navigates, so a row that
+ * The workhorse of the app — settings entries, provisioning routes and lock methods are all
+ * this. The chevron is drawn only when the row actually navigates, so a row that
  * merely acts in place does not promise a screen that never arrives.
  *
  * @param accent colours the title and the chevron; defaults to ordinary foreground.
- * @param borderColor set alongside [accent] to make a row read as consequential — the red pairing
+ * @param borderColor set alongside [accent] to make a row read as consequential — the red release
  *   row, for instance. Left dim by default.
  * @param title the row's label.
  * @param modifier applied to the row.

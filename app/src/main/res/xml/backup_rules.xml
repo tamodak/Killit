@@ -7,9 +7,9 @@
     and the attribute is kept so that turning backup on later is a one-line change made deliberately
     rather than by deleting a reference.
 
-    Nothing in Killit should ever be backed up. The credential record and the peer list would go to
-    the cloud and come back on a different handset, where the Keystore key they were written against
-    does not exist — restoring a lock nobody can open.
+    Nothing in Killit should ever be backed up. The credential record carries the lockout counters,
+    so restoring an older copy would roll back failed attempts; and on a different handset it would
+    describe a device owner and a blocklist that are not there.
 
     See https://developer.android.com/guide/topics/data/autobackup
 -->

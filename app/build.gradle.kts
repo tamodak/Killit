@@ -13,17 +13,16 @@ android {
 
     defaultConfig {
         applicationId = "org.tamodak.killit"
-        // 26 is what the pairing design costs: ECDSA P-256 is Keystore-native from 23, but the
-        // rest of the app assumes API 26 platform behaviour. A few features degrade below their
-        // ceiling here — force-stop blocking needs 30, StrongBox needs 28 — and each is guarded at
-        // its call site rather than raising the floor for everyone.
+        // The app assumes API 26 platform behaviour. A few features degrade below their ceiling
+        // here — force-stop blocking needs 30 — and each is guarded at its call site rather than
+        // raising the floor for everyone.
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
-        // Killit's meaningful tests are instrumented: the Keystore, DataStore and the device policy
-        // service have no JVM equivalent worth faking.
+        // Killit's meaningful tests are instrumented: DataStore and the device policy service have
+        // no JVM equivalent worth faking.
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // How long "unblock all & remove admin" waits before it can be carried out. The delay is
@@ -80,9 +79,6 @@ dependencies {
     // Provisioning without a computer. `api` is the client, `provider` the manifest component.
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
-    // QR encoding and decoding for companion pairing.
-    implementation(libs.zxing.core)
-    implementation(libs.zxing.embedded)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

@@ -16,7 +16,6 @@
     <string name="cancel">Annuler</string>
     <string name="ok">OK</string>
     <string name="back">Retour</string>
-    <string name="done">Terminé</string>
     <string name="save">Enregistrer</string>
     <string name="discard">Abandonner</string>
     <string name="copy">Copier</string>
@@ -135,90 +134,6 @@
     <string name="harden_apps_control_desc">Désactivé par défaut, car cela s\'applique à toutes les applis de l\'appareil : tu ne pourrais en désinstaller, forcer l\'arrêt ni effacer les données d\'aucune, pas seulement des applis bloquées. Les données de Killit sont déjà protégées sans cela.</string>
     <string name="harden_date_time">Bloquer la modification de la date et de l\'heure</string>
     <string name="harden_date_time_desc">Le compte à rebours de retrait se mesure à l\'horloge. Sans cela, il suffirait d\'avancer la date pour le sauter.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">Impossible de dessiner le code QR.</string>
-    <string name="pair_camera_permission">Autoriser l\'accès à la caméra</string>
-    <string name="scan_camera_back">Arrière</string>
-    <string name="scan_camera_front">Avant</string>
-    <string name="pair_title">Appareils compagnons</string>
-    <string name="pair_entry">Appareils compagnons</string>
-    <string name="pair_code_description">Code d\'appairage de cet appareil</string>
-    <string name="pair_list_title">Appairés : %1$d</string>
-    <string name="pair_list_all_required">Chacun d\'eux doit approuver avant que cet appareil ne s\'ouvre.</string>
-    <string name="pair_remove">Retirer</string>
-    <string name="pair_remove_title">Retirer %1$s ?</string>
-    <string name="pair_remove_body">%1$s doit approuver son retrait : il te faudra ce téléphone devant toi. C\'est la seule façon d\'annuler un appairage.</string>
-    <string name="pair_remove_start">Continuer</string>
-    <string name="pair_remove_show_title">Montre ceci à %1$s</string>
-    <string name="pair_remove_show_body">%1$s scanne ceci pour approuver son retrait. Il reste %2$s.</string>
-    <string name="pair_remove_scan_title">Scanne ce que %1$s affiche en retour</string>
-    <string name="pair_remove_scan_body">Pointe la caméra vers le code d\'approbation sur leur écran. Il reste %1$s.</string>
-    <string name="pair_remove_code_description">Code de demande de retrait</string>
-    <string name="pair_warning_title">Tu ne peux pas annuler cela tout seul</string>
-    <string name="pair_warning_body">Dès que cet appareil a un compagnon :\n\n• Ton code PIN, ton schéma ou ton mot de passe cesse de fonctionner. La seule façon d\'entrer est qu\'un compagnon approuve depuis son téléphone, en personne.\n• Tous les compagnons doivent approuver, pas seulement un.\n• Retirer Killit devient impossible tant que tous les compagnons ne sont pas retirés.\n• Retirer un compagnon exige l\'approbation de ce compagnon.\n\nSi un téléphone compagnon est perdu, effacé ou réinstallé, cet appareil ne pourra plus être ouvert et Killit ne pourra plus être retiré. La seule option restante est une réinitialisation d\'usine depuis le mode Recovery, qui efface tout son contenu.</string>
-    <string name="pair_warning_accept">J\'ai compris, continuer</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">Étape %1$d sur %2$d</string>
-    <string name="pair_scanned_next">Ils l\'ont scanné — ouvrir la caméra</string>
-    <string name="pair_back_to_code">Revenir à mon code</string>
-    <string name="pair_hub_subtitle">L\'appairage fonctionne dans un seul sens. Ajouter un compagnon ici ne change rien sur son téléphone, et le fait qu\'il t\'ajoute ne change rien sur le tien.</string>
-
-    <string name="pair_role_lock_title">Verrouiller ce téléphone</string>
-    <string name="pair_role_lock_desc">C\'est toi qui scannes leur code. Ce téléphone ne s\'ouvrira alors qu\'avec leur approbation.</string>
-    <string name="pair_role_companion_title">Être le compagnon d\'un autre téléphone</string>
-    <string name="pair_role_companion_desc">Ce sont eux qui scannent ton code. Ce téléphone n\'est pas verrouillé et ne change pas.</string>
-
-    <string name="pair_locks_this_phone">C\'est ce téléphone qui est verrouillé</string>
-    <string name="pair_locks_this_phone_desc">Dès que tu scannes leur code, ce téléphone aura besoin de leur approbation à chaque ouverture. L\'autre téléphone ne change pas.</string>
-    <string name="pair_locks_other_phone">Ce téléphone n\'est pas verrouillé</string>
-    <string name="pair_locks_other_phone_desc">C\'est le téléphone qui scanne ce code qui se retrouve verrouillé. Rien ne change sur ce téléphone.</string>
-    <string name="pair_add_ready_title">Prépare l\'autre téléphone</string>
-    <string name="pair_add_ready_body">Sur l\'autre téléphone, ouvre Killit, va dans Appareils compagnons et touche « Afficher mon code ». Reviens ensuite ici.</string>
-    <string name="pair_add_ready_action">Prêt — ouvrir la caméra</string>
-    <string name="pair_add_scan_title">Scanne leur code</string>
-    <string name="pair_add_scan_body">Pointe la caméra vers le code affiché sur l\'écran de l\'autre téléphone.</string>
-    <string name="pair_add_done_title">%1$s est désormais un compagnon</string>
-    <string name="pair_add_done_body">Ce téléphone ne s\'ouvre désormais qu\'avec l\'approbation d\'un compagnon.</string>
-    <string name="pair_add_another">Ajouter un autre compagnon</string>
-    <string name="pair_show_title">Ton code</string>
-    <string name="pair_show_body">Fais scanner ceci par l\'autre téléphone. Rien ne change sur ce téléphone.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">Approbation d\'un compagnon requise</string>
-    <string name="qr_choose_unlock">Déverrouiller ce téléphone</string>
-    <string name="qr_choose_unlock_desc">Montre un code à tes compagnons et scanne celui qu\'ils affichent en retour. Ils doivent tous approuver (%1$d).</string>
-    <string name="qr_choose_approve">Approuver un autre téléphone</string>
-    <string name="qr_choose_approve_desc">Quelqu\'un a besoin de ton approbation pour ouvrir son téléphone. Cela n\'ouvre pas le tien.</string>
-    <string name="qr_unlock_restart">Recommencer</string>
-    <string name="qr_unlock_code_description">Code de demande d\'approbation</string>
-    <string name="qr_unlock_progress">Approuvés : %1$d sur %2$d · %3$s restant</string>
-    <string name="qr_unlock_waiting_on">En attente de</string>
-    <string name="qr_unlock_show_title">Montre ceci à %1$s</string>
-    <string name="qr_unlock_show_body">Sur leur téléphone : Killit → Approuver un autre téléphone. Une fois qu\'ils l\'ont scanné, touche ci-dessous.</string>
-    <string name="qr_unlock_scan_title">Scanne ce que %1$s affiche en retour</string>
-    <string name="qr_unlock_scan_body">Pointe la caméra vers le code d\'approbation sur leur écran.</string>
-    <string name="qr_session_expired">Cette demande a dépassé le temps imparti.</string>
-    <string name="qr_approve_scan_title">Scanne leur code</string>
-    <string name="qr_approve_intro">Pointe la caméra vers le code du téléphone qui doit être ouvert. Approuver n\'ouvre pas ce téléphone.</string>
-    <string name="qr_approve_show_title">Montre ceci en retour</string>
-    <string name="qr_approve_ready">Présente ceci au téléphone qui doit être ouvert.</string>
-    <string name="qr_approve_code_description">Ton code d\'approbation</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">C\'est bien un code Killit, mais pas celui que cet écran attend.</string>
-    <string name="scan_expired">Cette demande a expiré. Lances-en une nouvelle.</string>
-    <string name="scan_bad_signature">Cette approbation n\'a pas été validée.</string>
-    <string name="scan_unknown_peer">Ce téléphone n\'est pas un compagnon de cet appareil.</string>
-    <string name="scan_already_approved">Ce compagnon a déjà approuvé.</string>
-    <string name="scan_no_key">Cet appareil n\'a pas d\'identité d\'appairage. Ses données ont peut-être été effacées.</string>
-    <string name="scan_not_device_owner">L\'appairage exige le rôle de propriétaire de l\'appareil : il ne peut donc pas être annulé en effaçant les données de l\'appli.</string>
-    <string name="scan_already_paired">Ce téléphone est déjà un compagnon.</string>
-    <string name="scan_self_pairing">Un appareil ne peut pas être son propre compagnon.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">Appareils qui ne peuvent être ouverts qu\'avec l\'approbation de ce téléphone : %1$d. La clé qui la donne se trouve ici et nulle part ailleurs. Retirer Killit, le désinstaller ou effacer ses données détruirait cette clé et rendrait ces appareils impossibles à ouvrir — il ne leur resterait qu\'une réinitialisation d\'usine depuis le mode Recovery. Ces appareils doivent d\'abord retirer ce téléphone comme compagnon.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">Les données de Killit ont été effacées</string>

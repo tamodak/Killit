@@ -16,7 +16,6 @@
     <string name="cancel">Отмена</string>
     <string name="ok">ОК</string>
     <string name="back">Назад</string>
-    <string name="done">Готово</string>
     <string name="save">Сохранить</string>
     <string name="discard">Отклонить</string>
     <string name="copy">Копировать</string>
@@ -135,90 +134,6 @@
     <string name="harden_apps_control_desc">По умолчанию выключено, потому что действует на все приложения устройства: вы не сможете удалить, принудительно остановить или очистить данные ни одного из них, а не только заблокированных. Данные самого Killit защищены и без этого.</string>
     <string name="harden_date_time">Запретить изменение даты и времени</string>
     <string name="harden_date_time_desc">Обратный отсчёт до удаления измеряется по часам. Без этого его можно пропустить, переведя дату вперёд.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">Не удалось построить QR-код.</string>
-    <string name="pair_camera_permission">Разрешить доступ к камере</string>
-    <string name="scan_camera_back">Задняя</string>
-    <string name="scan_camera_front">Фронтальная</string>
-    <string name="pair_title">Устройства-компаньоны</string>
-    <string name="pair_entry">Устройства-компаньоны</string>
-    <string name="pair_code_description">Код сопряжения этого устройства</string>
-    <string name="pair_list_title">Сопряжено: %1$d</string>
-    <string name="pair_list_all_required">Каждое из них должно подтвердить, прежде чем это устройство откроется.</string>
-    <string name="pair_remove">Удалить</string>
-    <string name="pair_remove_title">Удалить %1$s?</string>
-    <string name="pair_remove_body">%1$s должен подтвердить своё удаление — этот телефон понадобится вам под рукой. Это единственный способ отменить сопряжение.</string>
-    <string name="pair_remove_start">Продолжить</string>
-    <string name="pair_remove_show_title">Покажите это устройству %1$s</string>
-    <string name="pair_remove_show_body">%1$s сканирует это, чтобы подтвердить своё удаление. Осталось %2$s.</string>
-    <string name="pair_remove_scan_title">Отсканируйте то, что покажет %1$s</string>
-    <string name="pair_remove_scan_body">Наведите камеру на код подтверждения на их экране. Осталось %1$s.</string>
-    <string name="pair_remove_code_description">Код запроса на удаление</string>
-    <string name="pair_warning_title">В одиночку это не отменить</string>
-    <string name="pair_warning_body">Как только у этого устройства появится компаньон:\n\n• Ваш PIN-код, графический ключ или пароль перестанут работать. Единственный способ войти — подтверждение компаньона с его телефона, лично.\n• Подтвердить должны все компаньоны, а не один.\n• Удалить Killit будет нельзя, пока не удалены все компаньоны.\n• Удаление компаньона требует подтверждения именно этого компаньона.\n\nЕсли телефон-компаньон потерян, очищен или переустановлен, это устройство больше не удастся открыть, а Killit — удалить. Останется только сброс к заводским настройкам из режима восстановления, который стирает на нём всё.</string>
-    <string name="pair_warning_accept">Понимаю, продолжить</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">Шаг %1$d из %2$d</string>
-    <string name="pair_scanned_next">Они отсканировали — открыть камеру</string>
-    <string name="pair_back_to_code">Назад к моему коду</string>
-    <string name="pair_hub_subtitle">Сопряжение работает в одну сторону. Добавление компаньона здесь ничего не меняет на его телефоне, а то, что он добавит вас, ничего не изменит на вашем.</string>
-
-    <string name="pair_role_lock_title">Заблокировать этот телефон</string>
-    <string name="pair_role_lock_desc">Вы сканируете их код. После этого телефон будет открываться только с их подтверждения.</string>
-    <string name="pair_role_companion_title">Стать компаньоном другого телефона</string>
-    <string name="pair_role_companion_desc">Они сканируют ваш код. Этот телефон не блокируется и не меняется.</string>
-
-    <string name="pair_locks_this_phone">Блокируется именно этот телефон</string>
-    <string name="pair_locks_this_phone_desc">Как только вы отсканируете их код, этому телефону при каждом открытии будет нужно их подтверждение. Другой телефон не изменится.</string>
-    <string name="pair_locks_other_phone">Этот телефон не блокируется</string>
-    <string name="pair_locks_other_phone_desc">Блокируется тот телефон, который сканирует этот код. На этом телефоне ничего не меняется.</string>
-    <string name="pair_add_ready_title">Подготовьте другой телефон</string>
-    <string name="pair_add_ready_body">На другом телефоне откройте Killit, перейдите в «Устройства-компаньоны» и нажмите «Показать мой код». Затем вернитесь сюда.</string>
-    <string name="pair_add_ready_action">Готово — открыть камеру</string>
-    <string name="pair_add_scan_title">Отсканируйте их код</string>
-    <string name="pair_add_scan_body">Наведите камеру на код на экране другого телефона.</string>
-    <string name="pair_add_done_title">%1$s теперь компаньон</string>
-    <string name="pair_add_done_body">С этого момента телефон открывается только с подтверждения компаньона.</string>
-    <string name="pair_add_another">Добавить ещё компаньона</string>
-    <string name="pair_show_title">Ваш код</string>
-    <string name="pair_show_body">Дайте другому телефону отсканировать это. На этом телефоне ничего не изменится.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">Нужно подтверждение компаньона</string>
-    <string name="qr_choose_unlock">Разблокировать этот телефон</string>
-    <string name="qr_choose_unlock_desc">Покажите код своим компаньонам и отсканируйте то, что они покажут в ответ. Подтвердить должны все, а их %1$d.</string>
-    <string name="qr_choose_approve">Подтвердить другой телефон</string>
-    <string name="qr_choose_approve_desc">Кому-то нужно ваше подтверждение, чтобы открыть свой телефон. Ваш при этом не откроется.</string>
-    <string name="qr_unlock_restart">Начать заново</string>
-    <string name="qr_unlock_code_description">Код запроса на подтверждение</string>
-    <string name="qr_unlock_progress">Подтверждено %1$d из %2$d · осталось %3$s</string>
-    <string name="qr_unlock_waiting_on">Всё ещё ожидается</string>
-    <string name="qr_unlock_show_title">Покажите это устройству %1$s</string>
-    <string name="qr_unlock_show_body">На их телефоне: Killit → «Подтвердить другой телефон». После того как они отсканируют, нажмите ниже.</string>
-    <string name="qr_unlock_scan_title">Отсканируйте то, что покажет %1$s</string>
-    <string name="qr_unlock_scan_body">Наведите камеру на код подтверждения на их экране.</string>
-    <string name="qr_session_expired">Время этого запроса истекло.</string>
-    <string name="qr_approve_scan_title">Отсканируйте их код</string>
-    <string name="qr_approve_intro">Наведите камеру на код телефона, который нужно открыть. Подтверждение не откроет этот телефон.</string>
-    <string name="qr_approve_show_title">Покажите это в ответ</string>
-    <string name="qr_approve_ready">Поднесите это к телефону, который нужно открыть.</string>
-    <string name="qr_approve_code_description">Ваш код подтверждения</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">Это код Killit, но не тот, который ждёт этот экран.</string>
-    <string name="scan_expired">Этот запрос устарел. Создайте новый.</string>
-    <string name="scan_bad_signature">Это подтверждение не прошло проверку.</string>
-    <string name="scan_unknown_peer">Этот телефон не является компаньоном данного устройства.</string>
-    <string name="scan_already_approved">Этот компаньон уже подтвердил.</string>
-    <string name="scan_no_key">У этого устройства нет ключа сопряжения. Возможно, его данные были очищены.</string>
-    <string name="scan_not_device_owner">Для сопряжения нужны права владельца устройства, поэтому его нельзя отменить очисткой данных приложения.</string>
-    <string name="scan_already_paired">Этот телефон уже является компаньоном.</string>
-    <string name="scan_self_pairing">Устройство не может быть компаньоном самому себе.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">Устройств, которые открываются только с подтверждения этого телефона: %1$d, и ключ, дающий это подтверждение, хранится здесь и больше нигде. Удаление Killit, его деинсталляция или очистка его данных уничтожат этот ключ и сделают те устройства неоткрываемыми — им останется только сброс к заводским настройкам из режима восстановления. Сначала те устройства должны удалить этот телефон из компаньонов.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">Данные Killit были очищены</string>

@@ -33,7 +33,7 @@ import org.tamodak.killit.ui.theme.KillitIcons
 /**
  * Choose a method, enter the passkey, confirm it.
  *
- * The enter/confirm pairing is local UI state — **nothing is persisted until both entries match**,
+ * The enter/confirm step is local UI state — **nothing is persisted until both entries match**,
  * so a mistyped passkey can never lock the user out of their own device. On a mismatch the first
  * entry is discarded entirely and the flow restarts, rather than asking for the confirmation
  * again: re-confirming against a first entry the user may have fat-fingered would just persist the

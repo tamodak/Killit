@@ -16,17 +16,10 @@ import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.data.AppEntry
 import org.tamodak.killit.data.AppLanguage
 import org.tamodak.killit.data.AppInventory
-import org.tamodak.killit.data.CameraFacing
 import org.tamodak.killit.data.LockRepository
 import org.tamodak.killit.data.LockType
-import org.tamodak.killit.data.PairedPeer
 import org.tamodak.killit.data.ReleaseRequest
 import org.tamodak.killit.data.VerifyResult
-import org.tamodak.killit.pairing.ChallengePurpose
-import org.tamodak.killit.pairing.ChallengeSession
-import org.tamodak.killit.pairing.PairingManager
-import org.tamodak.killit.pairing.QrPayload
-import org.tamodak.killit.pairing.ScanOutcome
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -53,12 +46,6 @@ sealed interface Screen {
 
     /** Replacing an existing passkey. The same screen as [Setup], but cancellable. */
     data object ChangePasskey : Screen
-
-    /** Manage companion devices: show this device's code, scan another's, review the list. */
-    data object Pairing : Screen
-
-    /** Signing a challenge for another device. Reachable without unlocking this one. */
-    data object Approve : Screen
 
     /** Killit's data was cleared: apps are blocked but the passkey can no longer be verified. */
     data object Tampered : Screen
@@ -131,15 +118,7 @@ sealed interface ShizukuOutcome {
  * @param shizukuOutcome result of the last Shizuku provisioning attempt, shown as a dialog.
  * @param message a transient confirmation waiting to be shown as a toast.
  * @param releaseRequest outstanding request to give up device owner, or null if none has been made.
- * @param peers companions that must all approve before this device opens.
- * @param ownPublicKey this device's own pairing identity, or null if it has none yet.
- * @param challenge the approval round currently being collected, if any.
- * @param approvalResponse a signature produced for *another* device, waiting to be shown as a QR.
- * @param scanOutcome why the last scan was rejected. Cleared on the next successful one.
- * @param peerPendingRemoval companion whose removal is being confirmed.
- * @param cameraFacing which camera the QR scanner opens with.
  * @param language which language the UI is shown in.
- * @param guardianFor Base64 fingerprints of devices that cannot open without this phone's key.
  */
 data class KillitUiState(
     val screen: Screen = Screen.Loading,
@@ -156,37 +135,8 @@ data class KillitUiState(
     val shizukuOutcome: ShizukuOutcome? = null,
     val message: UiMessage? = null,
     val releaseRequest: ReleaseRequest? = null,
-
-    // ---------------------------------------------------------------- companion pairing
-    val peers: List<PairedPeer> = emptyList(),
-    val ownPublicKey: ByteArray? = null,
-    val challenge: ChallengeSession? = null,
-    val approvalResponse: String? = null,
-    val scanOutcome: ScanOutcome? = null,
-    val peerPendingRemoval: PairedPeer? = null,
-    val cameraFacing: CameraFacing = CameraFacing.DEFAULT,
     val language: AppLanguage = AppLanguage.DEFAULT,
-    val guardianFor: Set<String> = emptySet(),
 ) {
-    /**
-     * True once this device requires companion approval.
-     *
-     * This one flag disables the passkey, hides "change passkey" and blocks the removal countdown
-     * — see the checks in [KillitViewModel]. Pairing is meant to be binding, and every one of those
-     * routes would otherwise be a way back out of it.
-     */
-    val isPaired: Boolean get() = peers.isNotEmpty()
-
-    /**
-     * True when another device's only way in is this phone's private key.
-     *
-     * Distinct from [isPaired], and the two land on different phones: pairing is one-directional,
-     * so the device that *has* companions is the one that cannot open alone, while the device that
-     * *is* a companion is the one holding a key nobody can replace. Uninstalling Killit here, or
-     * clearing its data, destroys that key and leaves every device below unopenable for good.
-     */
-    val isGuardian: Boolean get() = guardianFor.isNotEmpty()
-
     /** How many checkboxes differ from what is applied: newly ticked plus newly cleared. */
     val pendingChanges: Int
         get() = ((selection - blocked) + (blocked - selection)).size
@@ -211,7 +161,7 @@ data class KillitUiState(
  *
  * Everything runs on `viewModelScope`, i.e. the main dispatcher, and there is deliberately no
  * `withContext` here: the repository and the policy controller are main-safe and own the
- * dispatchers for their own binder, keystore and disk work. If a slow operation ever does surface
+ * dispatchers for their own binder and disk work. If a slow operation ever does surface
  * on the main thread, the fix belongs in that class, not in a wrapper here.
  *
  * ### Authentication
@@ -220,18 +170,16 @@ data class KillitUiState(
  * saved state bundle. It dies with the ViewModel, which means process death re-locks — the
  * conservative direction.
  *
- * @param repository the passkey record, peer list and release request.
+ * @param repository the passkey record, the hardening toggles and the release request.
  * @param dpc every call into `DevicePolicyManager`.
  * @param inventory the installed-package list and icon decoding.
  * @param shizuku the no-computer provisioning path.
- * @param pairing the rules that turn a scanned QR into a decision.
  */
 class KillitViewModel(
     private val repository: LockRepository,
     private val dpc: DevicePolicyController,
     private val inventory: AppInventory,
     private val shizuku: ShizukuProvisioner,
-    private val pairing: PairingManager,
 ) : ViewModel() {
 
     /** The single source of UI state. Mutated only through [update] calls in this class. */
@@ -282,30 +230,16 @@ class KillitViewModel(
         // no device policy service, whose first call in a process is the most expensive thing at
         // startup. Everything else, reconciliation with durable storage included, runs behind the
         // gate the user is already looking at.
-        // Both reads hit the same already-open DataStore file, so the companion list costs
-        // essentially nothing on top of the record — and the gate cannot be chosen without it,
-        // since a paired device must never be shown a passkey prompt.
         val cached = repository.readCachedRecord()
-        val cachedPeers = repository.readCachedPeers()
-        val ownKey = repository.readCachedOwnPublicKey()
         // Read here rather than with the rest of the preferences, because every screen below this
         // point renders text: loading it later would show one frame in the wrong language.
         val language = repository.language()
         _state.update { it.copy(language = language) }
 
-        if (cached != null || cachedPeers.isNotEmpty()) {
-            KillitLog.i(
-                KillitLog.VM,
-                "Bootstrap: cached ${cached?.lockType} record, ${cachedPeers.size} companions -> Gate",
-            )
+        if (cached != null) {
+            KillitLog.i(KillitLog.VM, "Bootstrap: cached ${cached.lockType} record -> Gate")
             _state.update {
-                it.copy(
-                    lockType = cached?.lockType,
-                    peers = cachedPeers,
-                    ownPublicKey = ownKey,
-                    screen = Screen.Gate,
-                    appsLoading = true,
-                )
+                it.copy(lockType = cached.lockType, screen = Screen.Gate, appsLoading = true)
             }
             startBackgroundLoad(reconcile = true)
             return@timed
@@ -349,29 +283,11 @@ class KillitViewModel(
         viewModelScope.launch { loadHardening() }
         viewModelScope.launch { loadApps() }
         viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    cameraFacing = repository.readCameraFacing(),
-                    guardianFor = repository.readCachedGuardianships(),
-                )
-            }
-        }
-        viewModelScope.launch {
             val isOwner = dpc.isDeviceOwner()
             _state.update { it.copy(isDeviceOwner = isOwner) }
             // Promotes a pre-provisioning passkey to durable storage, and refreshes the local
-            // cache from durable if the two ever drifted. The companion list gets the same
-            // treatment: after a "Clear data" this is what brings the pairing back, rather than
-            // leaving the device quietly unpaired and open to its passkey again.
-            if (reconcile) {
-                repository.reconcile()
-                val peers = repository.reconcilePeers()
-                val ownKey = repository.reconcileOwnPublicKey()
-                val guardianFor = repository.reconcileGuardianships()
-                _state.update {
-                    it.copy(peers = peers, ownPublicKey = ownKey, guardianFor = guardianFor)
-                }
-            }
+            // cache from durable if the two ever drifted.
+            if (reconcile) repository.reconcile()
         }
     }
 
@@ -433,17 +349,9 @@ class KillitViewModel(
      * Guarded by [KillitUiState.busy] so a double tap cannot spend two lockout attempts on one
      * entry — which matters because key derivation takes long enough for a second tap to land.
      *
-     * @param credential the normalised passkey string as entered. Refused outright on a paired
-     *   device, where companion approval is the only way in.
+     * @param credential the normalised passkey string as entered.
      */
     fun submitGate(credential: String) {
-        if (_state.value.isPaired) {
-            // The passkey is not merely hidden while paired — it stops being accepted. Enforcing
-            // it only in the UI would leave the old credential working for anything that reached
-            // this function another way.
-            KillitLog.w(KillitLog.VM, "Passkey refused: this device requires companion approval")
-            return
-        }
         if (_state.value.busy) {
             KillitLog.d(KillitLog.VM) { "submitGate ignored: already verifying" }
             return
@@ -481,16 +389,9 @@ class KillitViewModel(
      * Setting one authenticates the session, since the setup screen has the user enter it twice.
      *
      * @param lockType which input the gate should collect in future.
-     * @param credential the normalised passkey string. Refused outright on a paired device, where
-     *   a new passkey would be a second way in that the companions know nothing about.
+     * @param credential the normalised passkey string.
      */
     fun setCredential(lockType: LockType, credential: String) {
-        if (_state.value.isPaired) {
-            // Setting a new passkey while paired would create a second way in that the companions
-            // know nothing about.
-            KillitLog.w(KillitLog.VM, "Refusing to set a passkey: this device requires companion approval")
-            return
-        }
         viewModelScope.launch {
             KillitLog.i(KillitLog.VM, "Setting passkey ($lockType)")
             _state.update { it.copy(busy = true) }
@@ -581,31 +482,14 @@ class KillitViewModel(
     /**
      * Applies and persists the anti-tamper toggles.
      *
-     * @param config what the user asked for. Two flags are forced on while other devices depend on
-     *   this phone's key — see the comment below for why.
+     * @param config the full set of toggles, as the user left them.
      */
     fun setHardening(config: HardeningConfig) {
         viewModelScope.launch {
-            // Refusing the release button alone would be decoration: uninstalling Killit, or
-            // clearing its data, destroys the Keystore entry just as completely. While other
-            // devices depend on this phone's key, the two restrictions that close those routes are
-            // held on.
-            //
-            // Both are scoped to Killit's own package, so being a guardian does not also cost the
-            // user control of their other apps. Clear data is held shut by blockForceStop —
-            // setUserControlDisabledPackages covers it from Android 13 — rather than by the
-            // device-wide blockAppsControl this used to force on; and below 13 the platform
-            // already refuses to clear a device owner's data.
-            val effective = if (_state.value.isGuardian) {
-                config.copy(blockUninstall = true, blockForceStop = true)
-            } else {
-                config
-            }
-
-            KillitLog.i(KillitLog.VM, "Hardening changed: $effective")
-            repository.setHardening(effective)
-            dpc.applyHardening(effective)
-            _state.update { it.copy(hardening = effective) }
+            KillitLog.i(KillitLog.VM, "Hardening changed: $config")
+            repository.setHardening(config)
+            dpc.applyHardening(config)
+            _state.update { it.copy(hardening = config) }
         }
     }
 
@@ -660,120 +544,7 @@ class KillitViewModel(
         _state.update { it.copy(shizukuOutcome = null) }
     }
 
-    // ---------------------------------------------------------------- companion pairing
-
-    /**
-     * Opens the pairing screen, creating this device's identity if it does not have one yet.
-     *
-     * The key is created here rather than at startup so an unpaired user never pays for a Keystore
-     * operation they may never need.
-     */
-    fun openPairing() {
-        viewModelScope.launch {
-            // Granting the camera to ourselves keeps the system permission dialog out of the flow.
-            // That dialog is another app's window, so it would background Killit, fire ON_STOP and
-            // re-lock the session the user just authenticated into.
-            dpc.grantSelfPermission(android.Manifest.permission.CAMERA)
-
-            val ownKey = pairing.ensureIdentity()
-            if (ownKey == null) {
-                KillitLog.e(KillitLog.VM, "Could not establish a pairing identity")
-                _state.update { it.copy(scanOutcome = ScanOutcome.NoPairingKey) }
-                return@launch
-            }
-            _state.update { it.copy(ownPublicKey = ownKey, screen = Screen.Pairing, scanOutcome = null) }
-        }
-    }
-
-    /**
-     * Handles a QR scanned on the pairing screen: another device offering itself as a companion.
-     *
-     * @param raw the scanned text.
-     */
-    fun onPairingCodeScanned(raw: String) {
-        val ownKey = _state.value.ownPublicKey ?: return
-        viewModelScope.launch {
-            val outcome = pairing.acceptPairing(raw, ownKey)
-            val peers = if (outcome == ScanOutcome.Accepted) repository.reconcilePeers() else _state.value.peers
-            _state.update { it.copy(scanOutcome = outcome, peers = peers) }
-        }
-    }
-
-    /**
-     * Handles a QR scanned while acting as somebody else's companion.
-     *
-     * Available from the locked gate without authenticating. Signing proves possession of this
-     * device's private key and opens nothing here; requiring an unlock first would deadlock two
-     * mutually paired phones, since neither could open in order to help the other.
-     *
-     * @param raw the scanned text.
-     */
-    fun onApprovalRequestScanned(raw: String) {
-        viewModelScope.launch {
-            val (outcome, response) = pairing.approveChallenge(raw)
-            val guardianFor = if (outcome == ScanOutcome.Accepted) {
-                repository.readCachedGuardianships()
-            } else {
-                _state.value.guardianFor
-            }
-            _state.update {
-                it.copy(
-                    scanOutcome = outcome,
-                    approvalResponse = response?.encode(),
-                    guardianFor = guardianFor,
-                )
-            }
-        }
-    }
-
-    /**
-     * Opens the approval flow, creating this device's identity if it does not have one yet.
-     *
-     * Reachable from the locked gate as well as from Home. A device that is not itself paired is
-     * never deadlocked, but it still has to be able to sign for the devices that paired with it,
-     * and making its owner pass a passkey first buys nothing: signing opens nothing here.
-     */
-    fun openApproval() {
-        viewModelScope.launch {
-            dpc.grantSelfPermission(android.Manifest.permission.CAMERA)
-
-            val ownKey = pairing.ensureIdentity()
-            if (ownKey == null) {
-                KillitLog.e(KillitLog.VM, "Could not establish a pairing identity")
-                _state.update { it.copy(scanOutcome = ScanOutcome.NoPairingKey) }
-                return@launch
-            }
-            _state.update {
-                it.copy(
-                    ownPublicKey = ownKey,
-                    screen = Screen.Approve,
-                    approvalResponse = null,
-                    scanOutcome = null,
-                )
-            }
-        }
-    }
-
-    /**
-     * Leaves the approval flow.
-     *
-     * [goHome] cannot be used: this screen is reachable from the locked gate, and an unauthenticated
-     * session has to land back there rather than on Home.
-     */
-    fun closeApproval() {
-        _state.update {
-            it.copy(
-                approvalResponse = null,
-                scanOutcome = null,
-                screen = if (authenticated) Screen.Home else Screen.Gate,
-            )
-        }
-    }
-
-    /** Clears the explanation of why the last scan was rejected. */
-    fun dismissScanOutcome() {
-        _state.update { it.copy(scanOutcome = null) }
-    }
+    // ---------------------------------------------------------------- language
 
     /**
      * Switches the language the UI is shown in, and remembers the choice.
@@ -790,120 +561,6 @@ class KillitViewModel(
         viewModelScope.launch { repository.setLanguage(language) }
     }
 
-    /**
-     * Switches which camera the QR scanner uses, and remembers the choice.
-     *
-     * @param facing the camera to switch to. Re-selecting the current one is a no-op, so the
-     *   scanner is not torn down and rebuilt for nothing.
-     */
-    fun setCameraFacing(facing: CameraFacing) {
-        if (_state.value.cameraFacing == facing) return
-        KillitLog.i(KillitLog.VM, "Scanner camera -> $facing")
-        _state.update { it.copy(cameraFacing = facing) }
-        viewModelScope.launch { repository.setCameraFacing(facing) }
-    }
-
-    /**
-     * Starts (or restarts) a round of collecting companion approvals.
-     *
-     * @param purpose what the collected signatures will authorise.
-     */
-    fun startChallenge(purpose: ChallengePurpose) {
-        viewModelScope.launch {
-            val ownKey = _state.value.ownPublicKey ?: pairing.ensureIdentity()
-            if (ownKey == null) {
-                _state.update { it.copy(scanOutcome = ScanOutcome.NoPairingKey) }
-                return@launch
-            }
-            _state.update {
-                it.copy(
-                    ownPublicKey = ownKey,
-                    challenge = ChallengeSession.start(purpose, ownKey),
-                    scanOutcome = null,
-                )
-            }
-        }
-    }
-
-    /**
-     * Handles a companion's response to an open challenge.
-     *
-     * Every paired companion has to approve, so this accumulates rather than deciding on the first
-     * signature. A rejected scan leaves the approvals already collected untouched — a mis-scan
-     * should not cost the user a second trip to the first companion.
-     *
-     * @param raw the scanned text. Ignored when no round is open.
-     */
-    fun onApprovalResponseScanned(raw: String) {
-        val current = _state.value
-        val session = current.challenge ?: return
-        viewModelScope.launch {
-            val (outcome, updated) = pairing.applyResponse(raw, session, current.peers)
-            _state.update { it.copy(scanOutcome = outcome, challenge = updated) }
-
-            if (outcome != ScanOutcome.Accepted) return@launch
-
-            when (updated.purpose) {
-                // Opening the device needs *every* companion, which is the whole point of the
-                // arrangement — one person cannot decide alone.
-                ChallengePurpose.UNLOCK -> {
-                    if (!updated.isSatisfiedBy(current.peers)) return@launch
-                    KillitLog.i(KillitLog.VM, "Every companion approved; unlocking")
-                    authenticated = true
-                    _state.update { it.copy(challenge = null, screen = Screen.Home) }
-                }
-
-                // Removing one companion needs only that companion's consent. Demanding the whole
-                // group would mean a single unreachable phone freezes the list permanently, with
-                // no way to remove even the peers that *are* present.
-                ChallengePurpose.UNPAIR -> {
-                    val peer = current.peerPendingRemoval
-                    if (peer == null) {
-                        KillitLog.w(KillitLog.VM, "Unpair approved but no companion was selected")
-                        return@launch
-                    }
-                    if (!updated.hasApproval(peer)) {
-                        KillitLog.i(
-                            KillitLog.VM,
-                            "A companion signed, but not the one being removed ('${peer.label}')",
-                        )
-                        return@launch
-                    }
-                    repository.removePeer(peer.publicKey)
-                    val peers = repository.reconcilePeers()
-                    KillitLog.i(KillitLog.VM, "Companion '${peer.label}' removed with its own approval")
-                    _state.update {
-                        it.copy(challenge = null, peerPendingRemoval = null, peers = peers)
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Begins removing a companion, which that companion has to approve.
-     *
-     * Unpairing freely would undo everything: remove the companions, fall back to the passkey,
-     * and the removal countdown becomes reachable again. Requiring the departing companion's
-     * signature keeps the commitment as binding as making it was.
-     *
-     * @param peer the companion to remove.
-     */
-    fun startPeerRemoval(peer: PairedPeer) {
-        _state.update { it.copy(peerPendingRemoval = peer) }
-        startChallenge(ChallengePurpose.UNPAIR)
-    }
-
-    /** Abandons a companion removal, discarding any approval already collected for it. */
-    fun cancelPeerRemoval() {
-        _state.update { it.copy(peerPendingRemoval = null, challenge = null, scanOutcome = null) }
-    }
-
-    /** Abandons the open approval round, discarding the signatures collected so far. */
-    fun cancelChallenge() {
-        _state.update { it.copy(challenge = null, scanOutcome = null) }
-    }
-
     // ---------------------------------------------------------------- delayed release
 
     /**
@@ -913,16 +570,6 @@ class KillitViewModel(
      * confirmation once the wait has elapsed.
      */
     fun requestRelease() {
-        if (_state.value.isGuardian) {
-            // Blocked on the phone whose key others depend on, not on the phone that has
-            // companions. Releasing here ends with Killit uninstallable and its Keystore entry
-            // gone, and every device that pairs to this one is then unopenable for good — a
-            // factory reset from Recovery is all that is left for them. The phone that merely
-            // *has* companions holds nothing anyone else needs, so it is not stopped: it still
-            // cannot reach this screen without its companions letting it in.
-            KillitLog.w(KillitLog.VM, "Release refused: other devices depend on this phone's key")
-            return
-        }
         viewModelScope.launch {
             val request = repository.requestRelease(BuildConfig.RELEASE_DELAY_MILLIS)
             _state.update { it.copy(releaseRequest = request) }
@@ -947,10 +594,6 @@ class KillitViewModel(
     fun releaseDeviceOwner() {
         if (_state.value.busy) return
         viewModelScope.launch {
-            if (_state.value.isGuardian) {
-                KillitLog.w(KillitLog.VM, "Release refused: other devices depend on this phone's key")
-                return@launch
-            }
             if (!repository.isReleaseAllowed()) {
                 KillitLog.w(KillitLog.VM, "Release refused: the waiting period has not elapsed")
                 // Re-sync so the UI shows the real remaining time rather than an enabled button.
@@ -1072,7 +715,6 @@ class KillitViewModel(
                     dpc = ServiceLocator.devicePolicyController,
                     inventory = ServiceLocator.appInventory,
                     shizuku = ShizukuProvisioner(application),
-                    pairing = ServiceLocator.pairingManager,
                 )
             }
         }

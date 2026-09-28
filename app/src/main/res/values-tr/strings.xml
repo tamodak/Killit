@@ -16,7 +16,6 @@
     <string name="cancel">İptal</string>
     <string name="ok">Tamam</string>
     <string name="back">Geri</string>
-    <string name="done">Bitti</string>
     <string name="save">Kaydet</string>
     <string name="discard">Vazgeç</string>
     <string name="copy">Kopyala</string>
@@ -135,90 +134,6 @@
     <string name="harden_apps_control_desc">Varsayılan olarak kapalı, çünkü cihazdaki her uygulama için geçerlidir: yalnızca engellenenler değil, hiçbirini kaldıramaz, zorla durduramaz veya verilerini temizleyemezsin. Killit\'in kendi verileri bu olmadan da korunuyor.</string>
     <string name="harden_date_time">Tarih ve saat değişikliğini engelle</string>
     <string name="harden_date_time_desc">Kaldırma geri sayımı saate göre ölçülür. Bu olmadan tarihi ileri alarak atlanabilir.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">QR kodu çizilemedi.</string>
-    <string name="pair_camera_permission">Kamera erişimine izin ver</string>
-    <string name="scan_camera_back">Arka</string>
-    <string name="scan_camera_front">Ön</string>
-    <string name="pair_title">Eş cihazlar</string>
-    <string name="pair_entry">Eş cihazlar</string>
-    <string name="pair_code_description">Bu cihazın eşleşme kodu</string>
-    <string name="pair_list_title">%1$d eşleşme</string>
-    <string name="pair_list_all_required">Bu cihaz açılmadan önce her birinin onaylaması gerekir.</string>
-    <string name="pair_remove">Kaldır</string>
-    <string name="pair_remove_title">%1$s kaldırılsın mı?</string>
-    <string name="pair_remove_body">%1$s kaldırılmayı onaylamalı — o telefonun yanında olması gerekir. Bir eşleşmeyi geri almanın tek yolu budur.</string>
-    <string name="pair_remove_start">Devam</string>
-    <string name="pair_remove_show_title">Bunu %1$s cihazına göster</string>
-    <string name="pair_remove_show_body">%1$s kaldırılmayı onaylamak için bunu tarar. %2$s kaldı.</string>
-    <string name="pair_remove_scan_title">%1$s cihazının gösterdiğini tara</string>
-    <string name="pair_remove_scan_body">Kamerayı ekranlarındaki onay koduna doğrult. %1$s kaldı.</string>
-    <string name="pair_remove_code_description">Kaldırma isteği kodu</string>
-    <string name="pair_warning_title">Bunu tek başına geri alamazsın</string>
-    <string name="pair_warning_body">Bu cihazın bir eş cihazı olduğunda:\n\n• PIN\'in, desenin veya parolan artık çalışmaz. Tek giriş yolu, bir eş cihazın kendi telefonundan, yüz yüze onay vermesidir.\n• Her eş cihaz onaylamalıdır — yalnızca biri değil.\n• Tüm eş cihazlar kaldırılana kadar Killit kaldırılamaz.\n• Bir eş cihazı kaldırmak, o eş cihazın onayını gerektirir.\n\nBir eş cihaz kaybolur, silinir veya yeniden kurulursa bu cihaz bir daha açılamaz ve Killit bir daha kaldırılamaz. Geriye kalan tek seçenek, her şeyi silen Kurtarma Modu\'ndan fabrika ayarlarına dönüştür.</string>
-    <string name="pair_warning_accept">Anladım, devam et</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">Adım %1$d / %2$d</string>
-    <string name="pair_scanned_next">Taradılar — kamerayı aç</string>
-    <string name="pair_back_to_code">Koduma dön</string>
-    <string name="pair_hub_subtitle">Eşleşme tek yönlüdür. Buradan bir eş cihaz eklemek onların telefonunda hiçbir şeyi değiştirmez, onların seni eklemesi de seninkinde.</string>
-
-    <string name="pair_role_lock_title">Bu telefonu kilitle</string>
-    <string name="pair_role_lock_desc">Sen onların kodunu tararsın. Bu telefon bundan sonra yalnızca onların onayıyla açılır.</string>
-    <string name="pair_role_companion_title">Başka bir telefonun eş cihazı ol</string>
-    <string name="pair_role_companion_desc">Onlar senin kodunu tarar. Bu telefon kilitlenmez ve değişmez.</string>
-
-    <string name="pair_locks_this_phone">Kilitlenen bu telefon</string>
-    <string name="pair_locks_this_phone_desc">Onların kodunu taradığında bu telefon her açılışta onların onayına ihtiyaç duyar. Diğer telefon değişmez.</string>
-    <string name="pair_locks_other_phone">Bu telefon kilitlenmez</string>
-    <string name="pair_locks_other_phone_desc">Bu kodu tarayan telefon, kilitlenen telefondur. Bu telefonda hiçbir şey değişmez.</string>
-    <string name="pair_add_ready_title">Diğer telefonu hazırla</string>
-    <string name="pair_add_ready_body">Diğer telefonda Killit\'i aç, Eş cihazlar\'a git ve “Kodumu göster”e dokun. Sonra buraya dön.</string>
-    <string name="pair_add_ready_action">Hazır — kamerayı aç</string>
-    <string name="pair_add_scan_title">Onların kodunu tara</string>
-    <string name="pair_add_scan_body">Kamerayı diğer telefonun ekranındaki koda doğrult.</string>
-    <string name="pair_add_done_title">%1$s artık bir eş cihaz</string>
-    <string name="pair_add_done_body">Bu telefon bundan sonra yalnızca eş cihaz onayıyla açılır.</string>
-    <string name="pair_add_another">Başka bir eş cihaz ekle</string>
-    <string name="pair_show_title">Senin kodun</string>
-    <string name="pair_show_body">Diğer telefona bunu taratın. Bu telefonda hiçbir şey değişmez.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">Eş cihaz onayı gerekiyor</string>
-    <string name="qr_choose_unlock">Bu telefonun kilidini aç</string>
-    <string name="qr_choose_unlock_desc">Eş cihazlarına bir kod göster ve gösterdiklerini tara. %1$d cihazın tamamı onaylamalı.</string>
-    <string name="qr_choose_approve">Başka bir telefonu onayla</string>
-    <string name="qr_choose_approve_desc">Bir başkası kendi telefonunu açmak için onayına ihtiyaç duyuyor. Bu, seninkini açmaz.</string>
-    <string name="qr_unlock_restart">Baştan başla</string>
-    <string name="qr_unlock_code_description">Onay isteği kodu</string>
-    <string name="qr_unlock_progress">%1$d / %2$d onaylandı · %3$s kaldı</string>
-    <string name="qr_unlock_waiting_on">Hâlâ bekleniyor</string>
-    <string name="qr_unlock_show_title">Bunu %1$s cihazına göster</string>
-    <string name="qr_unlock_show_body">Onların telefonunda: Killit → Başka bir telefonu onayla. Taradıktan sonra aşağıya dokun.</string>
-    <string name="qr_unlock_scan_title">%1$s cihazının gösterdiğini tara</string>
-    <string name="qr_unlock_scan_body">Kamerayı ekranlarındaki onay koduna doğrult.</string>
-    <string name="qr_session_expired">Bu isteğin süresi doldu.</string>
-    <string name="qr_approve_scan_title">Onların kodunu tara</string>
-    <string name="qr_approve_intro">Kamerayı açılması gereken telefondaki koda doğrult. Onaylamak bu telefonu açmaz.</string>
-    <string name="qr_approve_show_title">Bunu geri göster</string>
-    <string name="qr_approve_ready">Bunu açılması gereken telefona doğru tut.</string>
-    <string name="qr_approve_code_description">Onay kodun</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">Bu bir Killit kodu, ama bu ekranın beklediği kod değil.</string>
-    <string name="scan_expired">Bu isteğin süresi dolmuş. Yenisini başlat.</string>
-    <string name="scan_bad_signature">Bu onay doğrulanamadı.</string>
-    <string name="scan_unknown_peer">O telefon bu cihazın eş cihazı değil.</string>
-    <string name="scan_already_approved">O eş cihaz zaten onayladı.</string>
-    <string name="scan_no_key">Bu cihazın eşleşme kimliği yok. Verileri temizlenmiş olabilir.</string>
-    <string name="scan_not_device_owner">Eşleşme Cihaz Sahibi gerektirir, bu yüzden uygulama verileri temizlenerek geri alınamaz.</string>
-    <string name="scan_already_paired">O telefon zaten bir eş cihaz.</string>
-    <string name="scan_self_pairing">Bir cihaz kendi eş cihazı olamaz.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">%1$d cihaz yalnızca bu telefonun onayıyla açılabilir ve bunu veren anahtar burada, başka hiçbir yerde değil. Killit\'i kaldırmak, silmek veya verilerini temizlemek o anahtarı yok eder ve o cihazları bir daha açılamaz hale getirir — geriye yalnızca Kurtarma Modu\'ndan fabrika ayarlarına dönmek kalır. Önce o cihazların bu telefonu eş cihaz olmaktan çıkarması gerekir.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">Killit verileri temizlendi</string>

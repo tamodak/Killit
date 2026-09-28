@@ -160,76 +160,6 @@ class LockPreferences(context: Context) {
         }
     }
 
-    // ---------------------------------------------------------------- paired peers
-
-    /**
-     * Reads the locally cached companion list.
-     *
-     * @return the paired companions, or an empty list when there are none.
-     */
-    suspend fun readPeers(): List<PairedPeer> =
-        PairedPeer.deserialize(store.data.first()[KEY_PEERS])
-
-    /**
-     * Writes the companion list to local storage.
-     *
-     * @param peers the full list; this replaces whatever was stored.
-     */
-    suspend fun writePeers(peers: List<PairedPeer>) {
-        store.edit { prefs -> prefs[KEY_PEERS] = PairedPeer.serialize(peers) }
-        KillitLog.d(KillitLog.PAIRING) { "Local peer list now holds ${peers.size} companions" }
-    }
-
-    /**
-     * Reads this device's own public key from local storage.
-     *
-     * @return the compressed P-256 point, or null if none has been written or it is corrupt.
-     */
-    suspend fun readOwnPublicKey(): ByteArray? = store.data.first()[KEY_OWN_PUBLIC_KEY]?.decodeBase64()
-
-    /**
-     * Writes this device's own public key to local storage.
-     *
-     * @param publicKey the compressed P-256 point matching the Keystore private key.
-     */
-    suspend fun writeOwnPublicKey(publicKey: ByteArray) {
-        store.edit { prefs -> prefs[KEY_OWN_PUBLIC_KEY] = publicKey.encodeBase64() }
-    }
-
-    /**
-     * Reads the locally cached set of devices this phone can open.
-     *
-     * @return Base64 fingerprints of those devices, or an empty set when there are none.
-     */
-    suspend fun readGuardianships(): Set<String> =
-        deserializeGuardianships(store.data.first()[KEY_GUARDIAN_FOR])
-
-    /**
-     * Writes the set of devices this phone can open to local storage.
-     *
-     * @param fingerprints the full set; this replaces whatever was stored.
-     */
-    suspend fun writeGuardianships(fingerprints: Set<String>) {
-        store.edit { prefs -> prefs[KEY_GUARDIAN_FOR] = serializeGuardianships(fingerprints) }
-    }
-
-    /**
-     * Reads which camera the QR scanner should open with.
-     *
-     * @return the stored preference, or [CameraFacing.DEFAULT] when none has been set.
-     */
-    suspend fun readCameraFacing(): CameraFacing =
-        CameraFacing.fromName(store.data.first()[KEY_CAMERA_FACING])
-
-    /**
-     * Remembers which camera the QR scanner should open with.
-     *
-     * @param facing the camera the user last chose.
-     */
-    suspend fun writeCameraFacing(facing: CameraFacing) {
-        store.edit { prefs -> prefs[KEY_CAMERA_FACING] = facing.name }
-    }
-
     // ---------------------------------------------------------------- language
 
     /**
@@ -322,11 +252,6 @@ class LockPreferences(context: Context) {
         val KEY_RELEASE_REQUESTED_AT = longPreferencesKey("release_requested_at")
         val KEY_RELEASE_AVAILABLE_AT = longPreferencesKey("release_available_at")
 
-        val KEY_PEERS = stringPreferencesKey("paired_peers")
-        val KEY_OWN_PUBLIC_KEY = stringPreferencesKey("own_public_key")
-
-        val KEY_GUARDIAN_FOR = stringPreferencesKey("guardian_for")
-        val KEY_CAMERA_FACING = stringPreferencesKey("camera_facing")
         val KEY_LANGUAGE = stringPreferencesKey("language")
 
         val KEY_HARDEN_UNINSTALL = booleanPreferencesKey("harden_uninstall")

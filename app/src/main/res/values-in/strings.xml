@@ -19,7 +19,6 @@
     <string name="cancel">Batal</string>
     <string name="ok">OK</string>
     <string name="back">Kembali</string>
-    <string name="done">Selesai</string>
     <string name="save">Simpan</string>
     <string name="discard">Buang</string>
     <string name="copy">Salin</string>
@@ -138,90 +137,6 @@
     <string name="harden_apps_control_desc">Nonaktif secara bawaan, karena berlaku untuk semua aplikasi di perangkat: kamu tidak akan bisa mencopot, menghentikan paksa, atau menghapus data aplikasi mana pun, bukan hanya yang diblokir. Data Killit sendiri sudah terlindungi tanpa ini.</string>
     <string name="harden_date_time">Blokir perubahan tanggal dan waktu</string>
     <string name="harden_date_time_desc">Hitung mundur penghapusan diukur dengan jam. Tanpa ini, hitung mundur bisa dilewati dengan memajukan tanggal.</string>
-
-    <!-- Pairing -->
-    <string name="pair_qr_failed">Tidak bisa menggambar kode QR.</string>
-    <string name="pair_camera_permission">Izinkan akses kamera</string>
-    <string name="scan_camera_back">Belakang</string>
-    <string name="scan_camera_front">Depan</string>
-    <string name="pair_title">Perangkat pendamping</string>
-    <string name="pair_entry">Perangkat pendamping</string>
-    <string name="pair_code_description">Kode penyandingan perangkat ini</string>
-    <string name="pair_list_title">%1$d tersanding</string>
-    <string name="pair_list_all_required">Setiap satu dari mereka harus menyetujui sebelum perangkat ini terbuka.</string>
-    <string name="pair_remove">Hapus</string>
-    <string name="pair_remove_title">Hapus %1$s?</string>
-    <string name="pair_remove_body">%1$s harus menyetujui penghapusannya — kamu perlu ponsel itu ada di depanmu. Ini satu-satunya cara membatalkan penyandingan.</string>
-    <string name="pair_remove_start">Lanjutkan</string>
-    <string name="pair_remove_show_title">Tunjukkan ini ke %1$s</string>
-    <string name="pair_remove_show_body">%1$s memindai ini untuk menyetujui penghapusannya. Sisa %2$s.</string>
-    <string name="pair_remove_scan_title">Pindai yang ditampilkan %1$s</string>
-    <string name="pair_remove_scan_body">Arahkan kamera ke kode persetujuan di layar mereka. Sisa %1$s.</string>
-    <string name="pair_remove_code_description">Kode permintaan penghapusan</string>
-    <string name="pair_warning_title">Ini tidak bisa dibatalkan sendirian</string>
-    <string name="pair_warning_body">Begitu perangkat ini punya pendamping:\n\n• PIN, pola, atau kata sandimu berhenti berfungsi. Satu-satunya jalan masuk adalah pendamping yang menyetujui dari ponsel mereka, secara langsung.\n• Setiap pendamping harus menyetujui — bukan hanya satu.\n• Menghapus Killit tidak tersedia sampai semua pendamping dihapus.\n• Menghapus seorang pendamping memerlukan persetujuan pendamping itu.\n\nJika ponsel pendamping hilang, dihapus, atau dipasang ulang, perangkat ini tidak bisa dibuka lagi dan Killit tidak bisa dihapus lagi. Satu-satunya pilihan yang tersisa adalah reset pabrik dari Mode Pemulihan, yang menghapus semua isinya.</string>
-    <string name="pair_warning_accept">Saya mengerti, lanjutkan</string>
-
-    <!-- Pairing flow -->
-    <string name="pair_step_indicator">Langkah %1$d dari %2$d</string>
-    <string name="pair_scanned_next">Mereka sudah memindainya — buka kamera</string>
-    <string name="pair_back_to_code">Kembali ke kode saya</string>
-    <string name="pair_hub_subtitle">Penyandingan berjalan satu arah. Menambahkan pendamping di sini tidak mengubah apa pun di ponsel mereka, dan mereka menambahkanmu tidak mengubah apa pun di ponselmu.</string>
-
-    <string name="pair_role_lock_title">Kunci ponsel ini</string>
-    <string name="pair_role_lock_desc">Kamu memindai kode mereka. Ponsel ini lalu hanya terbuka dengan persetujuan mereka.</string>
-    <string name="pair_role_companion_title">Jadi pendamping ponsel lain</string>
-    <string name="pair_role_companion_desc">Mereka memindai kodemu. Ponsel ini tidak terkunci dan tidak berubah.</string>
-
-    <string name="pair_locks_this_phone">Ponsel ini yang terkunci</string>
-    <string name="pair_locks_this_phone_desc">Begitu kamu memindai kode mereka, ponsel ini akan memerlukan persetujuan mereka setiap kali dibuka. Ponsel yang satunya tidak berubah.</string>
-    <string name="pair_locks_other_phone">Ponsel ini tidak terkunci</string>
-    <string name="pair_locks_other_phone_desc">Ponsel yang memindai kode ini adalah yang terkunci. Tidak ada yang berubah di ponsel ini.</string>
-    <string name="pair_add_ready_title">Siapkan ponsel yang satunya</string>
-    <string name="pair_add_ready_body">Di ponsel yang satunya buka Killit, masuk ke Perangkat pendamping, lalu ketuk “Tampilkan kode saya”. Setelah itu kembali ke sini.</string>
-    <string name="pair_add_ready_action">Siap — buka kamera</string>
-    <string name="pair_add_scan_title">Pindai kode mereka</string>
-    <string name="pair_add_scan_body">Arahkan kamera ke kode di layar ponsel yang satunya.</string>
-    <string name="pair_add_done_title">%1$s sekarang menjadi pendamping</string>
-    <string name="pair_add_done_body">Mulai sekarang ponsel ini hanya terbuka dengan persetujuan pendamping.</string>
-    <string name="pair_add_another">Tambah pendamping lain</string>
-    <string name="pair_show_title">Kode kamu</string>
-    <string name="pair_show_body">Minta ponsel yang satunya memindai ini. Tidak ada yang berubah di ponsel ini.</string>
-
-    <!-- QR gate -->
-    <string name="qr_gate_title">Perlu persetujuan pendamping</string>
-    <string name="qr_choose_unlock">Buka kunci ponsel ini</string>
-    <string name="qr_choose_unlock_desc">Tunjukkan kode ke pendampingmu dan pindai yang mereka tunjukkan kembali. Semua %1$d harus menyetujui.</string>
-    <string name="qr_choose_approve">Setujui ponsel lain</string>
-    <string name="qr_choose_approve_desc">Orang lain memerlukan persetujuanmu untuk membuka ponsel mereka. Ini tidak membuka ponselmu.</string>
-    <string name="qr_unlock_restart">Mulai lagi</string>
-    <string name="qr_unlock_code_description">Kode permintaan persetujuan</string>
-    <string name="qr_unlock_progress">%1$d dari %2$d disetujui · sisa %3$s</string>
-    <string name="qr_unlock_waiting_on">Masih menunggu</string>
-    <string name="qr_unlock_show_title">Tunjukkan ini ke %1$s</string>
-    <string name="qr_unlock_show_body">Di ponsel mereka: Killit → Setujui ponsel lain. Setelah mereka memindainya, ketuk di bawah.</string>
-    <string name="qr_unlock_scan_title">Pindai yang ditampilkan %1$s</string>
-    <string name="qr_unlock_scan_body">Arahkan kamera ke kode persetujuan di layar mereka.</string>
-    <string name="qr_session_expired">Permintaan ini kehabisan waktu.</string>
-    <string name="qr_approve_scan_title">Pindai kode mereka</string>
-    <string name="qr_approve_intro">Arahkan kamera ke kode di ponsel yang perlu dibuka. Menyetujui tidak membuka ponsel ini.</string>
-    <string name="qr_approve_show_title">Tunjukkan ini kembali</string>
-    <string name="qr_approve_ready">Hadapkan ini ke ponsel yang perlu dibuka.</string>
-    <string name="qr_approve_code_description">Kode persetujuanmu</string>
-
-    <!-- Scan outcomes -->
-    <string name="scan_wrong_kind">Itu kode Killit, tapi bukan yang ditunggu layar ini.</string>
-    <string name="scan_expired">Permintaan itu sudah kedaluwarsa. Mulai yang baru.</string>
-    <string name="scan_bad_signature">Persetujuan itu tidak lolos pemeriksaan.</string>
-    <string name="scan_unknown_peer">Ponsel itu bukan pendamping perangkat ini.</string>
-    <string name="scan_already_approved">Pendamping itu sudah menyetujui.</string>
-    <string name="scan_no_key">Perangkat ini tidak punya identitas penyandingan. Datanya mungkin sudah dihapus.</string>
-    <string name="scan_not_device_owner">Penyandingan memerlukan Pemilik Perangkat, jadi tidak bisa dibatalkan dengan menghapus data aplikasi.</string>
-    <string name="scan_already_paired">Ponsel itu sudah menjadi pendamping.</string>
-    <string name="scan_self_pairing">Sebuah perangkat tidak bisa menjadi pendamping dirinya sendiri.</string>
-
-    <!-- Home, pairing entry -->
-    <string name="home_guardian_release_blocked">%1$d perangkat hanya bisa dibuka dengan persetujuan ponsel ini, dan kunci yang memberikannya ada di sini dan tidak di tempat lain. Menghapus Killit, mencopotnya, atau menghapus datanya akan memusnahkan kunci itu dan membuat perangkat-perangkat tersebut tidak bisa dibuka lagi — yang tersisa bagi mereka hanya reset pabrik dari Mode Pemulihan. Perangkat-perangkat itu harus menghapus ponsel ini sebagai pendamping terlebih dahulu.</string>
 
     <!-- Tamper recovery -->
     <string name="tamper_title">Data Killit telah dihapus</string>
