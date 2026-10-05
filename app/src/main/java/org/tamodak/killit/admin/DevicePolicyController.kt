@@ -100,6 +100,35 @@ class DevicePolicyController(
             }
         }
 
+    /**
+     * Blocks packages, leaving every other package as it is.
+     *
+     * The call default-blocking uses: it only ever adds blocks, so it needs no picture of what is
+     * blocked already. Suspending a package that is already suspended changes nothing, which makes
+     * this safe to repeat on every check.
+     *
+     * @param packages the packages to block.
+     * @return the packages the platform refused to suspend, or every requested package when the
+     *   call could not be made at all — so a caller never takes a failed block for a successful one.
+     */
+    suspend fun blockPackages(packages: Collection<String>): List<String> = withContext(ioDispatcher) {
+        if (packages.isEmpty()) return@withContext emptyList()
+        if (!isDeviceOwnerBlocking()) {
+            KillitLog.w(KillitLog.DPC, "blockPackages refused: $NOT_DEVICE_OWNER")
+            return@withContext packages.toList()
+        }
+        KillitLog.timed(KillitLog.DPC, "blockPackages (${packages.size})") {
+            runCatching { suspendPackages(packages.toTypedArray(), suspended = true) }
+                .onSuccess { refused ->
+                    if (refused.isNotEmpty()) KillitLog.w(KillitLog.DPC, "Android refused to suspend: $refused")
+                }
+                .getOrElse { error ->
+                    KillitLog.e(KillitLog.DPC, "blockPackages failed outright", error)
+                    packages.toList()
+                }
+        }
+    }
+
     // ---------------------------------------------------------------- hardening
 
     /**
@@ -182,6 +211,11 @@ class DevicePolicyController(
      * **The order matters.** Once Killit is no longer the admin it can no longer lift its own
      * suspensions, and there is no second chance: re-provisioning needs a factory reset. Each step
      * is logged so a partial teardown can be diagnosed after the fact.
+     *
+     * One platform defect this cannot work around: on Android 14's first release (fixed in QPR1),
+     * hardening restrictions that were in force across a reboot come back as restrictions no admin
+     * owns, so neither clearing them nor releasing device owner lifts them. On that build they
+     * stay until the phone is wiped from recovery.
      *
      * @param candidates every package to consider unblocking, normally the whole inventory.
      * @return true when device owner was given up. An incomplete unblock is logged but does not

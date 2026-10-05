@@ -48,6 +48,8 @@ class PluralsTest {
             R.plurals.gate_wrong,
             R.plurals.home_blocked_count,
             R.plurals.apps_save_pending,
+            R.plurals.notif_blocked_many_title,
+            R.plurals.home_waiting_apps,
         )
 
         /** Reaches zero, one, two, few and many in Arabic, and one, few and many in Russian. */

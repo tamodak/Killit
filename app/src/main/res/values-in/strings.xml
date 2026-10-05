@@ -152,4 +152,31 @@
     <string name="compliance_title">Killit siap</string>
     <string name="compliance_body">Killit sekarang menjadi Pemilik Perangkat pada perangkat ini.</string>
     <string name="compliance_continue">Lanjutkan</string>
+
+    <string name="notif_channel_protection">Perlindungan</string>
+    <string name="notif_channel_protection_desc">Ditampilkan selama Killit memantau aplikasi yang baru dipasang.</string>
+    <string name="notif_channel_new_apps">Aplikasi baru</string>
+    <string name="notif_channel_new_apps_desc">Memberitahumu saat Killit memblokir aplikasi yang baru dipasang.</string>
+    <string name="notif_protection_title">Killit melindungi ponsel ini</string>
+    <string name="notif_protection_text">Aplikasi baru tetap diblokir sampai kamu mengizinkannya.</string>
+    <string name="notif_blocked_one_title">%1$s diblokir</string>
+    <string name="notif_blocked_one_text">Buka Killit untuk mengizinkannya.</string>
+    <plurals name="notif_blocked_many_title">
+        <item quantity="other">%1$d aplikasi baru diblokir</item>
+    </plurals>
+    <string name="notif_blocked_many_text">Buka Killit untuk meninjaunya.</string>
+
+    <string name="apps_section_new">Baru: diblokir otomatis</string>
+    <string name="apps_section_blocked">Diblokir</string>
+    <string name="apps_section_allowed">Diizinkan</string>
+    <string name="apps_new_chip">Baru</string>
+    <string name="apps_keep_blocked">Tetap blokir</string>
+
+    <plurals name="home_waiting_apps">
+        <item quantity="other">%1$d aplikasi baru menunggu</item>
+    </plurals>
+    <string name="home_waiting_apps_desc">Diblokir otomatis. Ketuk untuk meninjau.</string>
+    <string name="home_notifications_title">Izinkan notifikasi</string>
+    <string name="home_notifications_body">Killit memberitahumu saat memblokir aplikasi yang baru dipasang.</string>
+    <string name="home_notifications_allow">Izinkan</string>
 </resources>

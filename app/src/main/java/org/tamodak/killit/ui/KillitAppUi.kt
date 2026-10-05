@@ -165,6 +165,7 @@ private fun KillitAppContent(state: KillitUiState, viewModel: KillitViewModel) {
                 onDiscard = viewModel::discardSelection,
                 onBack = viewModel::goHome,
                 onDismissFailures = viewModel::dismissSaveFailures,
+                onKeepBlocked = viewModel::keepWaitingAppsBlocked,
                 iconLoader = viewModel::iconFor,
             )
         }

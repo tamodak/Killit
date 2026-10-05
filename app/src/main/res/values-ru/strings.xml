@@ -158,4 +158,37 @@
     <string name="compliance_title">Killit готов</string>
     <string name="compliance_body">Killit теперь владелец этого устройства.</string>
     <string name="compliance_continue">Продолжить</string>
+
+    <string name="notif_channel_protection">Защита</string>
+    <string name="notif_channel_protection_desc">Показывается, пока Killit следит за новыми установленными приложениями.</string>
+    <string name="notif_channel_new_apps">Новые приложения</string>
+    <string name="notif_channel_new_apps_desc">Сообщает, когда Killit блокирует только что установленное приложение.</string>
+    <string name="notif_protection_title">Killit защищает этот телефон</string>
+    <string name="notif_protection_text">Новые приложения остаются заблокированными, пока вы их не разрешите.</string>
+    <string name="notif_blocked_one_title">Приложение %1$s заблокировано</string>
+    <string name="notif_blocked_one_text">Откройте Killit, чтобы разрешить его.</string>
+    <plurals name="notif_blocked_many_title">
+        <item quantity="one">%1$d новое приложение заблокировано</item>
+        <item quantity="few">%1$d новых приложения заблокированы</item>
+        <item quantity="many">%1$d новых приложений заблокировано</item>
+        <item quantity="other">%1$d нового приложения заблокировано</item>
+    </plurals>
+    <string name="notif_blocked_many_text">Откройте Killit, чтобы просмотреть их.</string>
+
+    <string name="apps_section_new">Новые: заблокированы автоматически</string>
+    <string name="apps_section_blocked">Заблокированы</string>
+    <string name="apps_section_allowed">Разрешены</string>
+    <string name="apps_new_chip">Новое</string>
+    <string name="apps_keep_blocked">Оставить заблокированными</string>
+
+    <plurals name="home_waiting_apps">
+        <item quantity="one">%1$d новое приложение ждёт</item>
+        <item quantity="few">%1$d новых приложения ждут</item>
+        <item quantity="many">%1$d новых приложений ждут</item>
+        <item quantity="other">%1$d нового приложения ждут</item>
+    </plurals>
+    <string name="home_waiting_apps_desc">Заблокированы автоматически. Нажмите, чтобы просмотреть.</string>
+    <string name="home_notifications_title">Разрешить уведомления</string>
+    <string name="home_notifications_body">Killit сообщает, когда блокирует только что установленное приложение.</string>
+    <string name="home_notifications_allow">Разрешить</string>
 </resources>

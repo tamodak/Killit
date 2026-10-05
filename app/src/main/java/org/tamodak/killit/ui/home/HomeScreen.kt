@@ -1,11 +1,17 @@
 package org.tamodak.killit.ui.home
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +45,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import org.tamodak.killit.R
 import org.tamodak.killit.admin.HardeningConfig
 import org.tamodak.killit.admin.KillitDeviceAdminReceiver
@@ -93,7 +103,11 @@ private enum class SetupMethod { Adb, Shizuku, Qr }
  * read-only preview beforehand — so the user can see what Killit will manage before committing to a
  * factory reset.
  *
- * @param state supplies owner status, the hardening toggles and the release request.
+ * Once Killit is device owner it also points at new apps waiting for a decision, and asks for the
+ * notification permission for as long as Killit cannot tell the user what it blocked.
+ *
+ * @param state supplies owner status, the hardening toggles, the release request and the waiting
+ *   apps.
  * @param onManageApps opens the app picker.
  * @param onChangePasskey opens the change-passkey flow.
  * @param onHardeningChange called with the full config whenever one toggle moves.
@@ -179,6 +193,24 @@ fun HomeScreen(
                 )
 
                 StatusPanel(state = state, onRefresh = onRefreshStatus)
+
+                if (state.isDeviceOwner && state.waitingApps.isNotEmpty()) {
+                    KillitRow(
+                        title = pluralStringResource(
+                            R.plurals.home_waiting_apps,
+                            state.waitingApps.size,
+                            state.waitingApps.size,
+                        ),
+                        subtitle = stringResource(R.string.home_waiting_apps_desc),
+                        icon = KillitIcons.Apps,
+                        iconTint = KillitBlue,
+                        borderColor = KillitBlue,
+                        onClick = onManageApps,
+                    )
+                }
+
+                // Only once protection can run: before that there is nothing to announce.
+                if (state.isDeviceOwner) NotificationPermissionPanel()
 
                 // Browsable before provisioning too: the list shows a banner and leaves the
                 // checkboxes disabled, so the user can see what Killit will manage first.
@@ -340,6 +372,75 @@ private fun StatusPanel(state: KillitUiState, onRefresh: () -> Unit) {
         KillitTextButton(text = stringResource(R.string.prov_refresh), onClick = onRefresh)
     }
 }
+
+/**
+ * Asks for permission to post notifications, for as long as Killit cannot post any.
+ *
+ * The request sits next to its reason, on the screen where protection starts, which is where
+ * Android's guidance wants a permission asked for. Android 13 and later show the system's dialog;
+ * once that has been declined it will not be shown again, and on any version notifications can be
+ * switched off in Settings, so the button then opens Killit's notification settings instead.
+ *
+ * Leaving for Settings locks Killit like leaving for anywhere else; the permission dialog does not,
+ * because it only pauses the activity.
+ */
+@Composable
+private fun NotificationPermissionPanel() {
+    val context = LocalContext.current
+    var allowed by remember { mutableStateOf(context.notificationsAllowed()) }
+    var declined by rememberSaveable { mutableStateOf(false) }
+
+    // Read again on every return: the answer can change in Settings while Killit is away.
+    LifecycleResumeEffect(Unit) {
+        allowed = context.notificationsAllowed()
+        onPauseOrDispose { }
+    }
+    val requestPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        KillitLog.i(KillitLog.UI, "Notification permission ${if (granted) "granted" else "declined"}")
+        declined = !granted
+        allowed = context.notificationsAllowed()
+    }
+    if (allowed) return
+
+    KillitPanel(borderColor = KillitBlue, spacing = 12.dp) {
+        KillitSectionTitle(stringResource(R.string.home_notifications_title))
+        KillitBody(stringResource(R.string.home_notifications_body))
+        KillitButton(
+            text = stringResource(R.string.home_notifications_allow),
+            onClick = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !declined &&
+                    !context.hasNotificationPermission()
+                ) {
+                    requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    context.startActivity(
+                        Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                            .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    )
+                }
+            },
+        )
+    }
+}
+
+/**
+ * Reports whether Killit's notifications would be shown.
+ *
+ * @return true when the permission is held (or not needed) and notifications are on for Killit.
+ */
+private fun Context.notificationsAllowed(): Boolean =
+    hasNotificationPermission() && NotificationManagerCompat.from(this).areNotificationsEnabled()
+
+/**
+ * Reports whether the notification permission is held.
+ *
+ * @return true from Android 13 when it has been granted, and always below 13, which has no such
+ *   permission.
+ */
+private fun Context.hasNotificationPermission(): Boolean =
+    Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+        PackageManager.PERMISSION_GRANTED
 
 /**
  * The routes to becoming device owner, shown only while Killit is not one.

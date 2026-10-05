@@ -25,6 +25,11 @@ import org.junit.runner.RunWith
  * succeeded, because several of the policies are version-specific and a wrong branch fails
  * silently. Needs Killit as device owner; the device's own stored toggles are applied again
  * afterwards.
+ *
+ * On Android 14's first release (fixed in QPR1) [dateAndTimeFollowTheToggle] fails once the device
+ * has rebooted with the restriction set: that build restores a device owner's restrictions as ones
+ * no admin owns, so clearing them has no effect. The stock `android-34` emulator image is that
+ * build; run this on a freshly wiped one.
  */
 @RunWith(AndroidJUnit4::class)
 class HardeningTest {

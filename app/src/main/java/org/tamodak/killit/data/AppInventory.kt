@@ -82,7 +82,7 @@ class AppInventory(
         KillitLog.timed(KillitLog.APPS, "load installed packages") {
             val collator = Collator.getInstance()
             val installed = installedApplications()
-            val launchable = launchablePackages()
+            val launchable = pm.queryLaunchablePackages()
 
             val entries = installed
                 .asSequence()
@@ -145,34 +145,6 @@ class AppInventory(
     }
 
     /**
-     * Resolves which packages have a launcher entry, in **two** queries rather than one per
-     * package.
-     *
-     * `getLaunchIntentForPackage` is the obvious call, but it crosses a binder each time — 167
-     * round trips on a typical device, and measurably the second-largest cost in [load]. The
-     * platform can answer the same question for all packages at once, so it is asked once.
-     *
-     * Both categories are queried because `getLaunchIntentForPackage` itself falls back from
-     * LAUNCHER to INFO, and matching that keeps the "show packages without a launcher icon"
-     * toggle behaving as it did.
-     *
-     * @return the launchable package names, or an empty set if the query failed.
-     */
-    private fun launchablePackages(): Set<String> = runCatching {
-        KillitLog.timed(KillitLog.APPS, "query launchable packages") {
-            val categories = listOf(Intent.CATEGORY_LAUNCHER, Intent.CATEGORY_INFO)
-            categories.flatMapTo(mutableSetOf()) { category ->
-                @Suppress("DEPRECATION")
-                pm.queryIntentActivities(Intent(Intent.ACTION_MAIN).addCategory(category), 0)
-                    .map { it.activityInfo.packageName }
-            }
-        }
-    }.getOrElse { error ->
-        KillitLog.w(KillitLog.APPS, "queryIntentActivities failed; treating nothing as launchable", error)
-        emptySet()
-    }
-
-    /**
      * Reads every installed application across both platform overloads.
      *
      * The flagged and non-flagged overloads do the same thing; Android just deprecated the int
@@ -203,4 +175,31 @@ class AppInventory(
         /** An updated system app keeps FLAG_SYSTEM off but gains FLAG_UPDATED_SYSTEM_APP. */
         const val SYSTEM_FLAGS = ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP
     }
+}
+
+/**
+ * Resolves which packages have a launcher entry, in **two** queries rather than one per package.
+ *
+ * `getLaunchIntentForPackage` is the obvious call, but it crosses a binder each time — 167 round
+ * trips on a typical device, and measurably the second-largest cost of building the app list. The
+ * platform can answer the same question for all packages at once, so it is asked once.
+ *
+ * Both categories are queried because `getLaunchIntentForPackage` itself falls back from LAUNCHER
+ * to INFO, and matching that keeps every caller's idea of "launchable" the same as that call's.
+ * Blocking: call it on a background dispatcher.
+ *
+ * @return the launchable package names, or an empty set if the query failed.
+ */
+internal fun PackageManager.queryLaunchablePackages(): Set<String> = runCatching {
+    KillitLog.timed(KillitLog.APPS, "query launchable packages") {
+        val categories = listOf(Intent.CATEGORY_LAUNCHER, Intent.CATEGORY_INFO)
+        categories.flatMapTo(mutableSetOf()) { category ->
+            @Suppress("DEPRECATION")
+            queryIntentActivities(Intent(Intent.ACTION_MAIN).addCategory(category), 0)
+                .map { it.activityInfo.packageName }
+        }
+    }
+}.getOrElse { error ->
+    KillitLog.w(KillitLog.APPS, "queryIntentActivities failed; treating nothing as launchable", error)
+    emptySet()
 }

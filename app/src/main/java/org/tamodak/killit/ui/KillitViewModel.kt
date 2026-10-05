@@ -18,12 +18,18 @@ import org.tamodak.killit.data.AppLanguage
 import org.tamodak.killit.data.AppInventory
 import org.tamodak.killit.data.LockRepository
 import org.tamodak.killit.data.LockType
+import org.tamodak.killit.data.PackageStatus
 import org.tamodak.killit.data.ReleaseRequest
 import org.tamodak.killit.data.VerifyResult
+import org.tamodak.killit.protection.PackageGuard
+import org.tamodak.killit.protection.Protection
+import org.tamodak.killit.protection.ProtectionControl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -132,6 +138,8 @@ sealed interface ShizukuOutcome {
  * @param message a transient confirmation waiting to be shown as a toast.
  * @param releaseRequest outstanding request to give up device owner, or null if none has been made.
  * @param language which language the UI is shown in.
+ * @param waitingApps packages blocked automatically that nobody has decided about yet: the app
+ *   list's "New" section.
  */
 data class KillitUiState(
     val screen: Screen = Screen.Loading,
@@ -149,6 +157,7 @@ data class KillitUiState(
     val message: UiMessage? = null,
     val releaseRequest: ReleaseRequest? = null,
     val language: AppLanguage = AppLanguage.DEFAULT,
+    val waitingApps: Set<String> = emptySet(),
 ) {
     /** How many checkboxes differ from what is applied: newly ticked plus newly cleared. */
     val pendingChanges: Int
@@ -192,12 +201,17 @@ data class KillitUiState(
  * @param dpc every call into `DevicePolicyManager`.
  * @param inventory the installed-package list and icon decoding.
  * @param shizuku the no-computer provisioning path.
+ * @param guard default-blocking: records what the user decides in the app list.
+ * @param protection starts protection whenever it may have become possible, and stops it before
+ *   device owner is given up.
  */
 class KillitViewModel(
     private val repository: LockRepository,
     private val dpc: DevicePolicyController,
     private val inventory: AppInventory,
     private val shizuku: ShizukuProvisioner,
+    private val guard: PackageGuard,
+    private val protection: ProtectionControl,
 ) : ViewModel() {
 
     /** The single source of UI state. Mutated only through [update] calls in this class. */
@@ -232,9 +246,16 @@ class KillitViewModel(
      */
     private var awaitingExternalScreen = false
 
+    /**
+     * Where to go once the passkey has been proved, when the session was opened for a purpose —
+     * tapping the blocked-apps notification, say. Null means Home.
+     */
+    private var destinationAfterUnlock: Screen? = null
+
     init {
         KillitLog.d(KillitLog.VM) { "ViewModel created; bootstrapping" }
         viewModelScope.launch { bootstrap() }
+        viewModelScope.launch { followWaitingApps() }
     }
 
     // ---------------------------------------------------------------- startup
@@ -325,7 +346,29 @@ class KillitViewModel(
             // Promotes a pre-provisioning passkey to durable storage, and refreshes the local
             // cache from durable if the two ever drifted.
             if (reconcile) repository.reconcile()
+            // Opening Killit is one of the moments protection checks every package.
+            protection.ensureRunning()
         }
+    }
+
+    /**
+     * Keeps [KillitUiState.waitingApps] in step with the guard's decisions, for as long as the
+     * ViewModel lives.
+     *
+     * A package that starts waiting was just installed and blocked, so the app list is read again
+     * to show it — keeping whatever the user has ticked but not saved yet.
+     */
+    private suspend fun followWaitingApps() {
+        var first = true
+        guard.packages
+            .map { known -> known.values.filter { it.status == PackageStatus.PENDING }.mapTo(mutableSetOf()) { it.packageName } }
+            .distinctUntilChanged()
+            .collect { waiting ->
+                val arrived = waiting - _state.value.waitingApps
+                _state.update { it.copy(waitingApps = waiting) }
+                if (!first && arrived.isNotEmpty() && !_state.value.appsLoading) refreshApps()
+                first = false
+            }
     }
 
     /**
@@ -363,6 +406,29 @@ class KillitViewModel(
         KillitLog.d(KillitLog.VM) { "loadApps: ${apps.size} apps, ${blocked.size} blocked" }
     }
 
+    /**
+     * Reads the app list again after something outside the screen changed it, keeping the user's
+     * unsaved ticks.
+     *
+     * Packages whose state changed underneath move with it — a newly blocked app arrives ticked —
+     * and every other checkbox stays as the user left it.
+     */
+    private suspend fun refreshApps() {
+        val apps = inventory.load()
+        val installed = apps.mapTo(mutableSetOf()) { it.packageName }
+        val blocked = dpc.blockedPackages(installed)
+        _state.update { current ->
+            val newlyBlocked = blocked - current.blocked
+            val newlyUnblocked = current.blocked - blocked
+            current.copy(
+                apps = apps,
+                blocked = blocked,
+                selection = ((current.selection + newlyBlocked) - newlyUnblocked).intersect(installed),
+            )
+        }
+        KillitLog.d(KillitLog.VM) { "refreshApps: ${apps.size} apps, ${blocked.size} blocked" }
+    }
+
     /** Re-checks device owner status after the user has provisioned outside the app (adb, QR). */
     fun refreshOwnerStatus() {
         viewModelScope.launch {
@@ -373,6 +439,8 @@ class KillitViewModel(
                 // A passkey set before provisioning now gains durable, clear-data-proof backing.
                 repository.promoteToDurable()
                 dpc.applyHardening(_state.value.hardening)
+                // Becoming device owner is one of the two moments protection can start.
+                protection.ensureRunning()
             }
             loadApps()
         }
@@ -439,6 +507,8 @@ class KillitViewModel(
             repository.setCredential(lockType, credential)
             _state.update { it.copy(busy = false, lockType = lockType, message = UiMessage.PasskeySet) }
             if (!unlockIfInForeground()) _state.update { it.copy(screen = Screen.Gate) }
+            // Setting the first passkey is the other moment protection can start.
+            protection.ensureRunning()
         }
     }
 
@@ -458,8 +528,22 @@ class KillitViewModel(
             return false
         }
         authenticated = true
-        _state.update { it.copy(screen = Screen.Home) }
+        val destination = destinationAfterUnlock ?: Screen.Home
+        destinationAfterUnlock = null
+        _state.update { it.copy(screen = destination) }
         return true
+    }
+
+    /**
+     * Opens a screen once the passkey has been proved, or right away when it already has.
+     *
+     * Used when Killit is opened for a purpose, such as tapping the blocked-apps notification. The
+     * passkey is asked for as always; this only decides where the user lands afterwards.
+     *
+     * @param screen where to go.
+     */
+    fun openAfterUnlock(screen: Screen) {
+        if (authenticated) navigateTo(screen) else destinationAfterUnlock = screen
     }
 
     // ---------------------------------------------------------------- app blocking
@@ -509,7 +593,9 @@ class KillitViewModel(
             KillitLog.i(KillitLog.VM, "Saving ${snapshot.pendingChanges} blocklist changes")
             _state.update { it.copy(busy = true, saveFailures = emptyList()) }
 
-            val result = dpc.applyBlocklist(desired = snapshot.selection, current = snapshot.blocked)
+            // Through the guard, so the decisions are remembered: an unblocked app stays allowed
+            // after an update, a blocked one stays blocked even if it is reinstalled.
+            val result = guard.applySelection(desired = snapshot.selection, current = snapshot.blocked)
 
             // Re-read from the OS rather than assuming the write landed: any package Android
             // refused is still unblocked, and its checkbox has to go back.
@@ -535,6 +621,11 @@ class KillitViewModel(
     /** Closes the dialog listing packages Android refused to suspend. */
     fun dismissSaveFailures() {
         _state.update { it.copy(saveFailures = emptyList()) }
+    }
+
+    /** Keeps every waiting new app blocked, which empties the app list's "New" section. */
+    fun keepWaitingAppsBlocked() {
+        viewModelScope.launch { guard.keepWaitingAppsBlocked() }
     }
 
     // ---------------------------------------------------------------- hardening
@@ -679,6 +770,10 @@ class KillitViewModel(
             // The cost of this ordering is that a failed release makes the user start the wait
             // over. That is the right direction to fail in.
             repository.cancelRelease()
+            // Also before the release, for the same reason: the decisions have a durable copy, and
+            // protecting the phone again later should start from a fresh snapshot.
+            guard.forget()
+            protection.stop()
 
             val packages = _state.value.apps.map { it.packageName }
             dpc.releaseDeviceOwner(packages)
@@ -790,6 +885,8 @@ class KillitViewModel(
         /**
          * Reads the graph from [ServiceLocator]. [ShizukuProvisioner] is built per-ViewModel
          * rather than being a singleton because it holds no state between provisioning attempts.
+         * Protection is started and stopped through [Protection] with the application context, so
+         * the ViewModel itself never holds a context.
          */
         val Factory = viewModelFactory {
             initializer {
@@ -800,6 +897,13 @@ class KillitViewModel(
                     dpc = ServiceLocator.devicePolicyController,
                     inventory = ServiceLocator.appInventory,
                     shizuku = ShizukuProvisioner(application),
+                    guard = ServiceLocator.packageGuard,
+                    protection = object : ProtectionControl {
+                        override suspend fun ensureRunning() =
+                            Protection.ensureRunning(application, ServiceLocator.packageGuard)
+
+                        override fun stop() = Protection.stop(application)
+                    },
                 )
             }
         }

@@ -1,5 +1,7 @@
 package org.tamodak.killit.data
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.LocaleList
 import java.util.Locale
 
@@ -61,6 +63,21 @@ enum class AppLanguage(val tag: String, val endonym: String, val qualifier: Stri
      */
     fun localeList(): LocaleList? =
         if (tag.isEmpty()) null else LocaleList(Locale.forLanguageTag(tag))
+
+    /**
+     * A context whose resources speak this language, for text built outside Compose.
+     *
+     * Compose gets the language from `ProvideAppLanguage`; notifications are built by a service with
+     * no composition, so they resolve their strings through this instead.
+     *
+     * @param context the context to base it on.
+     * @return [context] itself for [SYSTEM]; otherwise a configuration context in this language.
+     */
+    fun applyTo(context: Context): Context {
+        val locales = localeList() ?: return context
+        val configuration = Configuration(context.resources.configuration).apply { setLocales(locales) }
+        return context.createConfigurationContext(configuration)
+    }
 
     companion object {
         /** Chosen when nothing is stored: follow the device, which is what a user expects to happen. */

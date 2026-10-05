@@ -41,7 +41,8 @@ import java.security.MessageDigest
  *
  * ```
  * adb logcat -s Killit.App Killit.Ui Killit.Vm Killit.Repo Killit.Cred Killit.Prefs \
- *              Killit.Durable Killit.Dpc Killit.Apps Killit.Shizuku Killit.Priv Killit.Admin
+ *              Killit.Durable Killit.Dpc Killit.Apps Killit.Shizuku Killit.Priv Killit.Admin \
+ *              Killit.Guard
  * ```
  *
  * or, more simply, `adb logcat | grep Killit.`
@@ -87,6 +88,9 @@ object KillitLog {
 
     /** Device admin receiver and the provisioning activities. */
     const val ADMIN = "Killit.Admin"
+
+    /** Default-blocking: package scans, the decisions made on them, and the protection service. */
+    const val GUARD = "Killit.Guard"
 
     // ---------------------------------------------------------------- configuration
 

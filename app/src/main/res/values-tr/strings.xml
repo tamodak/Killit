@@ -152,4 +152,33 @@
     <string name="compliance_title">Killit hazır</string>
     <string name="compliance_body">Killit artık bu cihazın Cihaz Sahibi.</string>
     <string name="compliance_continue">Devam</string>
+
+    <string name="notif_channel_protection">Koruma</string>
+    <string name="notif_channel_protection_desc">Killit yeni yüklenen uygulamaları izlerken gösterilir.</string>
+    <string name="notif_channel_new_apps">Yeni uygulamalar</string>
+    <string name="notif_channel_new_apps_desc">Killit yeni yüklenen bir uygulamayı engellediğinde sana haber verir.</string>
+    <string name="notif_protection_title">Killit bu telefonu koruyor</string>
+    <string name="notif_protection_text">Yeni uygulamalar sen izin verene kadar engelli kalır.</string>
+    <string name="notif_blocked_one_title">%1$s engellendi</string>
+    <string name="notif_blocked_one_text">İzin vermek için Killit\'i aç.</string>
+    <plurals name="notif_blocked_many_title">
+        <item quantity="one">%1$d yeni uygulama engellendi</item>
+        <item quantity="other">%1$d yeni uygulama engellendi</item>
+    </plurals>
+    <string name="notif_blocked_many_text">İncelemek için Killit\'i aç.</string>
+
+    <string name="apps_section_new">Yeni: otomatik engellendi</string>
+    <string name="apps_section_blocked">Engelli</string>
+    <string name="apps_section_allowed">İzinli</string>
+    <string name="apps_new_chip">Yeni</string>
+    <string name="apps_keep_blocked">Engelli kalsın</string>
+
+    <plurals name="home_waiting_apps">
+        <item quantity="one">%1$d yeni uygulama bekliyor</item>
+        <item quantity="other">%1$d yeni uygulama bekliyor</item>
+    </plurals>
+    <string name="home_waiting_apps_desc">Otomatik engellendi. İncelemek için dokun.</string>
+    <string name="home_notifications_title">Bildirimlere izin ver</string>
+    <string name="home_notifications_body">Killit yeni yüklenen bir uygulamayı engellediğinde sana haber verir.</string>
+    <string name="home_notifications_allow">İzin ver</string>
 </resources>

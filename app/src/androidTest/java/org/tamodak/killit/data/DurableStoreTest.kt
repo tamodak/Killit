@@ -83,4 +83,23 @@ class DurableStoreTest {
 
         assertEquals(request, durable.readReleaseRequest())
     }
+
+    /**
+     * The known-package list comes back entry for entry, nested bundles and all, and writing it
+     * leaves the credential record beside it untouched.
+     */
+    @Test
+    fun knownPackagesSurviveARoundTripBesideTheRecord(): Unit = runBlocking {
+        val record = CredentialRecord(LockType.PATTERN, ByteArray(16) { 1 }, ByteArray(32) { 2 })
+        val packages = listOf(
+            KnownPackage("com.example.one", ByteArray(32) { 3 }, PackageStatus.APPROVED, 1_760_000_000_001L),
+            KnownPackage("com.example.two", ByteArray(32) { 4 }, PackageStatus.PENDING, 1_760_000_000_002L),
+        )
+        durable.write(record)
+
+        assertTrue("The write must be accepted", durable.writeKnownPackages(packages))
+
+        assertEquals(packages.associateBy { it.packageName }, durable.readKnownPackages())
+        assertEquals("The record beside it must be untouched", record, durable.read())
+    }
 }

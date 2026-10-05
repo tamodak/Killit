@@ -155,4 +155,35 @@
     <string name="compliance_title">Killit est prêt</string>
     <string name="compliance_body">Killit est désormais le propriétaire de cet appareil.</string>
     <string name="compliance_continue">Continuer</string>
+
+    <string name="notif_channel_protection">Protection</string>
+    <string name="notif_channel_protection_desc">Affichée tant que Killit surveille les applis nouvellement installées.</string>
+    <string name="notif_channel_new_apps">Nouvelles applis</string>
+    <string name="notif_channel_new_apps_desc">Te prévient quand Killit bloque une appli nouvellement installée.</string>
+    <string name="notif_protection_title">Killit protège ce téléphone</string>
+    <string name="notif_protection_text">Les nouvelles applis restent bloquées jusqu\'à ce que tu les autorises.</string>
+    <string name="notif_blocked_one_title">%1$s a été bloquée</string>
+    <string name="notif_blocked_one_text">Ouvre Killit pour l\'autoriser.</string>
+    <plurals name="notif_blocked_many_title">
+        <item quantity="one">%1$d nouvelle appli est bloquée</item>
+        <item quantity="many">%1$d nouvelles applis sont bloquées</item>
+        <item quantity="other">%1$d nouvelles applis sont bloquées</item>
+    </plurals>
+    <string name="notif_blocked_many_text">Ouvre Killit pour les examiner.</string>
+
+    <string name="apps_section_new">Nouvelles : bloquées automatiquement</string>
+    <string name="apps_section_blocked">Bloquées</string>
+    <string name="apps_section_allowed">Autorisées</string>
+    <string name="apps_new_chip">Nouvelle</string>
+    <string name="apps_keep_blocked">Garder bloquées</string>
+
+    <plurals name="home_waiting_apps">
+        <item quantity="one">%1$d nouvelle appli en attente</item>
+        <item quantity="many">%1$d nouvelles applis en attente</item>
+        <item quantity="other">%1$d nouvelles applis en attente</item>
+    </plurals>
+    <string name="home_waiting_apps_desc">Bloquées automatiquement. Touche pour examiner.</string>
+    <string name="home_notifications_title">Autoriser les notifications</string>
+    <string name="home_notifications_body">Killit te prévient quand il bloque une appli nouvellement installée.</string>
+    <string name="home_notifications_allow">Autoriser</string>
 </resources>

@@ -6,8 +6,13 @@ import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.data.AppInventory
 import org.tamodak.killit.data.CredentialStore
 import org.tamodak.killit.data.DurableStore
+import org.tamodak.killit.data.KnownPackagesStore
 import org.tamodak.killit.data.LockPreferences
 import org.tamodak.killit.data.LockRepository
+import org.tamodak.killit.data.db.KillitDatabase
+import org.tamodak.killit.protection.PackageGuard
+import org.tamodak.killit.protection.PackageScanner
+import org.tamodak.killit.protection.ProtectionNotifications
 
 /**
  * Hand-rolled dependency graph.
@@ -43,6 +48,14 @@ object ServiceLocator {
     lateinit var appInventory: AppInventory
         private set
 
+    /** Default-blocking: blocks every app installed after protection started. */
+    lateinit var packageGuard: PackageGuard
+        private set
+
+    /** The protection service's notification and the blocked-apps one. */
+    lateinit var protectionNotifications: ProtectionNotifications
+        private set
+
     /**
      * Builds the graph.
      *
@@ -62,13 +75,26 @@ object ServiceLocator {
 
         devicePolicyController = DevicePolicyController(appContext)
         appInventory = AppInventory(appContext)
+        // Exactly one of each per process. The durable store's lock only serialises writers that
+        // share it, and Room expects a single database instance.
+        val durable = DurableStore(devicePolicyController)
+        val database = KillitDatabase.create(appContext)
         lockRepository = LockRepository(
             // Local cache and pre-provisioning bootstrap.
             prefs = LockPreferences(appContext),
             // Master copy once Killit is device owner; survives "Clear data".
-            durable = DurableStore(devicePolicyController),
+            durable = durable,
             // Argon2id hashing of the passkey.
             credentials = CredentialStore(),
+        )
+        protectionNotifications = ProtectionNotifications(appContext, language = { lockRepository.language() })
+        packageGuard = PackageGuard(
+            context = appContext,
+            dpc = devicePolicyController,
+            scanner = PackageScanner(appContext),
+            store = KnownPackagesStore(database.knownPackages(), durable),
+            lockRepository = lockRepository,
+            notifications = protectionNotifications,
         )
 
         initialised = true

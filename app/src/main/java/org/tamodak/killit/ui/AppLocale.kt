@@ -30,8 +30,9 @@ import java.util.Locale
  * make changing language look like being logged out. Overriding the composition locals instead
  * re-resolves the strings in place, with no activity lifecycle involved and no state lost.
  *
- * The cost is that the choice reaches Compose and nothing else — but Killit has no notifications
- * and its label is a proper noun, so Compose is the only thing with a language to speak.
+ * The cost is that the choice reaches Compose and nothing else. Notifications are built outside
+ * any composition, so they resolve their text through [AppLanguage.applyTo] instead; the app's
+ * label is a proper noun and needs no translation.
  *
  * ### What has to be provided together
  *

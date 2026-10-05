@@ -152,4 +152,33 @@
     <string name="compliance_title">Killit ist bereit</string>
     <string name="compliance_body">Killit ist jetzt der Geräteeigentümer dieses Geräts.</string>
     <string name="compliance_continue">Weiter</string>
+
+    <string name="notif_channel_protection">Schutz</string>
+    <string name="notif_channel_protection_desc">Wird angezeigt, solange Killit auf neu installierte Apps achtet.</string>
+    <string name="notif_channel_new_apps">Neue Apps</string>
+    <string name="notif_channel_new_apps_desc">Sagt dir, wenn Killit eine neu installierte App blockiert.</string>
+    <string name="notif_protection_title">Killit schützt dieses Telefon</string>
+    <string name="notif_protection_text">Neue Apps bleiben blockiert, bis du sie erlaubst.</string>
+    <string name="notif_blocked_one_title">%1$s wurde blockiert</string>
+    <string name="notif_blocked_one_text">Öffne Killit, um sie zu erlauben.</string>
+    <plurals name="notif_blocked_many_title">
+        <item quantity="one">%1$d neue App ist blockiert</item>
+        <item quantity="other">%1$d neue Apps sind blockiert</item>
+    </plurals>
+    <string name="notif_blocked_many_text">Öffne Killit, um sie zu prüfen.</string>
+
+    <string name="apps_section_new">Neu: automatisch blockiert</string>
+    <string name="apps_section_blocked">Blockiert</string>
+    <string name="apps_section_allowed">Erlaubt</string>
+    <string name="apps_new_chip">Neu</string>
+    <string name="apps_keep_blocked">Blockiert lassen</string>
+
+    <plurals name="home_waiting_apps">
+        <item quantity="one">%1$d neue App wartet</item>
+        <item quantity="other">%1$d neue Apps warten</item>
+    </plurals>
+    <string name="home_waiting_apps_desc">Automatisch blockiert. Tippe zum Prüfen.</string>
+    <string name="home_notifications_title">Benachrichtigungen erlauben</string>
+    <string name="home_notifications_body">Killit sagt dir, wenn es eine neu installierte App blockiert.</string>
+    <string name="home_notifications_allow">Erlauben</string>
 </resources>

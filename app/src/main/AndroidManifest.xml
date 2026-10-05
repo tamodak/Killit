@@ -14,6 +14,16 @@
     <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
 
     <!--
+        Default-blocking runs in a foreground service of type systemExempted, which Android allows a
+        device owner to use. It is started again on boot, and announces blocked apps in a
+        notification, which from Android 13 needs the user's permission.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!--
         allowBackup is false because Killit's state belongs to this device: the credential record
         carries the lockout counters, so restoring an older copy would roll back failed attempts,
         and on another handset it would describe a device owner and a blocklist that are not there.
@@ -108,6 +118,35 @@
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin" />
+        </receiver>
+
+        <!--
+            Default-blocking's foreground service: holds the receiver that hears installs. Not
+            exported; only Killit starts it.
+
+            tools:ignore="ForegroundServicePermission": lint models systemExempted as needing an
+            exact-alarm permission. The platform accepts any one of several qualifications, and
+            being device owner is one of them (developer.android.com, "Foreground service types").
+            This service only runs while Killit is device owner, so Killit declares no alarm
+            permission it does not use.
+        -->
+        <service
+            android:name=".protection.ProtectionService"
+            android:exported="false"
+            android:foregroundServiceType="systemExempted"
+            tools:ignore="ForegroundServicePermission" />
+
+        <!--
+            Starts protection again after a reboot and after Killit is updated. Not exported: both
+            broadcasts come from the system, which reaches unexported receivers.
+        -->
+        <receiver
+            android:name=".protection.ProtectionStartReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
         </receiver>
 
         <!--

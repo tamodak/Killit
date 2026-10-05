@@ -160,4 +160,36 @@
     <string name="compliance_title">Killit is ready</string>
     <string name="compliance_body">Killit is now the Device Owner of this device.</string>
     <string name="compliance_continue">Continue</string>
+
+    <!-- Default-blocking: notifications -->
+    <string name="notif_channel_protection">Protection</string>
+    <string name="notif_channel_protection_desc">Shown while Killit watches for newly installed apps.</string>
+    <string name="notif_channel_new_apps">New apps</string>
+    <string name="notif_channel_new_apps_desc">Tells you when Killit blocks a newly installed app.</string>
+    <string name="notif_protection_title">Killit is protecting this phone</string>
+    <string name="notif_protection_text">New apps stay blocked until you allow them.</string>
+    <string name="notif_blocked_one_title">%1$s was blocked</string>
+    <string name="notif_blocked_one_text">Open Killit to allow it.</string>
+    <plurals name="notif_blocked_many_title">
+        <item quantity="one">%1$d new app is blocked</item>
+        <item quantity="other">%1$d new apps are blocked</item>
+    </plurals>
+    <string name="notif_blocked_many_text">Open Killit to review them.</string>
+
+    <!-- Default-blocking: the app list -->
+    <string name="apps_section_new">New: blocked automatically</string>
+    <string name="apps_section_blocked">Blocked</string>
+    <string name="apps_section_allowed">Allowed</string>
+    <string name="apps_new_chip">New</string>
+    <string name="apps_keep_blocked">Keep blocked</string>
+
+    <!-- Default-blocking: home -->
+    <plurals name="home_waiting_apps">
+        <item quantity="one">%1$d new app is waiting</item>
+        <item quantity="other">%1$d new apps are waiting</item>
+    </plurals>
+    <string name="home_waiting_apps_desc">Blocked automatically. Tap to review.</string>
+    <string name="home_notifications_title">Allow notifications</string>
+    <string name="home_notifications_body">Killit tells you when it blocks a newly installed app.</string>
+    <string name="home_notifications_allow">Allow</string>
 </resources>

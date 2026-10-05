@@ -4,31 +4,42 @@ import android.os.Bundle
 import android.util.Base64
 import org.tamodak.killit.admin.DevicePolicyController
 import org.tamodak.killit.core.KillitLog
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
- * The passkey's master copy, kept in the device owner's own application restrictions.
+ * The clear-data-proof copies of Killit's state, kept in the device owner's own application
+ * restrictions: the passkey record, the pending release request and the known-package list.
  *
  * ### Why application restrictions, of all places
  *
  * The device policy service stores restrictions in system storage rather than in
  * `/data/data/<pkg>/`, so they survive Settings -> Apps -> Killit -> Storage -> **Clear data**.
  * That matters: without it, clearing app data would erase the passkey while the OS kept every app
- * blocked, leaving a Killit that anyone could walk into and unblock.
+ * blocked, leaving a Killit that anyone could walk into and unblock — or would forget which apps
+ * were new, so the next check would approve them.
  *
  * It is an unusual home for security material — restrictions are designed for managed
  * configuration pushed by an EMM — but Killit is its own admin, so it is the only writer and the
  * only reader. What is stored is a salted hash, never the credential.
  *
- * Only usable once Killit is device owner. Before that [isAvailable] is false and the repository
- * falls back to [LockPreferences].
+ * Only usable once Killit is device owner. Before that [isAvailable] is false and the callers fall
+ * back to their local stores.
  *
  * ### Value types
  *
  * The system persists restrictions as XML and only understands `boolean`, `int`, `String`,
  * `String[]`, `Bundle` and `Bundle[]`. Anything else makes system_server drop the whole write while
- * the call still returns normally, so wall-clock times — the one 64-bit value stored here — are kept
+ * the call still returns normally, so wall-clock times — the 64-bit values stored here — are kept
  * as decimal strings. [DevicePolicyController.writeSelfRestrictions] refuses a bundle holding any
  * other type, which turns that silent loss into a failed write the caller can see.
+ *
+ * ### One bundle, one writer at a time
+ *
+ * Everything lives in a single bundle that can only be written whole, so every change is a read,
+ * a merge and a write. [writeLock] runs those one at a time: the passkey's lockout counters and the
+ * package guard write from different coroutines, and two merges interleaving would each put back
+ * what the other had just changed.
  *
  * Every function is `suspend` because every one is a binder call into the device policy service;
  * [DevicePolicyController] is what moves them off the main thread.
@@ -37,11 +48,14 @@ import org.tamodak.killit.core.KillitLog
  */
 class DurableStore(private val dpc: DevicePolicyController) {
 
+    /** Serialises every read-merge-write of the bundle; see the class documentation. */
+    private val writeLock = Mutex()
+
     /**
      * Reports whether this store can be used at all.
      *
-     * @return true once Killit is device owner; false while the repository must fall back to
-     *   [LockPreferences].
+     * @return true once Killit is device owner; false while callers must fall back to their local
+     *   stores.
      */
     suspend fun isAvailable(): Boolean = dpc.isDeviceOwner()
 
@@ -88,23 +102,19 @@ class DurableStore(private val dpc: DevicePolicyController) {
     }
 
     /**
-     * Writes the credential record.
-     *
-     * Merges the record into the existing bundle rather than replacing it, so any restriction set
-     * by something else survives a passkey change.
+     * Writes the credential record, leaving every other entry in the bundle as it was.
      *
      * @param record the record to persist.
      * @return true when the device policy service accepted the write.
      */
     suspend fun write(record: CredentialRecord): Boolean {
-        val existing = dpc.readSelfRestrictions() ?: Bundle()
-        existing.putString(KEY_LOCK_TYPE, record.lockType.name)
-        existing.putString(KEY_SALT, record.salt.encodeBase64())
-        existing.putString(KEY_HASH, record.hash.encodeBase64())
-        existing.putInt(KEY_FAILED_ATTEMPTS, record.failedAttempts)
-        existing.putMillis(KEY_LOCKOUT_UNTIL, record.lockoutUntilMillis)
-
-        val written = dpc.writeSelfRestrictions(existing)
+        val written = update {
+            putString(KEY_LOCK_TYPE, record.lockType.name)
+            putString(KEY_SALT, record.salt.encodeBase64())
+            putString(KEY_HASH, record.hash.encodeBase64())
+            putInt(KEY_FAILED_ATTEMPTS, record.failedAttempts)
+            putMillis(KEY_LOCKOUT_UNTIL, record.lockoutUntilMillis)
+        }
         if (written) {
             KillitLog.d(KillitLog.DURABLE) {
                 "write: ${record.lockType} hash=${KillitLog.fingerprint(record.hash)} " +
@@ -141,46 +151,135 @@ class DurableStore(private val dpc: DevicePolicyController) {
     }
 
     /**
-     * Writes the pending release request, starting or extending the countdown.
+     * Writes the pending release request, starting the countdown.
      *
      * @param request the request to persist.
      * @return true when the device policy service accepted the write.
      */
     suspend fun writeReleaseRequest(request: ReleaseRequest): Boolean {
-        val existing = dpc.readSelfRestrictions() ?: Bundle()
-        existing.putMillis(KEY_RELEASE_REQUESTED_AT, request.requestedAtMillis)
-        existing.putMillis(KEY_RELEASE_AVAILABLE_AT, request.availableAtMillis)
-        return dpc.writeSelfRestrictions(existing).also { written ->
-            if (!written) {
-                // Falling back to the local copy alone would leave the countdown resettable.
-                KillitLog.e(KillitLog.DURABLE, "Release request NOT written durably; Clear data could reset it")
-            }
+        val written = update {
+            putMillis(KEY_RELEASE_REQUESTED_AT, request.requestedAtMillis)
+            putMillis(KEY_RELEASE_AVAILABLE_AT, request.availableAtMillis)
         }
+        if (!written) {
+            // Falling back to the local copy alone would leave the countdown resettable.
+            KillitLog.e(KillitLog.DURABLE, "Release request NOT written durably; Clear data could reset it")
+        }
+        return written
     }
 
     /**
      * Cancels the pending release request, leaving every other restriction in place.
      *
-     * @return true when the request was removed, or when there was no bundle to remove it from.
+     * @return true when the device policy service accepted the write.
      */
-    suspend fun clearReleaseRequest(): Boolean {
-        val existing = dpc.readSelfRestrictions() ?: return true
-        existing.remove(KEY_RELEASE_REQUESTED_AT)
-        existing.remove(KEY_RELEASE_AVAILABLE_AT)
-        return dpc.writeSelfRestrictions(existing)
+    suspend fun clearReleaseRequest(): Boolean = update {
+        remove(KEY_RELEASE_REQUESTED_AT)
+        remove(KEY_RELEASE_AVAILABLE_AT)
+    }
+
+    // ---------------------------------------------------------------- known packages
+
+    /**
+     * Reads the known-package list.
+     *
+     * An entry with a missing or unreadable field is left out rather than failing the whole list:
+     * the package it described is then simply treated as new, which blocks it — the safe direction.
+     *
+     * @return every readable entry, keyed by package name; empty when none were ever written; null
+     *   when Killit is not device owner.
+     */
+    suspend fun readKnownPackages(): Map<String, KnownPackage>? {
+        val bundle = dpc.readSelfRestrictions() ?: return null
+        val list = bundle.getBundle(KEY_KNOWN_PACKAGES) ?: return emptyMap()
+        return list.keySet()
+            .mapNotNull { name ->
+                val entry = list.getBundle(name)?.toKnownPackage(name)
+                if (entry == null) {
+                    KillitLog.w(KillitLog.DURABLE, "readKnownPackages: entry for $name is corrupt; skipped")
+                }
+                entry
+            }
+            .associateBy { it.packageName }
     }
 
     /**
-     * Wipes the durable copy.
+     * Replaces the known-package list with [packages], leaving every other entry as it was.
      *
-     * Not currently called by any screen; kept as the counterpart to [write] for a future
-     * "forget this device" flow.
+     * @param packages the complete list.
+     * @return true when the device policy service accepted the write.
+     */
+    suspend fun writeKnownPackages(packages: Collection<KnownPackage>): Boolean {
+        val written = update {
+            putBundle(KEY_KNOWN_PACKAGES, Bundle().apply {
+                packages.forEach { putBundle(it.packageName, it.toBundle()) }
+            })
+        }
+        if (!written) {
+            // Clear data would now restore an older list, so some decisions could be lost.
+            KillitLog.e(KillitLog.DURABLE, "Known packages NOT written durably (${packages.size} entries)")
+        }
+        return written
+    }
+
+    /**
+     * Removes the known-package list, so that protecting the phone again starts from a fresh
+     * snapshot of what is installed.
      *
      * @return true when the device policy service accepted the write.
      */
-    suspend fun clear(): Boolean {
-        KillitLog.i(KillitLog.DURABLE, "Clearing the durable credential record")
-        return dpc.writeSelfRestrictions(Bundle())
+    suspend fun clearKnownPackages(): Boolean = update { remove(KEY_KNOWN_PACKAGES) }
+
+    /**
+     * Wipes every durable entry.
+     *
+     * Used by tests to start from nothing; the app itself clears entries one feature at a time.
+     *
+     * @return true when the device policy service accepted the write.
+     */
+    suspend fun clear(): Boolean = writeLock.withLock {
+        KillitLog.i(KillitLog.DURABLE, "Clearing every durable entry")
+        dpc.writeSelfRestrictions(Bundle())
+    }
+
+    /**
+     * Reads the bundle, applies [edit], and writes it back, holding [writeLock] throughout.
+     *
+     * Nothing is written when the read fails. Writing [edit] into a fresh bundle instead would
+     * replace everything else stored here — the passkey record included — with nothing.
+     *
+     * @param edit the change to make to the current bundle.
+     * @return true when the device policy service accepted the write; false when Killit is not
+     *   device owner or the bundle could not be read or written.
+     */
+    private suspend fun update(edit: Bundle.() -> Unit): Boolean = writeLock.withLock {
+        val bundle = dpc.readSelfRestrictions() ?: return@withLock false
+        bundle.edit()
+        dpc.writeSelfRestrictions(bundle)
+    }
+
+    /**
+     * Encodes one known package as a nested bundle.
+     *
+     * @return the entry's bundle; the package name is its key in the list, not a field.
+     */
+    private fun KnownPackage.toBundle() = Bundle().apply {
+        putString(KEY_ENTRY_CERT, certDigest.encodeBase64())
+        putString(KEY_ENTRY_STATUS, status.name)
+        putMillis(KEY_ENTRY_SINCE, sinceMillis)
+    }
+
+    /**
+     * Decodes what [toBundle] wrote.
+     *
+     * @param packageName the entry's key in the list.
+     * @return the entry, or null when any field is missing or unreadable.
+     */
+    private fun Bundle.toKnownPackage(packageName: String): KnownPackage? {
+        val cert = getString(KEY_ENTRY_CERT)?.decodeBase64() ?: return null
+        val status = PackageStatus.fromName(getString(KEY_ENTRY_STATUS)) ?: return null
+        val since = getMillis(KEY_ENTRY_SINCE) ?: return null
+        return KnownPackage(packageName, cert, status, since)
     }
 
     private companion object {
@@ -192,6 +291,12 @@ class DurableStore(private val dpc: DevicePolicyController) {
 
         const val KEY_RELEASE_REQUESTED_AT = "killit_release_requested_at"
         const val KEY_RELEASE_AVAILABLE_AT = "killit_release_available_at"
+
+        // The known-package list: one nested bundle per package, keyed by package name.
+        const val KEY_KNOWN_PACKAGES = "killit_known_packages"
+        const val KEY_ENTRY_CERT = "cert_sha256"
+        const val KEY_ENTRY_STATUS = "status"
+        const val KEY_ENTRY_SINCE = "since"
     }
 }
 

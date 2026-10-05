@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    // Room's annotation processor runs under KSP.
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -61,6 +64,12 @@ android {
     }
 }
 
+// Every schema version is exported and committed, so a migration can be tested against the exact
+// tables an earlier build created.
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
     // The BOM pins every Compose artifact to one compatible set, so the entries below carry no
     // versions of their own. Applied to androidTest as well, or the test artifacts drift from it.
@@ -77,6 +86,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     // Backs LockPreferences: the local half of the credential store.
     implementation(libs.androidx.datastore.preferences)
+    // Backs the known-package list: the local half of what default-blocking remembers.
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    // Runs the periodic package check.
+    implementation(libs.androidx.work.runtime)
     // Provisioning without a computer. `api` is the client, `provider` the manifest component.
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)

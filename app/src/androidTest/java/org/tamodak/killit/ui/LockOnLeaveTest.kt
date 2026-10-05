@@ -17,6 +17,8 @@ import org.tamodak.killit.data.LockPreferences
 import org.tamodak.killit.data.LockRepository
 import org.tamodak.killit.data.LockType
 import org.tamodak.killit.data.PersistedStateSnapshot
+import org.tamodak.killit.protection.ProtectionControl
+import org.tamodak.killit.ServiceLocator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -83,6 +85,13 @@ class LockOnLeaveTest {
                         dpc = dpc,
                         inventory = AppInventory(context),
                         shizuku = ShizukuProvisioner(context),
+                        guard = ServiceLocator.packageGuard,
+                        // Protection is not what these tests are about; starting it would only
+                        // add a service and a snapshot to every run.
+                        protection = object : ProtectionControl {
+                            override suspend fun ensureRunning() = Unit
+                            override fun stop() = Unit
+                        },
                     )
                 }
             }

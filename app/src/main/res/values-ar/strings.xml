@@ -167,4 +167,41 @@
     <string name="compliance_title">‏Killit جاهز</string>
     <string name="compliance_body">‏Killit الآن مالك هذا الجهاز.</string>
     <string name="compliance_continue">متابعة</string>
+
+    <string name="notif_channel_protection">الحماية</string>
+    <string name="notif_channel_protection_desc">يظهر ما دام Killit يراقب التطبيقات المثبّتة حديثًا.</string>
+    <string name="notif_channel_new_apps">التطبيقات الجديدة</string>
+    <string name="notif_channel_new_apps_desc">يخبرك عندما يحظر Killit تطبيقًا مثبّتًا حديثًا.</string>
+    <string name="notif_protection_title">Killit يحمي هذا الهاتف</string>
+    <string name="notif_protection_text">تبقى التطبيقات الجديدة محظورة حتى تسمح بها.</string>
+    <string name="notif_blocked_one_title">تم حظر %1$s</string>
+    <string name="notif_blocked_one_text">افتح Killit للسماح به.</string>
+    <plurals name="notif_blocked_many_title">
+        <item quantity="zero">لا توجد تطبيقات جديدة محظورة</item>
+        <item quantity="one">تطبيق جديد واحد محظور</item>
+        <item quantity="two">تطبيقان جديدان محظوران</item>
+        <item quantity="few">%1$d تطبيقات جديدة محظورة</item>
+        <item quantity="many">%1$d تطبيقًا جديدًا محظورًا</item>
+        <item quantity="other">%1$d تطبيق جديد محظور</item>
+    </plurals>
+    <string name="notif_blocked_many_text">افتح Killit لمراجعتها.</string>
+
+    <string name="apps_section_new">جديدة: محظورة تلقائيًا</string>
+    <string name="apps_section_blocked">محظورة</string>
+    <string name="apps_section_allowed">مسموح بها</string>
+    <string name="apps_new_chip">جديد</string>
+    <string name="apps_keep_blocked">إبقاؤها محظورة</string>
+
+    <plurals name="home_waiting_apps">
+        <item quantity="zero">لا توجد تطبيقات جديدة بانتظارك</item>
+        <item quantity="one">تطبيق جديد واحد بانتظارك</item>
+        <item quantity="two">تطبيقان جديدان بانتظارك</item>
+        <item quantity="few">%1$d تطبيقات جديدة بانتظارك</item>
+        <item quantity="many">%1$d تطبيقًا جديدًا بانتظارك</item>
+        <item quantity="other">%1$d تطبيق جديد بانتظارك</item>
+    </plurals>
+    <string name="home_waiting_apps_desc">محظورة تلقائيًا. اضغط للمراجعة.</string>
+    <string name="home_notifications_title">السماح بالإشعارات</string>
+    <string name="home_notifications_body">يخبرك Killit عندما يحظر تطبيقًا مثبّتًا حديثًا.</string>
+    <string name="home_notifications_allow">السماح</string>
 </resources>
