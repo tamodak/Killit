@@ -29,7 +29,14 @@
     <!-- Auth gate -->
     <string name="gate_title">أدخل مفتاحك</string>
     <string name="gate_subtitle">يستطيع Killit رفع الحظر عن كل تطبيق حظرته، ولهذا يبقى هو نفسه مقفلًا.</string>
-    <string name="gate_wrong">مفتاح خاطئ. المحاولات المتبقية قبل القفل: %1$d.</string>
+    <plurals name="gate_wrong">
+        <item quantity="zero">مفتاح خاطئ. لم تبقَ أي محاولة قبل القفل.</item>
+        <item quantity="one">مفتاح خاطئ. بقيت محاولة واحدة قبل القفل.</item>
+        <item quantity="two">مفتاح خاطئ. بقيت محاولتان قبل القفل.</item>
+        <item quantity="few">مفتاح خاطئ. بقيت %1$d محاولات قبل القفل.</item>
+        <item quantity="many">مفتاح خاطئ. بقيت %1$d محاولة قبل القفل.</item>
+        <item quantity="other">مفتاح خاطئ. بقيت %1$d محاولة قبل القفل.</item>
+    </plurals>
     <string name="gate_wrong_generic">مفتاح خاطئ.</string>
     <string name="gate_locked_out">محاولات كثيرة جدًا. أعد المحاولة بعد %1$s.</string>
 
@@ -56,7 +63,14 @@
     <string name="home_status_owner_no">ليس مالك الجهاز</string>
     <string name="home_status_owner_yes_desc">يستطيع Killit حظر التطبيقات ورفع الحظر عنها.</string>
     <string name="home_status_owner_no_desc">لا يستطيع Killit حظر أي شيء حتى يُعيَّن مالكًا للجهاز. اختر إحدى الطرق الثلاث أدناه.</string>
-    <string name="home_blocked_count">التطبيقات المحظورة: %1$d</string>
+    <plurals name="home_blocked_count">
+        <item quantity="zero">لا توجد تطبيقات محظورة</item>
+        <item quantity="one">تطبيق واحد محظور</item>
+        <item quantity="two">تطبيقان محظوران</item>
+        <item quantity="few">%1$d تطبيقات محظورة</item>
+        <item quantity="many">%1$d تطبيقًا محظورًا</item>
+        <item quantity="other">%1$d تطبيق محظور</item>
+    </plurals>
     <string name="home_manage_apps">اختر التطبيقات المراد حظرها</string>
     <string name="home_manage_apps_locked">أعدّ الإعداد أدناه أولًا</string>
     <string name="home_change_passkey">تغيير المفتاح</string>
@@ -116,7 +130,14 @@
     <string name="apps_tab_system">النظام</string>
     <string name="apps_show_all">إظهار الحزم التي بلا أيقونة تشغيل</string>
     <string name="apps_empty">لا يوجد تطبيق مطابق.</string>
-    <string name="apps_save_pending">تغييرات غير محفوظة: %1$d</string>
+    <plurals name="apps_save_pending">
+        <item quantity="zero">لا توجد تغييرات غير محفوظة</item>
+        <item quantity="one">تغيير واحد غير محفوظ</item>
+        <item quantity="two">تغييران غير محفوظين</item>
+        <item quantity="few">%1$d تغييرات غير محفوظة</item>
+        <item quantity="many">%1$d تغييرًا غير محفوظ</item>
+        <item quantity="other">%1$d تغيير غير محفوظ</item>
+    </plurals>
     <string name="apps_saved">تم الحفظ.</string>
     <string name="apps_discard_title">تجاهل التغييرات؟</string>
     <string name="apps_discard_body">لديك تغييرات غير محفوظة. الخروج دون تطبيقها؟</string>

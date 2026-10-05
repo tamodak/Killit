@@ -26,7 +26,10 @@
     <!-- Auth gate -->
     <string name="gate_title">Schlüssel eingeben</string>
     <string name="gate_subtitle">Killit kann jede von dir blockierte App wieder freigeben — deshalb bleibt es selbst gesperrt.</string>
-    <string name="gate_wrong">Falscher Schlüssel. Verbleibende Versuche bis zur Sperre: %1$d.</string>
+    <plurals name="gate_wrong">
+        <item quantity="one">Falscher Schlüssel. Noch %1$d Versuch bis zur Sperre.</item>
+        <item quantity="other">Falscher Schlüssel. Noch %1$d Versuche bis zur Sperre.</item>
+    </plurals>
     <string name="gate_wrong_generic">Falscher Schlüssel.</string>
     <string name="gate_locked_out">Zu viele Versuche. Versuche es in %1$s erneut.</string>
 
@@ -53,7 +56,10 @@
     <string name="home_status_owner_no">Kein Geräteeigentümer</string>
     <string name="home_status_owner_yes_desc">Killit kann Apps blockieren und freigeben.</string>
     <string name="home_status_owner_no_desc">Killit kann nichts blockieren, solange es nicht als Geräteeigentümer eingerichtet ist. Wähle einen der drei Wege unten.</string>
-    <string name="home_blocked_count">Blockierte Apps: %1$d</string>
+    <plurals name="home_blocked_count">
+        <item quantity="one">%1$d App blockiert</item>
+        <item quantity="other">%1$d Apps blockiert</item>
+    </plurals>
     <string name="home_manage_apps">Apps zum Blockieren wählen</string>
     <string name="home_manage_apps_locked">Zuerst unten einrichten</string>
     <string name="home_change_passkey">Schlüssel ändern</string>
@@ -113,7 +119,10 @@
     <string name="apps_tab_system">System</string>
     <string name="apps_show_all">Pakete ohne Startsymbol anzeigen</string>
     <string name="apps_empty">Keine App passt.</string>
-    <string name="apps_save_pending">Ausstehende Änderungen: %1$d</string>
+    <plurals name="apps_save_pending">
+        <item quantity="one">%1$d ausstehende Änderung</item>
+        <item quantity="other">%1$d ausstehende Änderungen</item>
+    </plurals>
     <string name="apps_saved">Gespeichert.</string>
     <string name="apps_discard_title">Änderungen verwerfen?</string>
     <string name="apps_discard_body">Du hast ungespeicherte Änderungen. Verlassen, ohne sie anzuwenden?</string>

@@ -26,7 +26,12 @@
     <!-- Auth gate -->
     <string name="gate_title">Введите ключ</string>
     <string name="gate_subtitle">Killit может разблокировать любое заблокированное вами приложение, поэтому сам остаётся под замком.</string>
-    <string name="gate_wrong">Неверный ключ. Осталось попыток до блокировки: %1$d.</string>
+    <plurals name="gate_wrong">
+        <item quantity="one">Неверный ключ. До блокировки осталась %1$d попытка.</item>
+        <item quantity="few">Неверный ключ. До блокировки осталось %1$d попытки.</item>
+        <item quantity="many">Неверный ключ. До блокировки осталось %1$d попыток.</item>
+        <item quantity="other">Неверный ключ. До блокировки осталось %1$d попытки.</item>
+    </plurals>
     <string name="gate_wrong_generic">Неверный ключ.</string>
     <string name="gate_locked_out">Слишком много попыток. Повторите через %1$s.</string>
 
@@ -53,7 +58,12 @@
     <string name="home_status_owner_no">Не владелец устройства</string>
     <string name="home_status_owner_yes_desc">Killit может блокировать и разблокировать приложения.</string>
     <string name="home_status_owner_no_desc">Killit ничего не сможет заблокировать, пока не будет назначен владельцем устройства. Выберите один из трёх способов ниже.</string>
-    <string name="home_blocked_count">Заблокировано приложений: %1$d</string>
+    <plurals name="home_blocked_count">
+        <item quantity="one">Заблокировано %1$d приложение</item>
+        <item quantity="few">Заблокировано %1$d приложения</item>
+        <item quantity="many">Заблокировано %1$d приложений</item>
+        <item quantity="other">Заблокировано %1$d приложения</item>
+    </plurals>
     <string name="home_manage_apps">Выбрать приложения для блокировки</string>
     <string name="home_manage_apps_locked">Сначала настройте ниже</string>
     <string name="home_change_passkey">Сменить ключ</string>
@@ -113,7 +123,12 @@
     <string name="apps_tab_system">Системные</string>
     <string name="apps_show_all">Показывать пакеты без значка запуска</string>
     <string name="apps_empty">Нет подходящих приложений.</string>
-    <string name="apps_save_pending">Несохранённых изменений: %1$d</string>
+    <plurals name="apps_save_pending">
+        <item quantity="one">%1$d несохранённое изменение</item>
+        <item quantity="few">%1$d несохранённых изменения</item>
+        <item quantity="many">%1$d несохранённых изменений</item>
+        <item quantity="other">%1$d несохранённого изменения</item>
+    </plurals>
     <string name="apps_saved">Сохранено.</string>
     <string name="apps_discard_title">Отменить изменения?</string>
     <string name="apps_discard_body">Есть несохранённые изменения. Выйти, не применяя их?</string>

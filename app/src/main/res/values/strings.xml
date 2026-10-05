@@ -1,12 +1,12 @@
 <!--
-    Every user-visible string in the app.
+    Every user-visible string in the app, in English. Each of the eight other languages has a
+    values-<qualifier>/ folder with the same names, and a string added here belongs in all of them:
+    lint reports a MissingTranslation error for any it is missing from.
 
-    Grouped by the screen that shows it, in roughly the order a user meets them. Killit is not
-    translated yet, so this is the only values/ folder — but the strings live here rather than in
-    code so that adding a language later is a matter of adding a folder, not rewriting the screens.
+    Grouped by the screen that shows it, in roughly the order a user meets them.
 
-    One exception is documented rather than hidden: ui/Durations.kt builds its countdowns ("2d 4h")
-    in code, so those unit letters are not localisable.
+    Text that depends on a number is a <plurals> resource, so every language can choose the right
+    form for each count — Russian has four of them, Arabic six.
 -->
 <resources>
     <string name="app_name">Killit</string>
@@ -34,7 +34,10 @@
     <!-- Auth gate -->
     <string name="gate_title">Enter your passkey</string>
     <string name="gate_subtitle">Killit can unblock every app you have blocked, so it stays locked.</string>
-    <string name="gate_wrong">Wrong passkey. %1$d attempts left before a lockout.</string>
+    <plurals name="gate_wrong">
+        <item quantity="one">Wrong passkey. %1$d attempt left before a lockout.</item>
+        <item quantity="other">Wrong passkey. %1$d attempts left before a lockout.</item>
+    </plurals>
     <string name="gate_wrong_generic">Wrong passkey.</string>
     <string name="gate_locked_out">Too many attempts. Try again in %1$s.</string>
 
@@ -61,7 +64,10 @@
     <string name="home_status_owner_no">Not a Device Owner</string>
     <string name="home_status_owner_yes_desc">Killit can block and unblock apps.</string>
     <string name="home_status_owner_no_desc">Killit cannot block anything until it is provisioned as Device Owner. Pick one of the three ways below.</string>
-    <string name="home_blocked_count">%1$d apps blocked</string>
+    <plurals name="home_blocked_count">
+        <item quantity="one">%1$d app blocked</item>
+        <item quantity="other">%1$d apps blocked</item>
+    </plurals>
     <string name="home_manage_apps">Choose apps to block</string>
     <string name="home_manage_apps_locked">Set up below first</string>
     <string name="home_change_passkey">Change passkey</string>
@@ -121,7 +127,10 @@
     <string name="apps_tab_system">System</string>
     <string name="apps_show_all">Show packages without a launcher icon</string>
     <string name="apps_empty">No apps match.</string>
-    <string name="apps_save_pending">%1$d pending change(s)</string>
+    <plurals name="apps_save_pending">
+        <item quantity="one">%1$d pending change</item>
+        <item quantity="other">%1$d pending changes</item>
+    </plurals>
     <string name="apps_saved">Saved.</string>
     <string name="apps_discard_title">Discard changes?</string>
     <string name="apps_discard_body">You have unsaved changes. Leave without applying them?</string>

@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -259,7 +260,7 @@ private fun SaveBar(pending: Int, enabled: Boolean, onSave: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             KillitBody(
-                text = stringResource(R.string.apps_save_pending, pending),
+                text = pluralStringResource(R.plurals.apps_save_pending, pending, pending),
                 color = KillitForeground,
                 modifier = Modifier.weight(1f),
             )

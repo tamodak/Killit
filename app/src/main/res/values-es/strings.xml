@@ -26,7 +26,11 @@
     <!-- Auth gate -->
     <string name="gate_title">Introduce tu clave</string>
     <string name="gate_subtitle">Killit puede desbloquear todas las apps que has bloqueado, por eso permanece cerrado.</string>
-    <string name="gate_wrong">Clave incorrecta. Intentos restantes antes del bloqueo: %1$d.</string>
+    <plurals name="gate_wrong">
+        <item quantity="one">Clave incorrecta. Te queda %1$d intento antes del bloqueo.</item>
+        <item quantity="many">Clave incorrecta. Te quedan %1$d intentos antes del bloqueo.</item>
+        <item quantity="other">Clave incorrecta. Te quedan %1$d intentos antes del bloqueo.</item>
+    </plurals>
     <string name="gate_wrong_generic">Clave incorrecta.</string>
     <string name="gate_locked_out">Demasiados intentos. Inténtalo de nuevo en %1$s.</string>
 
@@ -53,7 +57,11 @@
     <string name="home_status_owner_no">No es propietario del dispositivo</string>
     <string name="home_status_owner_yes_desc">Killit puede bloquear y desbloquear apps.</string>
     <string name="home_status_owner_no_desc">Killit no puede bloquear nada hasta que se configure como propietario del dispositivo. Elige una de las tres formas de abajo.</string>
-    <string name="home_blocked_count">Apps bloqueadas: %1$d</string>
+    <plurals name="home_blocked_count">
+        <item quantity="one">%1$d app bloqueada</item>
+        <item quantity="many">%1$d apps bloqueadas</item>
+        <item quantity="other">%1$d apps bloqueadas</item>
+    </plurals>
     <string name="home_manage_apps">Elegir apps para bloquear</string>
     <string name="home_manage_apps_locked">Configúralo primero abajo</string>
     <string name="home_change_passkey">Cambiar clave</string>
@@ -113,7 +121,11 @@
     <string name="apps_tab_system">Sistema</string>
     <string name="apps_show_all">Mostrar paquetes sin icono de inicio</string>
     <string name="apps_empty">Ninguna app coincide.</string>
-    <string name="apps_save_pending">Cambios pendientes: %1$d</string>
+    <plurals name="apps_save_pending">
+        <item quantity="one">%1$d cambio pendiente</item>
+        <item quantity="many">%1$d cambios pendientes</item>
+        <item quantity="other">%1$d cambios pendientes</item>
+    </plurals>
     <string name="apps_saved">Guardado.</string>
     <string name="apps_discard_title">¿Descartar los cambios?</string>
     <string name="apps_discard_body">Tienes cambios sin guardar. ¿Salir sin aplicarlos?</string>

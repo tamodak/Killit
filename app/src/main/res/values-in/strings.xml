@@ -29,7 +29,9 @@
     <!-- Auth gate -->
     <string name="gate_title">Masukkan kunci kamu</string>
     <string name="gate_subtitle">Killit bisa membuka blokir semua aplikasi yang kamu blokir, jadi Killit sendiri tetap terkunci.</string>
-    <string name="gate_wrong">Kunci salah. Sisa %1$d percobaan sebelum terkunci.</string>
+    <plurals name="gate_wrong">
+        <item quantity="other">Kunci salah. Sisa %1$d percobaan sebelum terkunci.</item>
+    </plurals>
     <string name="gate_wrong_generic">Kunci salah.</string>
     <string name="gate_locked_out">Terlalu banyak percobaan. Coba lagi dalam %1$s.</string>
 
@@ -56,7 +58,9 @@
     <string name="home_status_owner_no">Bukan Pemilik Perangkat</string>
     <string name="home_status_owner_yes_desc">Killit bisa memblokir dan membuka blokir aplikasi.</string>
     <string name="home_status_owner_no_desc">Killit tidak bisa memblokir apa pun sebelum disiapkan sebagai Pemilik Perangkat. Pilih salah satu dari tiga cara di bawah.</string>
-    <string name="home_blocked_count">%1$d aplikasi diblokir</string>
+    <plurals name="home_blocked_count">
+        <item quantity="other">%1$d aplikasi diblokir</item>
+    </plurals>
     <string name="home_manage_apps">Pilih aplikasi untuk diblokir</string>
     <string name="home_manage_apps_locked">Siapkan dulu di bawah</string>
     <string name="home_change_passkey">Ubah kunci</string>
@@ -116,7 +120,9 @@
     <string name="apps_tab_system">Sistem</string>
     <string name="apps_show_all">Tampilkan paket tanpa ikon peluncur</string>
     <string name="apps_empty">Tidak ada aplikasi yang cocok.</string>
-    <string name="apps_save_pending">%1$d perubahan tertunda</string>
+    <plurals name="apps_save_pending">
+        <item quantity="other">%1$d perubahan tertunda</item>
+    </plurals>
     <string name="apps_saved">Tersimpan.</string>
     <string name="apps_discard_title">Buang perubahan?</string>
     <string name="apps_discard_body">Ada perubahan yang belum disimpan. Keluar tanpa menerapkannya?</string>

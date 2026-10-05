@@ -26,7 +26,11 @@
     <!-- Auth gate -->
     <string name="gate_title">Introduz a tua chave</string>
     <string name="gate_subtitle">O Killit pode desbloquear todas as apps que bloqueaste, por isso mantém-se trancado.</string>
-    <string name="gate_wrong">Chave errada. Tentativas restantes antes do bloqueio: %1$d.</string>
+    <plurals name="gate_wrong">
+        <item quantity="one">Chave errada. Resta-te %1$d tentativa antes do bloqueio.</item>
+        <item quantity="many">Chave errada. Restam-te %1$d tentativas antes do bloqueio.</item>
+        <item quantity="other">Chave errada. Restam-te %1$d tentativas antes do bloqueio.</item>
+    </plurals>
     <string name="gate_wrong_generic">Chave errada.</string>
     <string name="gate_locked_out">Demasiadas tentativas. Tenta de novo dentro de %1$s.</string>
 
@@ -53,7 +57,11 @@
     <string name="home_status_owner_no">Não é proprietário do dispositivo</string>
     <string name="home_status_owner_yes_desc">O Killit pode bloquear e desbloquear apps.</string>
     <string name="home_status_owner_no_desc">O Killit não consegue bloquear nada enquanto não for configurado como proprietário do dispositivo. Escolhe uma das três formas abaixo.</string>
-    <string name="home_blocked_count">Apps bloqueadas: %1$d</string>
+    <plurals name="home_blocked_count">
+        <item quantity="one">%1$d app bloqueada</item>
+        <item quantity="many">%1$d apps bloqueadas</item>
+        <item quantity="other">%1$d apps bloqueadas</item>
+    </plurals>
     <string name="home_manage_apps">Escolher apps para bloquear</string>
     <string name="home_manage_apps_locked">Configura primeiro abaixo</string>
     <string name="home_change_passkey">Alterar chave</string>
@@ -113,7 +121,11 @@
     <string name="apps_tab_system">Sistema</string>
     <string name="apps_show_all">Mostrar pacotes sem ícone de arranque</string>
     <string name="apps_empty">Nenhuma app corresponde.</string>
-    <string name="apps_save_pending">Alterações pendentes: %1$d</string>
+    <plurals name="apps_save_pending">
+        <item quantity="one">%1$d alteração pendente</item>
+        <item quantity="many">%1$d alterações pendentes</item>
+        <item quantity="other">%1$d alterações pendentes</item>
+    </plurals>
     <string name="apps_saved">Guardado.</string>
     <string name="apps_discard_title">Descartar as alterações?</string>
     <string name="apps_discard_body">Tens alterações por guardar. Sair sem as aplicar?</string>

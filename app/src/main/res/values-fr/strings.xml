@@ -26,7 +26,11 @@
     <!-- Auth gate -->
     <string name="gate_title">Saisis ta clé</string>
     <string name="gate_subtitle">Killit peut débloquer toutes les applis que tu as bloquées : c\'est pourquoi il reste verrouillé.</string>
-    <string name="gate_wrong">Clé incorrecte. Tentatives restantes avant le verrouillage : %1$d.</string>
+    <plurals name="gate_wrong">
+        <item quantity="one">Clé incorrecte. Il te reste %1$d tentative avant le verrouillage.</item>
+        <item quantity="many">Clé incorrecte. Il te reste %1$d tentatives avant le verrouillage.</item>
+        <item quantity="other">Clé incorrecte. Il te reste %1$d tentatives avant le verrouillage.</item>
+    </plurals>
     <string name="gate_wrong_generic">Clé incorrecte.</string>
     <string name="gate_locked_out">Trop de tentatives. Réessaie dans %1$s.</string>
 
@@ -53,7 +57,11 @@
     <string name="home_status_owner_no">Pas propriétaire de l\'appareil</string>
     <string name="home_status_owner_yes_desc">Killit peut bloquer et débloquer des applis.</string>
     <string name="home_status_owner_no_desc">Killit ne peut rien bloquer tant qu\'il n\'est pas configuré comme propriétaire de l\'appareil. Choisis l\'une des trois méthodes ci-dessous.</string>
-    <string name="home_blocked_count">Applis bloquées : %1$d</string>
+    <plurals name="home_blocked_count">
+        <item quantity="one">%1$d appli bloquée</item>
+        <item quantity="many">%1$d applis bloquées</item>
+        <item quantity="other">%1$d applis bloquées</item>
+    </plurals>
     <string name="home_manage_apps">Choisir les applis à bloquer</string>
     <string name="home_manage_apps_locked">Configure d\'abord ci-dessous</string>
     <string name="home_change_passkey">Changer de clé</string>
@@ -113,7 +121,11 @@
     <string name="apps_tab_system">Système</string>
     <string name="apps_show_all">Afficher les paquets sans icône de lancement</string>
     <string name="apps_empty">Aucune appli ne correspond.</string>
-    <string name="apps_save_pending">Modifications en attente : %1$d</string>
+    <plurals name="apps_save_pending">
+        <item quantity="one">%1$d modification en attente</item>
+        <item quantity="many">%1$d modifications en attente</item>
+        <item quantity="other">%1$d modifications en attente</item>
+    </plurals>
     <string name="apps_saved">Enregistré.</string>
     <string name="apps_discard_title">Abandonner les modifications ?</string>
     <string name="apps_discard_body">Tu as des modifications non enregistrées. Quitter sans les appliquer ?</string>

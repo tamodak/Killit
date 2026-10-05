@@ -26,7 +26,10 @@
     <!-- Auth gate -->
     <string name="gate_title">Şifreni gir</string>
     <string name="gate_subtitle">Killit engellediğin her uygulamanın engelini kaldırabilir, bu yüzden kilitli kalır.</string>
-    <string name="gate_wrong">Yanlış şifre. Kilitlenmeden önce %1$d deneme hakkın kaldı.</string>
+    <plurals name="gate_wrong">
+        <item quantity="one">Yanlış şifre. Kilitlenmeden önce %1$d deneme hakkın kaldı.</item>
+        <item quantity="other">Yanlış şifre. Kilitlenmeden önce %1$d deneme hakkın kaldı.</item>
+    </plurals>
     <string name="gate_wrong_generic">Yanlış şifre.</string>
     <string name="gate_locked_out">Çok fazla deneme. %1$s sonra tekrar dene.</string>
 
@@ -53,7 +56,10 @@
     <string name="home_status_owner_no">Cihaz Sahibi değil</string>
     <string name="home_status_owner_yes_desc">Killit uygulamaları engelleyip engelini kaldırabilir.</string>
     <string name="home_status_owner_no_desc">Killit, Cihaz Sahibi olarak kurulmadan hiçbir şeyi engelleyemez. Aşağıdaki üç yoldan birini seç.</string>
-    <string name="home_blocked_count">%1$d uygulama engellendi</string>
+    <plurals name="home_blocked_count">
+        <item quantity="one">%1$d uygulama engellendi</item>
+        <item quantity="other">%1$d uygulama engellendi</item>
+    </plurals>
     <string name="home_manage_apps">Engellenecek uygulamaları seç</string>
     <string name="home_manage_apps_locked">Önce aşağıdan kurulum yap</string>
     <string name="home_change_passkey">Şifreyi değiştir</string>
@@ -113,7 +119,10 @@
     <string name="apps_tab_system">Sistem</string>
     <string name="apps_show_all">Başlatıcı simgesi olmayan paketleri göster</string>
     <string name="apps_empty">Eşleşen uygulama yok.</string>
-    <string name="apps_save_pending">%1$d bekleyen değişiklik</string>
+    <plurals name="apps_save_pending">
+        <item quantity="one">%1$d bekleyen değişiklik</item>
+        <item quantity="other">%1$d bekleyen değişiklik</item>
+    </plurals>
     <string name="apps_saved">Kaydedildi.</string>
     <string name="apps_discard_title">Değişiklikler atılsın mı?</string>
     <string name="apps_discard_body">Kaydedilmemiş değişikliklerin var. Uygulamadan çıkılsın mı?</string>
