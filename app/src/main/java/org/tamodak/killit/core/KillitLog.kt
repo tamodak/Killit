@@ -107,8 +107,8 @@ object KillitLog {
      * is set. That second route is the point: a device nobody on the team owns can be traced
      * without shipping it a special APK.
      *
-     * `@Volatile` because it is read from every thread the app uses — main, IO, and the PBKDF2
-     * worker — and may be flipped from any of them.
+     * `@Volatile` because it is read from every thread the app uses — main, IO, and Default, where
+     * the passkey is hashed — and may be flipped from any of them.
      *
      * Note that `KillitLog` is named in `src/main/keepRules/`. Without that, R8 proves nothing in
      * the app assigns this field, folds it to a constant `false`, and deletes every traced branch
@@ -122,9 +122,9 @@ object KillitLog {
      * An operation slower than this is reported at WARN by [timed] **even when [verbose] is off**.
      *
      * That is deliberate: the whole point is that a device nobody on the team owns — a budget
-     * phone whose PBKDF2 takes seconds, a handset whose device policy service is slow to answer —
-     * reports its own problem from a stock release build, rather than needing to be reproduced
-     * first. 500 ms is roughly where a delay stops reading as "responsive".
+     * phone that is slow to hash the passkey, a handset whose device policy service is slow to
+     * answer — reports its own problem from a stock release build, rather than needing to be
+     * reproduced first. 500 ms is roughly where a delay stops reading as "responsive".
      */
     const val SLOW_OPERATION_MILLIS = 500L
 
@@ -202,7 +202,7 @@ object KillitLog {
      * NTP sync mid-operation cannot produce a nonsense duration.
      *
      * ```
-     * val hash = KillitLog.timed(KillitLog.CRED, "PBKDF2 x$ITERATIONS") { derive(...) }
+     * val hash = KillitLog.timed(KillitLog.CRED, "Argon2id") { credentials.hash(credential, salt) }
      * ```
      *
      * @param tag one of the layer tags declared above.

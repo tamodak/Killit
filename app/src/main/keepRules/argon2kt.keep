@@ -1,0 +1,6 @@
+# argon2kt's native code hands the computed hash back by writing ByteBufferTarget.byteBuffer, which
+# it looks up by name over JNI. R8 cannot see that write. Without this rule it is free to rename the
+# field, or — if no Java code is left writing it — to decide the field is always null and fold the
+# reads away. Either way every passkey hash would fail in release builds while debug builds kept
+# working. The class name itself is already kept, because it appears in a native method's signature.
+-keep class com.lambdapioneer.argon2kt.ByteBufferTarget { *; }

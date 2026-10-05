@@ -2,6 +2,7 @@ package org.tamodak.killit.ui.gate
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,9 +44,9 @@ import org.tamodak.killit.ui.theme.KillitIcons
  * them — the strength of the whole product is the strength of this screen plus the hardening that
  * stops it being bypassed.
  *
- * @param enabled false while a verification is in flight. Note that verification is genuinely slow
- *   (see `CredentialStore.derive`), so on a low-end device the inputs can stay disabled for
- *   seconds after a submission with no other indication that anything is happening.
+ * @param enabled false while a verification is in flight. Verification is deliberately slow (see
+ *   `CredentialStore.hash`), so the inputs stay disabled for a noticeable moment on a low-end device,
+ *   and a progress indicator shows that the entry is being checked rather than ignored.
  */
 @Composable
 fun AuthGateScreen(
@@ -125,5 +127,13 @@ fun AuthGateScreen(
                 .widthIn(max = 340.dp)
                 .padding(top = 8.dp),
         )
+
+        // The slot is always there and only its content comes and goes, so the centred column
+        // does not jump when a check starts or ends.
+        Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
+            if (!enabled) {
+                CircularProgressIndicator(color = KillitGreen, strokeWidth = 2.dp)
+            }
+        }
     }
 }

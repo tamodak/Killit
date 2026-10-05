@@ -15,6 +15,7 @@ kotlin = "2.2.10"
 composeBom = "2026.02.01"
 datastore = "1.2.1"
 shizuku = "13.1.5"
+argon2kt = "1.6.0"
 
 [libraries]
 
@@ -27,6 +28,8 @@ androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lif
 # Provisioning without a computer. `api` is the client half, `provider` the manifest component.
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
 shizuku-provider = { group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
+# Argon2id for the passkey hash: the reference C implementation behind a small JNI wrapper.
+argon2kt = { group = "com.lambdapioneer.argon2kt", name = "argon2kt", version.ref = "argon2kt" }
 # Testing.
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

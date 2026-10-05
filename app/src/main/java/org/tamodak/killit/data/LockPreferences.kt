@@ -238,14 +238,9 @@ class LockPreferences(context: Context) {
     }
 
     private companion object {
-        // Preference keys. The salt and hash keys carry a suffix because the hashing scheme
-        // changed: a record written by an older build holds a hash this code can never reproduce.
-        // Storing the new scheme under new keys makes such a record simply invisible — the user is
-        // sent to set a passkey again, rather than being locked out by attempts that can never
-        // succeed.
         val KEY_LOCK_TYPE = stringPreferencesKey("lock_type")
-        val KEY_SALT = stringPreferencesKey("salt_sha256")
-        val KEY_HASH = stringPreferencesKey("hash_sha256")
+        val KEY_SALT = stringPreferencesKey("passkey_salt")
+        val KEY_HASH = stringPreferencesKey("passkey_hash")
         val KEY_FAILED_ATTEMPTS = intPreferencesKey("failed_attempts")
         val KEY_LOCKOUT_UNTIL = longPreferencesKey("lockout_until")
 

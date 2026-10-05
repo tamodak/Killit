@@ -67,7 +67,7 @@ object ServiceLocator {
             prefs = LockPreferences(appContext),
             // Master copy once Killit is device owner; survives "Clear data".
             durable = DurableStore(devicePolicyController),
-            // Salted SHA-256 of the passkey.
+            // Argon2id hashing of the passkey.
             credentials = CredentialStore(),
         )
 

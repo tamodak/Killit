@@ -40,7 +40,7 @@ enum class LockType {
  *
  * @param lockType which input the gate must show to collect this credential.
  * @param salt random per-record input, so two identical passkeys do not produce identical hashes.
- * @param hash `SHA-256(salt || credential)`.
+ * @param hash Argon2id of the credential with [salt]; see `CredentialStore.hash`.
  * @param failedAttempts consecutive wrong guesses; reset to zero on success.
  * @param lockoutUntilMillis wall-clock time (`System.currentTimeMillis`) before which no attempt
  *   is accepted. Zero means no lockout.

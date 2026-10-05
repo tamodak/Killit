@@ -80,6 +80,11 @@ dependencies {
     // Provisioning without a computer. `api` is the client, `provider` the manifest component.
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+    // Hashes the passkey with Argon2id. Its POM also lists appcompat as a runtime dependency that
+    // none of its classes use, so that is left out rather than shipped in a device-owner app.
+    implementation(libs.argon2kt) {
+        exclude(group = "androidx.appcompat", module = "appcompat")
+    }
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

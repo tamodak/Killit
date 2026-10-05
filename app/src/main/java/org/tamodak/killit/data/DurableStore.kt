@@ -184,12 +184,9 @@ class DurableStore(private val dpc: DevicePolicyController) {
     }
 
     private companion object {
-        // Restriction keys. The hash and salt entries carry a `_sha256` suffix for the same reason
-        // as in LockPreferences: a record written under the old hashing scheme must read as absent
-        // rather than as one that can never be verified.
         const val KEY_LOCK_TYPE = "killit_lock_type"
-        const val KEY_SALT = "killit_salt_sha256"
-        const val KEY_HASH = "killit_hash_sha256"
+        const val KEY_SALT = "killit_passkey_salt"
+        const val KEY_HASH = "killit_passkey_hash"
         const val KEY_FAILED_ATTEMPTS = "killit_failed_attempts"
         const val KEY_LOCKOUT_UNTIL = "killit_lockout_until"
 

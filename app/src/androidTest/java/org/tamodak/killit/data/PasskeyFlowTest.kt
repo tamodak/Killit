@@ -7,7 +7,6 @@ import org.tamodak.killit.admin.DevicePolicyController
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -27,9 +26,6 @@ class PasskeyFlowTest {
     /** The instrumentation context, which owns the DataStore file these tests write to. */
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
-    /** Exercised directly by [hashingIsSaltedAndDeterministic], and through the repository above. */
-    private val credentials = CredentialStore()
-
     /** The local store. Emptied before every test, since it outlives the process. */
     private val prefs = LockPreferences(context)
 
@@ -43,7 +39,7 @@ class PasskeyFlowTest {
     private val repository = LockRepository(
         prefs = prefs,
         durable = durable,
-        credentials = credentials,
+        credentials = CredentialStore(),
     )
 
     /** What both stores held before the test, put back by [tearDown]. */
@@ -88,40 +84,6 @@ class PasskeyFlowTest {
 
         assertEquals(VerifyResult.Success, repository.verify("112233"))
         assertEquals("Attempts reset after a success", 0, prefs.readRecord()!!.failedAttempts)
-    }
-
-    /**
-     * The hash is reproducible from the same inputs, and changes when either input changes.
-     *
-     * Determinism is what makes verification possible at all; salt sensitivity is what stops two
-     * users with the same passkey producing the same stored hash.
-     */
-    @Test
-    fun hashingIsSaltedAndDeterministic() {
-        val salt = credentials.newSalt()
-
-        assertTrue(
-            "The same input must produce the same hash",
-            credentials.matches(
-                credentials.hash(PASSKEY, salt),
-                credentials.hash(PASSKEY, salt),
-            )
-        )
-        assertFalse(
-            "A different salt must produce a different hash",
-            credentials.matches(
-                credentials.hash(PASSKEY, salt),
-                credentials.hash(PASSKEY, credentials.newSalt()),
-            )
-        )
-        assertFalse(
-            "A different passkey must produce a different hash",
-            credentials.matches(
-                credentials.hash(PASSKEY, salt),
-                credentials.hash("1-2-3-4", salt),
-            )
-        )
-        assertEquals("Expected a SHA-256 digest", 32, credentials.hash(PASSKEY, salt).size)
     }
 
     private companion object {

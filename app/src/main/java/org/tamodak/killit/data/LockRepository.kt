@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * @param prefs local cache and pre-provisioning bootstrap.
  * @param durable master copy once Killit is device owner; survives "Clear data".
- * @param credentials salted SHA-256 of the passkey.
+ * @param credentials hashes the passkey with Argon2id.
  */
 class LockRepository(
     private val prefs: LockPreferences,
@@ -165,7 +165,7 @@ class LockRepository(
     suspend fun setCredential(type: LockType, credential: String) {
         KillitLog.i(KillitLog.REPO, "Setting a new passkey of type $type")
         val salt = credentials.newSalt()
-        val hash = credentials.hash(credential, salt)
+        val hash = hashTimed(credential, salt)
         write(CredentialRecord(lockType = type, salt = salt, hash = hash))
         KillitLog.i(KillitLog.REPO, "Passkey set; lockout counters reset")
     }
@@ -194,7 +194,7 @@ class LockRepository(
                 return@timed VerifyResult.LockedOut(remaining)
             }
 
-            val candidate = credentials.hash(credential, record.salt)
+            val candidate = hashTimed(credential, record.salt)
             if (credentials.matches(candidate, record.hash)) {
                 KillitLog.i(KillitLog.REPO, "verify -> Success (attempt counter reset)")
                 write(record.copy(failedAttempts = 0, lockoutUntilMillis = 0L))
@@ -353,6 +353,21 @@ class LockRepository(
             KillitLog.d(KillitLog.REPO) { "promoteToDurable: durable copy already present" }
         }
     }
+
+    /**
+     * Hashes a passkey, timed under the `Cred` tag.
+     *
+     * Argon2id is the slowest step of every unlock and its cost varies widely between phones, so
+     * its own timing is what tells a slow phone apart from a slow device policy service in a report.
+     *
+     * @param credential the normalised passkey string. Never logged.
+     * @param salt the record's salt.
+     * @return the hash.
+     */
+    private suspend fun hashTimed(credential: String, salt: ByteArray): ByteArray =
+        KillitLog.timed(KillitLog.CRED, "Argon2id") {
+            credentials.hash(credential, salt)
+        }
 
     /**
      * Writes a record to both stores. The durable one is skipped when Killit is not yet device
