@@ -8,16 +8,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import org.tamodak.killit.R
@@ -59,8 +56,8 @@ fun KillitAppUi(
  * Everything below the language provider.
  *
  * Split out so that [ProvideAppLanguage] wraps the whole screen host rather than each screen: the
- * toast text and the lifecycle observer below resolve strings too, and a provider placed any deeper
- * would leave them speaking the device's language while the screens speak the user's.
+ * toast text below resolves strings too, and a provider placed any deeper would leave it speaking
+ * the device's language while the screens speak the user's.
  *
  * @param state the current UI state.
  * @param viewModel the source of every action the screens can take.
@@ -68,19 +65,14 @@ fun KillitAppUi(
 @Composable
 private fun KillitAppContent(state: KillitUiState, viewModel: KillitViewModel) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Re-lock as soon as Killit leaves the foreground. ON_STOP rather than ON_PAUSE, so a
-    // permission dialog or a partially covering activity does not re-lock the session.
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) viewModel.lockOnBackground()
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            KillitLog.v(KillitLog.UI) { "Removing lifecycle observer" }
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+    // Tells the ViewModel when Killit is in the foreground: only then may a proved passkey unlock
+    // the session, and leaving locks it. Start/stop rather than resume/pause, so a permission
+    // dialog or a partially covering activity does not re-lock the session. The stop callback also
+    // runs if this content leaves the composition, which locks — the safe direction.
+    LifecycleStartEffect(viewModel) {
+        viewModel.onForeground()
+        onStopOrDispose { viewModel.lockOnBackground() }
     }
 
     // Messages are modelled rather than pre-rendered so their text stays in strings.xml; the

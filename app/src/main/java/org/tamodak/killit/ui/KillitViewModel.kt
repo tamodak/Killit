@@ -27,8 +27,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** Which screen the single-activity UI is showing. */
+/**
+ * Which screen the single-activity UI is showing.
+ *
+ * @property requiresAuthentication whether the screen may only be shown to a session that has
+ *   proved the passkey. [KillitViewModel.navigateTo] refuses such a screen otherwise.
+ */
 sealed interface Screen {
+    val requiresAuthentication: Boolean get() = false
+
     /** Bootstrapping: reading the stores and the current suspension state. */
     data object Loading : Screen
 
@@ -39,13 +46,19 @@ sealed interface Screen {
     data object Gate : Screen
 
     /** Unlocked. Status, hardening toggles, and the way into everything else. */
-    data object Home : Screen
+    data object Home : Screen {
+        override val requiresAuthentication get() = true
+    }
 
     /** Choosing which packages to block. */
-    data object Apps : Screen
+    data object Apps : Screen {
+        override val requiresAuthentication get() = true
+    }
 
     /** Replacing an existing passkey. The same screen as [Setup], but cancellable. */
-    data object ChangePasskey : Screen
+    data object ChangePasskey : Screen {
+        override val requiresAuthentication get() = true
+    }
 
     /** Killit's data was cleared: apps are blocked but the passkey can no longer be verified. */
     data object Tampered : Screen
@@ -170,6 +183,11 @@ data class KillitUiState(
  * saved state bundle. It dies with the ViewModel, which means process death re-locks — the
  * conservative direction.
  *
+ * A session is only ever unlocked while the activity is started (see [unlockIfInForeground]), and
+ * leaving the activity always locks it (see [lockOnBackground]). Work that is in flight when the
+ * user leaves — verifying a passkey, saving the blocklist, releasing device owner — keeps running
+ * in `viewModelScope` and finishes behind the gate.
+ *
  * @param repository the passkey record, the hardening toggles and the release request.
  * @param dpc every call into `DevicePolicyManager`.
  * @param inventory the installed-package list and icon decoding.
@@ -194,6 +212,25 @@ class KillitViewModel(
      * Deliberately not part of [KillitUiState] — see the class documentation.
      */
     private var authenticated = false
+
+    /**
+     * Whether the activity is between ON_START and ON_STOP, as reported by [onForeground] and
+     * [lockOnBackground].
+     *
+     * Starts false: until the UI reports its first ON_START, nothing may unlock the session.
+     */
+    private var inForeground = false
+
+    /**
+     * True only while another app's screen is expected to cover Killit on purpose: Shizuku's
+     * permission prompt, during provisioning.
+     *
+     * That prompt is a different app's activity, so Killit receives ON_STOP while the user is
+     * still in the middle of setting it up, and locking there would send them back to the gate
+     * mid-flow. The exemption is this narrow on purpose: it covers one prompt, and only before
+     * Killit is device owner, when there is nothing yet for an unlocked session to unblock.
+     */
+    private var awaitingExternalScreen = false
 
     init {
         KillitLog.d(KillitLog.VM) { "ViewModel created; bootstrapping" }
@@ -349,6 +386,9 @@ class KillitViewModel(
      * Guarded by [KillitUiState.busy] so a double tap cannot spend two lockout attempts on one
      * entry — which matters because key derivation takes long enough for a second tap to land.
      *
+     * A correct passkey opens Home only if the user is still here when the check finishes; see
+     * [unlockIfInForeground].
+     *
      * @param credential the normalised passkey string as entered.
      */
     fun submitGate(credential: String) {
@@ -362,8 +402,7 @@ class KillitViewModel(
 
             val feedback = when (val result = repository.verify(credential)) {
                 VerifyResult.Success -> {
-                    authenticated = true
-                    _state.update { it.copy(screen = Screen.Home) }
+                    unlockIfInForeground()
                     null
                 }
 
@@ -386,7 +425,9 @@ class KillitViewModel(
     /**
      * Sets or replaces the passkey, then opens Home.
      *
-     * Setting one authenticates the session, since the setup screen has the user enter it twice.
+     * Setting one authenticates the session, since the setup screen has the user enter it twice —
+     * but, as for [submitGate], only if the user is still here when the record has been written.
+     * Otherwise the new passkey is in place and the gate asks for it on return.
      *
      * @param lockType which input the gate should collect in future.
      * @param credential the normalised passkey string.
@@ -396,15 +437,29 @@ class KillitViewModel(
             KillitLog.i(KillitLog.VM, "Setting passkey ($lockType)")
             _state.update { it.copy(busy = true) }
             repository.setCredential(lockType, credential)
-            // Setting a passkey authenticates the session: the user just proved it twice.
-            authenticated = true
-            _state.update { it.copy(
-                busy = false,
-                lockType = lockType,
-                screen = Screen.Home,
-                message = UiMessage.PasskeySet,
-            ) }
+            _state.update { it.copy(busy = false, lockType = lockType, message = UiMessage.PasskeySet) }
+            if (!unlockIfInForeground()) _state.update { it.copy(screen = Screen.Gate) }
         }
+    }
+
+    /**
+     * Opens the session, but only while the activity is in the foreground.
+     *
+     * Every path that proves the passkey ends here. Proving it takes time, and a result that lands
+     * after the user has left would otherwise leave an unlocked Killit waiting in the background
+     * for whoever opens it next. Such a result is dropped: the user simply proves the passkey again
+     * on return.
+     *
+     * @return true when the session was unlocked and Home is showing.
+     */
+    private fun unlockIfInForeground(): Boolean {
+        if (!inForeground) {
+            KillitLog.i(KillitLog.VM, "Passkey proved after Killit left the foreground; staying locked")
+            return false
+        }
+        authenticated = true
+        _state.update { it.copy(screen = Screen.Home) }
+        return true
     }
 
     // ---------------------------------------------------------------- app blocking
@@ -438,6 +493,11 @@ class KillitViewModel(
      *
      * The re-read is the important part: Android silently refuses to suspend some packages, so
      * assuming the write succeeded would leave checkboxes ticked for apps that are still usable.
+     *
+     * The selection is read from a snapshot taken when Save was pressed, but state is only ever
+     * written through `update` on the latest value. Writing the snapshot back would undo anything
+     * that happened in between — a lock on leaving included, which would put the app list back on
+     * screen without a session.
      */
     fun save() {
         val snapshot = _state.value
@@ -447,7 +507,7 @@ class KillitViewModel(
         }
         viewModelScope.launch {
             KillitLog.i(KillitLog.VM, "Saving ${snapshot.pendingChanges} blocklist changes")
-            _state.update { snapshot.copy(busy = true, saveFailures = emptyList()) }
+            _state.update { it.copy(busy = true, saveFailures = emptyList()) }
 
             val result = dpc.applyBlocklist(desired = snapshot.selection, current = snapshot.blocked)
 
@@ -507,9 +567,9 @@ class KillitViewModel(
     /**
      * Walks the Shizuku provisioning flow and reports whatever came back.
      *
-     * [KillitUiState.busy] stays true across the permission prompt on purpose — that prompt is
-     * another app's activity, so Killit goes to the background and [lockOnBackground] would
-     * otherwise demand the passkey again mid-provisioning.
+     * Shizuku's permission prompt is another app's activity, so Killit receives ON_STOP while it is
+     * showing. [awaitingExternalScreen] is raised for exactly the duration of that prompt so the
+     * session is not locked mid-provisioning; see its documentation for why that is safe.
      */
     fun provisionViaShizuku() {
         if (_state.value.busy) {
@@ -523,12 +583,19 @@ class KillitViewModel(
             val outcome = when (shizuku.status()) {
                 ShizukuStatus.NOT_RUNNING -> ShizukuOutcome.NotRunning
                 ShizukuStatus.TOO_OLD -> ShizukuOutcome.TooOld
-                ShizukuStatus.READY ->
-                    if (!shizuku.requestPermission()) {
+                ShizukuStatus.READY -> {
+                    awaitingExternalScreen = true
+                    val granted = try {
+                        shizuku.requestPermission()
+                    } finally {
+                        awaitingExternalScreen = false
+                    }
+                    if (!granted) {
                         ShizukuOutcome.PermissionDenied
                     } else {
                         ShizukuOutcome.CommandOutput(shizuku.setDeviceOwner())
                     }
+                }
             }
 
             KillitLog.i(KillitLog.VM, "Shizuku provisioning outcome: ${outcome::class.java.simpleName}")
@@ -627,9 +694,17 @@ class KillitViewModel(
     /**
      * Moves to another screen, clearing any stale gate feedback on the way.
      *
+     * A screen that needs a session is refused while locked. The UI only offers those screens from
+     * an unlocked one, but a tap that lands just as Killit locks would otherwise open one without
+     * the passkey.
+     *
      * @param screen where to go.
      */
     fun navigateTo(screen: Screen) {
+        if (screen.requiresAuthentication && !authenticated) {
+            KillitLog.w(KillitLog.VM, "navigateTo($screen) refused: session is not authenticated")
+            return
+        }
         KillitLog.d(KillitLog.VM) { "navigate ${_state.value.screen} -> $screen" }
         _state.update { it.copy(screen = screen, gateFeedback = null) }
     }
@@ -648,22 +723,32 @@ class KillitViewModel(
     }
 
     /**
-     * Re-locks when Killit leaves the foreground.
+     * Records that the activity has started, which is what allows a proved passkey to unlock the
+     * session. Called on every ON_START, including the first.
+     */
+    fun onForeground() {
+        KillitLog.v(KillitLog.VM) { "onForeground" }
+        inForeground = true
+    }
+
+    /**
+     * Re-locks when Killit leaves the foreground. Called on every ON_STOP.
      *
      * Without this, an authenticated session would sit on the home screen indefinitely — hand the
      * phone over and everything can be unblocked.
      *
-     * Skipped while busy: the Shizuku permission prompt is another app's activity, and stopping
-     * mid-provisioning to demand the passkey again would just be obstructive.
+     * The lock is unconditional: an operation that is still running when the user leaves carries
+     * on in `viewModelScope` and finishes behind the gate. The one exception is
+     * [awaitingExternalScreen], and only while Killit is not yet device owner.
      */
     fun lockOnBackground() {
-        val current = _state.value
+        inForeground = false
         if (!authenticated) {
             KillitLog.v(KillitLog.VM) { "lockOnBackground: already locked" }
             return
         }
-        if (current.busy) {
-            KillitLog.d(KillitLog.VM) { "lockOnBackground skipped: busy (probably a permission prompt)" }
+        if (awaitingExternalScreen && !_state.value.isDeviceOwner) {
+            KillitLog.d(KillitLog.VM) { "lockOnBackground skipped: Shizuku's permission prompt is showing" }
             return
         }
 
