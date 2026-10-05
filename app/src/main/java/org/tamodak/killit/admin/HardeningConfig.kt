@@ -11,6 +11,10 @@ package org.tamodak.killit.admin
  * be aimed at Killit alone, and leaves the one device-wide restriction to the owner — starting
  * locked down is the safe direction to be wrong in, but not at the cost of the user's other apps.
  *
+ * Creating a work profile or a private space is not a toggle: it is always blocked, because apps
+ * in another profile are out of Killit's reach entirely (see
+ * `DevicePolicyController.ensureProfilesBlocked`).
+ *
  * @param blockUninstall stops Killit being uninstalled to escape the block. Scoped to Killit:
  *   `setUninstallBlocked` takes a package name.
  * @param blockForceStop greys out Force stop in Settings, and from Android 13 refuses Clear data
@@ -31,7 +35,7 @@ package org.tamodak.killit.admin
  *   [blockForceStop] protects it too, so Clear data on Killit is refused without this. Kept as a
  *   toggle for defence in depth, and for OEM builds that honour neither.
  * @param blockDateTime blocks changing the system date and time. The delay on "remove admin" is
- *   measured against the wall clock, so winding the clock forward three days would skip the wait
+ *   measured against the wall clock, so winding the clock past the deadline would skip the wait
  *   entirely. This restriction is what makes that delay real rather than decorative.
  */
 data class HardeningConfig(

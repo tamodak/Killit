@@ -41,9 +41,10 @@ android {
                 // live in src/main/keepRules/.
                 enable = true
             }
-            // Three days. Long enough that the decision has to survive a change of mood, short
-            // enough that someone with a genuine reason is not stranded for a week.
-            buildConfigField("long", "RELEASE_DELAY_MILLIS", "259_200_000L")
+            // Fourteen days. Long enough to outlast a craving or a bad week, so the release only
+            // happens if the decision still stands two weeks later; the countdown can be
+            // cancelled at any point, so a change of heart costs nothing.
+            buildConfigField("long", "RELEASE_DELAY_MILLIS", "1_209_600_000L")
         }
     }
     compileOptions {

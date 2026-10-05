@@ -103,7 +103,7 @@ class DevicePolicyController(
     // ---------------------------------------------------------------- hardening
 
     /**
-     * Applies every anti-tamper policy in a config.
+     * Applies every anti-tamper policy in a config, and makes sure no second profile can be made.
      *
      * Individual failures are logged, not fatal: a policy the platform or OEM will not accept
      * should not cost the other five, and there is nothing the user could do about it anyway.
@@ -111,7 +111,9 @@ class DevicePolicyController(
      * @param config the toggles to apply. Each maps 1:1 to a call below.
      */
     suspend fun applyHardening(config: HardeningConfig) = withContext(ioDispatcher) {
-        KillitLog.timed(KillitLog.DPC, "applyHardening") { applyHardeningBlocking(config) }
+        KillitLog.timed(KillitLog.DPC, "applyHardening") {
+            if (applyHardeningBlocking(config)) ensureProfilesBlocked()
+        }
     }
 
     // ---------------------------------------------------------------- durable storage
@@ -326,12 +328,16 @@ class DevicePolicyController(
     /**
      * Applies every policy in a config, the work behind [applyHardening].
      *
+     * Also used by [releaseDeviceOwner] to lift everything, which is why the profile restrictions
+     * live in [ensureProfilesBlocked] instead: they are never lifted.
+     *
      * @param config the toggles to apply.
+     * @return true when the policies were applied; false when Killit is not device owner.
      */
-    private fun applyHardeningBlocking(config: HardeningConfig) {
+    private fun applyHardeningBlocking(config: HardeningConfig): Boolean {
         if (!isDeviceOwnerBlocking()) {
             KillitLog.d(KillitLog.DPC) { "applyHardening skipped: not device owner" }
-            return
+            return false
         }
         KillitLog.i(KillitLog.DPC, "Applying hardening: $config")
 
@@ -343,7 +349,48 @@ class DevicePolicyController(
         setRestriction(UserManager.DISALLOW_ADD_USER, config.blockFactoryReset)
         setRestriction(UserManager.DISALLOW_APPS_CONTROL, config.blockAppsControl)
         // Without this, the release delay can be skipped by moving the clock forward.
-        setRestriction(UserManager.DISALLOW_CONFIG_DATE_TIME, config.blockDateTime)
+        setDateTimeLocked(config.blockDateTime)
+        return true
+    }
+
+    /**
+     * Stops the user setting the date and time by hand.
+     *
+     * `DISALLOW_CONFIG_DATE_TIME` exists from Android 9. On Android 8 the same effect comes from
+     * requiring automatic time: the clock then only follows the network, and the date and time
+     * settings cannot be changed.
+     *
+     * @param locked true to lock the clock, false to give the settings back.
+     */
+    private fun setDateTimeLocked(locked: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            setRestriction(UserManager.DISALLOW_CONFIG_DATE_TIME, locked)
+            return
+        }
+        @Suppress("DEPRECATION") // Deprecated from Android 11; this branch only runs on Android 8.
+        runCatching { dpm.setAutoTimeRequired(admin, locked) }
+            .onSuccess { KillitLog.d(KillitLog.DPC) { "setAutoTimeRequired($locked) ok" } }
+            .onFailure { KillitLog.w(KillitLog.DPC, "setAutoTimeRequired($locked) failed", it) }
+    }
+
+    /**
+     * Makes sure no second profile can be created on this device.
+     *
+     * Killit can only suspend packages for the user it manages, so apps installed in another
+     * profile — a work profile, or Android 15's private space — would be out of its reach. The
+     * platform already turns both restrictions on for a device owner, and from Android 11 a fully
+     * managed device cannot have a work profile at all; setting them here covers builds that skip
+     * those defaults. They are only ever added, never cleared, because no configuration of Killit
+     * wants either profile to exist.
+     */
+    private fun ensureProfilesBlocked() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            @Suppress("DEPRECATION") // Deprecated because Android 11 made it moot; set only below 11.
+            setRestriction(UserManager.DISALLOW_ADD_MANAGED_PROFILE, true)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            setRestriction(UserManager.DISALLOW_ADD_PRIVATE_PROFILE, true)
+        }
     }
 
     /**

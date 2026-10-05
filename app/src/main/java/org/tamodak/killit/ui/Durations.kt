@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
  *
  * Shared by the two places that count down: the gate's lockout after too many wrong attempts
  * (seconds to minutes) and the wait before device owner can be given up (up to days). Only the two
- * largest units are shown — at three days out, seconds are noise.
+ * largest units are shown — with days to go, seconds are noise.
  *
  * Floors at one second so a sub-second remainder never reads as `"0s"`, which would look like the
  * wait is over when it is not.
