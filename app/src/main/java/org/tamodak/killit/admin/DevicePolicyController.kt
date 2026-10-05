@@ -146,12 +146,23 @@ class DevicePolicyController(
      * The bundle replaces what was stored, which is why callers read, merge and write back rather
      * than writing a bundle holding only the keys they own.
      *
+     * A bundle holding a value type the system cannot persist is refused here rather than passed
+     * on. The device policy service would accept it, but system_server would then discard the whole
+     * write and report the failure only in its own log, leaving the caller believing the durable copy
+     * was updated. See [unsupportedRestrictionKeys].
+     *
      * @param bundle the full restrictions to store.
-     * @return true when the write succeeded; false when Killit is not device owner or it failed.
+     * @return true when the write succeeded; false when Killit is not device owner, the bundle holds
+     *   a type that cannot be persisted, or the call failed.
      */
     suspend fun writeSelfRestrictions(bundle: Bundle): Boolean = withContext(ioDispatcher) {
         if (!isDeviceOwnerBlocking()) {
             KillitLog.d(KillitLog.DPC) { "writeSelfRestrictions skipped: not device owner" }
+            return@withContext false
+        }
+        val unsupported = unsupportedRestrictionKeys(bundle)
+        if (unsupported.isNotEmpty()) {
+            KillitLog.e(KillitLog.DPC, "writeSelfRestrictions refused: unsupported value types at $unsupported")
             return@withContext false
         }
         KillitLog.timed(KillitLog.DPC, "writeSelfRestrictions (${bundle.size()} keys)") {
@@ -381,6 +392,37 @@ class DevicePolicyController(
     companion object {
         /** Reported in [BlocklistResult.error] when policy is attempted before provisioning. */
         const val NOT_DEVICE_OWNER = "Killit is not the device owner"
+
+        /**
+         * Lists the keys whose values the system cannot persist as application restrictions.
+         *
+         * Restrictions are stored as XML that knows exactly six value types: `boolean`, `int`,
+         * `String`, `String[]`, `Bundle` and `Bundle[]` (`null` is stored as an empty string).
+         * `setApplicationRestrictions` accepts any bundle, but any other type — a `long` is the
+         * easy one to reach for — makes system_server abandon the whole write.
+         *
+         * @param bundle the restrictions about to be written. Nested bundles are checked as well.
+         * @param prefix the path of [bundle] inside the outermost one, for the report.
+         * @return the offending keys as `outer/inner` paths; empty when the bundle can be stored.
+         */
+        internal fun unsupportedRestrictionKeys(bundle: Bundle, prefix: String = ""): List<String> =
+            bundle.keySet().flatMap { key ->
+                val path = prefix + key
+                // There is no typed accessor for "whatever this key holds", only the deprecated one.
+                @Suppress("DEPRECATION")
+                when (val value = bundle.get(key)) {
+                    null, is Boolean, is Int, is String -> emptyList()
+                    is Bundle -> unsupportedRestrictionKeys(value, "$path/")
+                    is Array<*> -> when {
+                        value.isArrayOf<String>() -> emptyList()
+                        value.all { it is Bundle } -> value.withIndex().flatMap { (index, element) ->
+                            unsupportedRestrictionKeys(element as Bundle, "$path[$index]/")
+                        }
+                        else -> listOf(path)
+                    }
+                    else -> listOf(path)
+                }
+            }
     }
 }
 

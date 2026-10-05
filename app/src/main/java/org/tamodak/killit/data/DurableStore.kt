@@ -22,6 +22,14 @@ import org.tamodak.killit.core.KillitLog
  * Only usable once Killit is device owner. Before that [isAvailable] is false and the repository
  * falls back to [LockPreferences].
  *
+ * ### Value types
+ *
+ * The system persists restrictions as XML and only understands `boolean`, `int`, `String`,
+ * `String[]`, `Bundle` and `Bundle[]`. Anything else makes system_server drop the whole write while
+ * the call still returns normally, so wall-clock times — the one 64-bit value stored here — are kept
+ * as decimal strings. [DevicePolicyController.writeSelfRestrictions] refuses a bundle holding any
+ * other type, which turns that silent loss into a failed write the caller can see.
+ *
  * Every function is `suspend` because every one is a binder call into the device policy service;
  * [DevicePolicyController] is what moves them off the main thread.
  *
@@ -71,7 +79,7 @@ class DurableStore(private val dpc: DevicePolicyController) {
             salt = salt,
             hash = hash,
             failedAttempts = bundle.getInt(KEY_FAILED_ATTEMPTS, 0),
-            lockoutUntilMillis = bundle.getLong(KEY_LOCKOUT_UNTIL, 0L),
+            lockoutUntilMillis = bundle.getMillis(KEY_LOCKOUT_UNTIL) ?: 0L,
         ).also {
             KillitLog.d(KillitLog.DURABLE) {
                 "read: $type hash=${KillitLog.fingerprint(hash)} failed=${it.failedAttempts}"
@@ -94,7 +102,7 @@ class DurableStore(private val dpc: DevicePolicyController) {
         existing.putString(KEY_SALT, record.salt.encodeBase64())
         existing.putString(KEY_HASH, record.hash.encodeBase64())
         existing.putInt(KEY_FAILED_ATTEMPTS, record.failedAttempts)
-        existing.putLong(KEY_LOCKOUT_UNTIL, record.lockoutUntilMillis)
+        existing.putMillis(KEY_LOCKOUT_UNTIL, record.lockoutUntilMillis)
 
         val written = dpc.writeSelfRestrictions(existing)
         if (written) {
@@ -121,11 +129,15 @@ class DurableStore(private val dpc: DevicePolicyController) {
      */
     suspend fun readReleaseRequest(): ReleaseRequest? {
         val bundle = dpc.readSelfRestrictions() ?: return null
-        if (!bundle.containsKey(KEY_RELEASE_REQUESTED_AT)) return null
-        return ReleaseRequest(
-            requestedAtMillis = bundle.getLong(KEY_RELEASE_REQUESTED_AT, 0L),
-            availableAtMillis = bundle.getLong(KEY_RELEASE_AVAILABLE_AT, 0L),
-        )
+        val requestedAt = bundle.getMillis(KEY_RELEASE_REQUESTED_AT) ?: return null
+        val availableAt = bundle.getMillis(KEY_RELEASE_AVAILABLE_AT)
+        if (availableAt == null) {
+            // A request with no deadline cannot be honoured; treating it as absent makes the user
+            // start the wait again rather than guessing when it should end.
+            KillitLog.w(KillitLog.DURABLE, "readReleaseRequest: deadline missing or corrupt; ignoring the request")
+            return null
+        }
+        return ReleaseRequest(requestedAtMillis = requestedAt, availableAtMillis = availableAt)
     }
 
     /**
@@ -136,8 +148,8 @@ class DurableStore(private val dpc: DevicePolicyController) {
      */
     suspend fun writeReleaseRequest(request: ReleaseRequest): Boolean {
         val existing = dpc.readSelfRestrictions() ?: Bundle()
-        existing.putLong(KEY_RELEASE_REQUESTED_AT, request.requestedAtMillis)
-        existing.putLong(KEY_RELEASE_AVAILABLE_AT, request.availableAtMillis)
+        existing.putMillis(KEY_RELEASE_REQUESTED_AT, request.requestedAtMillis)
+        existing.putMillis(KEY_RELEASE_AVAILABLE_AT, request.availableAtMillis)
         return dpc.writeSelfRestrictions(existing).also { written ->
             if (!written) {
                 // Falling back to the local copy alone would leave the countdown resettable.
@@ -206,3 +218,22 @@ internal fun String.decodeBase64(): ByteArray? =
         KillitLog.w(KillitLog.DURABLE, "Base64 decode failed; treating the value as absent", error)
         null
     }
+
+/**
+ * Stores a wall-clock time in a restrictions bundle.
+ *
+ * Restrictions have no 64-bit integer type (see [DurableStore]), so the value is written as a
+ * decimal string.
+ *
+ * @param key the restriction key.
+ * @param millis the time to store, in milliseconds since the epoch.
+ */
+private fun Bundle.putMillis(key: String, millis: Long) = putString(key, millis.toString())
+
+/**
+ * Reads back what [putMillis] wrote.
+ *
+ * @param key the restriction key.
+ * @return the stored time, or null when the key is absent or does not hold a decimal number.
+ */
+private fun Bundle.getMillis(key: String): Long? = getString(key)?.toLongOrNull()

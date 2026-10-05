@@ -33,28 +33,35 @@ class ReleaseDelayTest {
     /** The local store. Kept so [requestSurvivesANewRepositoryInstance] can reopen it separately. */
     private val prefs = LockPreferences(context)
 
+    /** The real policy controller, so the durable copy is exercised wherever it is available. */
+    private val dpc = DevicePolicyController(context)
+
     /**
      * The repository under test.
      *
-     * The durable store is real but inert: the test device is not device owner, so every write
-     * goes to [prefs] alone.
+     * On a device where Killit is device owner the durable store takes part too; elsewhere it is
+     * inert and every write goes to [prefs] alone.
      */
     private val repository = LockRepository(
         prefs = prefs,
-        durable = DurableStore(DevicePolicyController(context)),
+        durable = DurableStore(dpc),
         credentials = CredentialStore(),
     )
 
-    /** Turns tracing on and clears any request left by a previous run. */
+    /** What both stores held before the test, put back by [tearDown]. */
+    private lateinit var snapshot: PersistedStateSnapshot
+
+    /** Turns tracing on, saves the device's own state, and clears any request already running. */
     @Before
     fun setUp() = runBlocking {
         KillitLog.verbose = true
+        snapshot = PersistedStateSnapshot.take(prefs, dpc)
         repository.cancelRelease()
     }
 
-    /** Leaves no countdown behind — it would outlive the process and confuse the next run. */
+    /** Puts back whatever countdown the device had, so running the tests cannot cancel a real one. */
     @After
-    fun tearDown() = runBlocking { repository.cancelRelease() }
+    fun tearDown() = runBlocking { snapshot.restore() }
 
     /** The release is refused before a request, refused during the wait, and allowed after it. */
     @Test
