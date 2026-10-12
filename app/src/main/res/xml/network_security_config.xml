@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Killit's only network peer is the pairing server, reached over HTTPS. Cleartext is refused, and
+    only the system's certificate authorities are trusted: a user-installed CA can't intercept the
+    API (PLAN.md §6.2 rule 5). Certificates aren't pinned, because nothing the server says is
+    trusted for anything that matters: messages are signed and encrypted end to end.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

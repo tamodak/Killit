@@ -95,6 +95,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    testOptions {
+        // On the JVM, android.jar's stubs (Log above all) return defaults instead of throwing, so
+        // code that logs can be unit-tested. No JVM test relies on an Android method doing anything.
+        unitTests.isReturnDefaultValues = true
+    }
     // The protocol vector tests run twice: on the JVM, where they are fast, and on a device, where
     // the code under test meets Android's own UTF-8 decoder and security providers, which are not
     // the desktop JVM's.

@@ -42,7 +42,7 @@ import java.security.MessageDigest
  * ```
  * adb logcat -s Killit.App Killit.Ui Killit.Vm Killit.Repo Killit.Cred Killit.Prefs \
  *              Killit.Durable Killit.Dpc Killit.Apps Killit.Shizuku Killit.Priv Killit.Admin \
- *              Killit.Guard
+ *              Killit.Guard Killit.Keys Killit.Net Killit.Pair Killit.Sync Killit.Req
  * ```
  *
  * or, more simply, `adb logcat | grep Killit.`
@@ -91,6 +91,21 @@ object KillitLog {
 
     /** Default-blocking: package scans, the decisions made on them, and the protection service. */
     const val GUARD = "Killit.Guard"
+
+    /** This phone's identity: the Keystore signing key, the encryption keyset, registration. */
+    const val KEYS = "Killit.Keys"
+
+    /** The pairing API client: calls, statuses and clock correction. Never bodies or headers. */
+    const val NET = "Killit.Net"
+
+    /** Pairing: the ceremony, the pairings themselves, and the messages that change them. */
+    const val PAIR = "Killit.Pair"
+
+    /** The mailbox: sending, fetching, opening and acknowledging envelopes. */
+    const val SYNC = "Killit.Sync"
+
+    /** Requests between phones: unblock, unlock and unpair, and the decisions on them. */
+    const val REQ = "Killit.Req"
 
     // ---------------------------------------------------------------- configuration
 
