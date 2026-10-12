@@ -19,6 +19,11 @@ argon2kt = "1.6.0"
 ksp = "2.3.12"
 room = "2.8.5"
 work = "2.12.0"
+tink = "1.23.0"
+# 5.4 is the newest release whose Android artifact compiles against API 36; 5.5 needs compileSdk 37.
+okhttp = "5.4.0"
+# 1.9 is the newest release built for Kotlin 2.2; 1.10 and later need Kotlin 2.3.
+kotlinxSerialization = "1.9.0"
 
 [libraries]
 
@@ -39,8 +44,14 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-work-runtime = { group = "androidx.work", name = "work-runtime", version.ref = "work" }
 # Argon2id for the passkey hash: the reference C implementation behind a small JNI wrapper.
 argon2kt = { group = "com.lambdapioneer.argon2kt", name = "argon2kt", version.ref = "argon2kt" }
+# Pairing. Tink: HPKE for the end-to-end envelopes, its keyset sealed by Android Keystore. OkHttp
+# and kotlinx.serialization: the API client and its JSON, with no reflection on network input.
+tink-android = { group = "com.google.crypto.tink", name = "tink-android", version.ref = "tink" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 # Testing.
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver3", version.ref = "okhttp" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
@@ -64,4 +75,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 

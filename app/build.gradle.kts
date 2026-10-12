@@ -1,10 +1,22 @@
+import java.net.URI
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     // Room's annotation processor runs under KSP.
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    // Generates the API client's JSON codecs at compile time, so nothing is bound by reflection.
+    alias(libs.plugins.kotlin.serialization)
 }
+
+// The pairing server. Release builds talk to production; debug builds to the test server, unless
+// `-Pkillit.apiBaseUrl=http://10.0.2.2:8080` points them at a server on the development machine
+// (the debug network security config allows cleartext to that address only). The audience every
+// request is signed for is the URL's host and port (protocol/SPEC.md §4.2).
+val releaseApiBaseUrl = "https://api.tamodak.org"
+val debugApiBaseUrl = (findProperty("killit.apiBaseUrl") as String?) ?: "https://api.test.tamodak.org"
+fun audienceOf(baseUrl: String): String = URI(baseUrl).authority
 
 android {
     namespace = "org.tamodak.killit"
@@ -35,6 +47,26 @@ android {
         // Three seconds while developing, because otherwise the flow is untestable. Overridden
         // below for release.
         buildConfigField("long", "RELEASE_DELAY_MILLIS", "3_000L")
+
+        // Every other wait is a field too (PLAN.md §11, "Durations per build type"), three seconds
+        // in debug builds. Windows the user has to act within (an invite code's 15 minutes, a
+        // request's ±5-minute signature window) are not shortened: three seconds would make them
+        // unusable.
+        //
+        // How long a guardian who never answers an UNPAIR keeps being a guardian (B1, B2).
+        buildConfigField("long", "UNPAIR_TIMER_MILLIS", "3_000L")
+        // The pause after a denied or abandoned unlock request (C4).
+        buildConfigField("long", "UNLOCK_COOLDOWN_MILLIS", "3_000L")
+        // Unlock requests allowed per day (C4); unlimited while developing.
+        buildConfigField("int", "UNLOCKS_PER_DAY", "Integer.MAX_VALUE")
+        // A guardian's reminder about waiting requests (D9): once, this long after a request
+        // arrives, in debug builds; a daily daytime digest in release builds (0 here).
+        buildConfigField("long", "REMINDER_DELAY_MILLIS", "3_000L")
+        // How long a protected phone may stay silent before its guardians are told (H8).
+        buildConfigField("long", "SILENCE_ALERT_MILLIS", "3_000L")
+
+        buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
+        buildConfigField("String", "API_AUDIENCE", "\"${audienceOf(debugApiBaseUrl)}\"")
     }
 
     buildTypes {
@@ -48,11 +80,31 @@ android {
             // happens if the decision still stands two weeks later; the countdown can be
             // cancelled at any point, so a change of heart costs nothing.
             buildConfigField("long", "RELEASE_DELAY_MILLIS", "1_209_600_000L")
+            // Thirty days: a guardian who has vanished can't keep a phone forever, and one who is
+            // still there has a month to say no.
+            buildConfigField("long", "UNPAIR_TIMER_MILLIS", "2_592_000_000L")
+            buildConfigField("long", "UNLOCK_COOLDOWN_MILLIS", "300_000L")
+            buildConfigField("int", "UNLOCKS_PER_DAY", "6")
+            buildConfigField("long", "REMINDER_DELAY_MILLIS", "0L")
+            buildConfigField("long", "SILENCE_ALERT_MILLIS", "604_800_000L")
+            buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
+            buildConfigField("String", "API_AUDIENCE", "\"${audienceOf(releaseApiBaseUrl)}\"")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    // The protocol vector tests run twice: on the JVM, where they are fast, and on a device, where
+    // the code under test meets Android's own UTF-8 decoder and security providers, which are not
+    // the desktop JVM's.
+    sourceSets {
+        for (name in listOf("test", "androidTest")) {
+            getByName(name) {
+                kotlin.directories.add("src/sharedTest/java")
+                resources.directories.add("src/sharedTest/resources")
+            }
+        }
     }
     buildFeatures {
         compose = true
@@ -95,12 +147,17 @@ dependencies {
     // Provisioning without a computer. `api` is the client, `provider` the manifest component.
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+    // Pairing: end-to-end envelopes (Tink HPKE), the API client and its JSON.
+    implementation(libs.tink.android)
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.serialization.json)
     // Hashes the passkey with Argon2id. Its POM also lists appcompat as a runtime dependency that
     // none of its classes use, so that is left out rather than shipped in a device-owner app.
     implementation(libs.argon2kt) {
         exclude(group = "androidx.appcompat", module = "appcompat")
     }
     testImplementation(libs.junit)
+    testImplementation(libs.okhttp.mockwebserver)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
