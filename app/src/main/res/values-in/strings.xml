@@ -154,8 +154,6 @@
 
     <string name="notif_channel_protection">Perlindungan</string>
     <string name="notif_channel_protection_desc">Ditampilkan selama Killit memantau aplikasi yang baru dipasang.</string>
-    <string name="notif_channel_new_apps">Aplikasi baru</string>
-    <string name="notif_channel_new_apps_desc">Memberitahumu saat Killit memblokir aplikasi yang baru dipasang.</string>
     <string name="notif_protection_title">Killit melindungi ponsel ini</string>
     <string name="notif_protection_text">Aplikasi baru tetap diblokir sampai kamu mengizinkannya.</string>
     <string name="notif_blocked_one_title">%1$s diblokir</string>
@@ -410,4 +408,56 @@
     <string name="msg_sent">Terkirim ke penjagamu.</string>
     <string name="msg_no_guardians">Tidak ada yang menjaga ponsel ini.</string>
     <string name="msg_bad_explanation">Tulis antara 10 dan 500 karakter.</string>
+
+    <!-- Notifications (§15.8) -->
+    <string name="notif_channel_my_phone">Ponselku</string>
+    <string name="notif_channel_my_phone_desc">Aplikasi yang diblokir, jawaban penjagamu, dan perubahan pada penjagamu.</string>
+    <string name="notif_channel_requests">Permintaan dari ponsel yang kujaga</string>
+    <string name="notif_channel_requests_desc">Permintaan yang menunggu jawabanmu, dan pengingat harian selama masih menunggu.</string>
+    <string name="notif_channel_news">Kabar dari ponsel yang kujaga</string>
+    <string name="notif_channel_news_desc">Aplikasi baru, perubahan perlindungan, dan ponsel yang tidak ada kabar.</string>
+    <string name="notif_blocked_one_text_guarded">Minta penjagamu untuk mengizinkannya.</string>
+    <string name="notif_blocked_many_text_guarded">Minta penjagamu untuk mengizinkannya.</string>
+    <plurals name="notif_reminder_title">
+        <item quantity="other">%1$d permintaan menunggu jawabanmu</item>
+    </plurals>
+    <string name="notif_reminder_text">Buka Ponsel yang kujaga untuk menjawab.</string>
+    <string name="notif_answer_approved">%1$s menyetujui %2$s</string>
+    <string name="notif_answer_waiting">Menunggu penjagamu yang lain.</string>
+    <string name="notif_app_allowed_title">%1$s diizinkan</string>
+    <string name="notif_app_allowed_text">Penjagamu menyetujuinya.</string>
+    <string name="notif_app_denied_title">%1$s tetap diblokir</string>
+    <plurals name="notif_denied_chances">
+        <item quantity="other">Seorang penjaga menolak. Sisa %1$d dari 3 permintaan.</item>
+    </plurals>
+    <string name="notif_denied_no_chances">Seorang penjaga menolak. Tidak ada permintaan tersisa.</string>
+    <string name="notif_note">%1$s: “%2$s”</string>
+    <string name="notif_guardian_removed_title">%1$s bukan penjagamu lagi</string>
+    <string name="notif_guardian_removed_text">Semua penjaga menyetujui.</string>
+    <string name="notif_guardian_removed_timer">Tidak ada yang menolak tepat waktu.</string>
+    <string name="notif_guardian_kept_title">%1$s tetap menjadi penjagamu</string>
+    <string name="notif_guardian_left_title">%1$s berhenti menjaga ponsel ini</string>
+    <string name="notif_unguarded_text">Sekarang tidak ada yang menjaga ponsel ini.</string>
+    <string name="notif_removed_title">%1$s mengeluarkanmu sebagai penjaga</string>
+    <string name="notif_released_title">%1$s mematikan perlindungan Killit</string>
+    <string name="notif_no_longer_guard">Kamu tidak lagi menjaga ponsel ini.</string>
+    <string name="notif_silence_title">%1$s tidak ada kabar</string>
+    <string name="notif_silence_text">Killit di ponsel itu sudah lama tidak online. Mungkin ponselnya mati, atau Killit sudah dihapus.</string>
+    <string name="notif_update_title">Perbarui Killit</string>
+
+    <!-- Gate and guardians -->
+    <string name="gate_subtitle_guard">Kuncimu adalah kunci penjaga: siapa pun yang mengetahuinya bisa menjawab atas namamu.</string>
+    <string name="former_guardian">Mantan penjaga</string>
+
+    <!-- First launch (§15.9) -->
+    <string name="onboarding_language">Pilih bahasamu</string>
+    <string name="onboarding_what_title">Apa yang dilakukan Killit</string>
+    <string name="onboarding_what_body">Killit memblokir aplikasi agar tidak bisa dibuka, dan menjaganya tetap diblokir. Aplikasi yang baru dipasang tetap diblokir sampai diizinkan.</string>
+    <string name="onboarding_protect_title">Lindungi ponselmu</string>
+    <string name="onboarding_protect_body">Pilih apa yang diblokir, lalu lindungi Killit dengan kunci. Tambahkan penjaga jika kamu ingin seseorang yang kamu percaya ikut memutuskan.</string>
+    <string name="onboarding_guard_title">Jaga orang yang kamu sayangi</string>
+    <string name="onboarding_guard_body">Pasangkan dengan ponsel lain untuk menjaganya. Pemiliknya bertanya padamu sebelum membuka blokir aplikasi, dan kamu menjawab dari sini.</string>
+    <string name="onboarding_next">Berikutnya</string>
+    <string name="onboarding_skip">Lewati</string>
+    <string name="onboarding_start">Mulai</string>
 </resources>

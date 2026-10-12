@@ -12,13 +12,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import org.tamodak.killit.R
+import org.tamodak.killit.pairing.PairingTexts
 import org.tamodak.killit.pairing.store.EventEntity
-import org.tamodak.killit.pairing.store.EventType
-import org.tamodak.killit.protocol.ProtectionOption
-import org.tamodak.killit.protocol.RemovedHow
 import org.tamodak.killit.protocol.toHex
 import org.tamodak.killit.ui.PairingUiState
 import org.tamodak.killit.ui.components.CautiousChoice
@@ -29,7 +28,6 @@ import org.tamodak.killit.ui.components.KillitGutter
 import org.tamodak.killit.ui.components.KillitScreen
 import org.tamodak.killit.ui.components.KillitSectionTitle
 import org.tamodak.killit.ui.components.KillitTextButton
-import org.tamodak.killit.ui.components.formatDate
 import org.tamodak.killit.ui.components.formatWhen
 import org.tamodak.killit.ui.myphone.PeerHeader
 import org.tamodak.killit.ui.myphone.RenameDialog
@@ -73,7 +71,7 @@ fun PhoneScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     KillitSectionTitle(stringResource(R.string.guard_requests))
                     requests.forEach { request ->
-                        RequestCard(request, ward, pairing) { onOpenRequest(pairIdHex, request.requestId.toHex()) }
+                        RequestCard(request, ward) { onOpenRequest(pairIdHex, request.requestId.toHex()) }
                     }
                 }
             }
@@ -129,44 +127,4 @@ fun PhoneScreen(
 
 /** One history line, written on this phone in its own language (E-F3). */
 @Composable
-internal fun eventText(event: EventEntity): String {
-    val app = event.appLabel?.ifEmpty { null } ?: event.packageName.orEmpty()
-    return when (event.type) {
-        EventType.PAIRED -> stringResource(R.string.event_paired)
-        EventType.GUARDIAN_LEFT -> stringResource(R.string.event_left)
-        EventType.GUARDIAN_REMOVED -> if (event.otherName != null) {
-            stringResource(
-                if (event.value == RemovedHow.LEFT.code) R.string.event_other_left else R.string.event_other_removed,
-                event.otherName,
-            )
-        } else {
-            stringResource(R.string.event_guardian_removed)
-        }
-        EventType.REMOVED_AS_GUARDIAN -> stringResource(R.string.event_removed_you)
-        EventType.APP_INSTALLED -> stringResource(if (event.flag == true) R.string.event_app_installed_blocked else R.string.event_app_installed, app)
-        EventType.GUARDIAN_ADDED -> stringResource(R.string.event_guardian_added, event.otherName.orEmpty())
-        EventType.RELEASE_STARTED -> stringResource(R.string.event_release_started, formatDate(event.time ?: 0L))
-        EventType.RELEASE_CANCELLED -> stringResource(R.string.event_release_cancelled)
-        EventType.PROTECTION_CHANGED -> stringResource(
-            if (event.flag == true) R.string.event_protection_on else R.string.event_protection_off,
-            protectionName(event.value),
-        )
-        EventType.MANAGEMENT_CHANGED -> stringResource(if (event.flag == true) R.string.event_management_on else R.string.event_management_off)
-        EventType.REQUEST_APPROVED -> stringResource(R.string.event_request_approved, app)
-        EventType.REQUEST_DENIED -> stringResource(R.string.event_request_denied, app)
-        EventType.REQUEST_CANCELLED -> stringResource(R.string.event_request_cancelled, app)
-        EventType.UNKNOWN_NOTICE -> stringResource(R.string.update_needed)
-    }
-}
-
-@Composable
-private fun protectionName(code: Int?): String = stringResource(
-    when (ProtectionOption.entries.firstOrNull { it.code == code }) {
-        ProtectionOption.UNINSTALL -> R.string.harden_uninstall
-        ProtectionOption.FORCE_STOP -> R.string.harden_force_stop
-        ProtectionOption.SAFE_BOOT -> R.string.harden_safe_boot
-        ProtectionOption.FACTORY_RESET -> R.string.harden_factory_reset
-        ProtectionOption.APPS_CONTROL -> R.string.harden_apps_control
-        ProtectionOption.DATE_TIME, null -> R.string.harden_date_time
-    },
-)
+internal fun eventText(event: EventEntity): String = PairingTexts.event(LocalContext.current, event)

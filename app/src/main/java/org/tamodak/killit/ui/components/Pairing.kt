@@ -25,17 +25,14 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import org.tamodak.killit.R
+import org.tamodak.killit.pairing.PairingTexts
 import org.tamodak.killit.protocol.ICON_BYTES
 import org.tamodak.killit.protocol.ICON_SIDE
 import org.tamodak.killit.protocol.TextRule
@@ -248,12 +245,7 @@ fun formatWhen(millis: Long, now: Long = System.currentTimeMillis()): String {
 
 /** A date and time in the app's language. */
 @Composable
-fun formatDate(millis: Long): String {
-    val locale = LocalConfiguration.current.locales[0]
-    return DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
-        .withLocale(locale)
-        .format(Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()))
-}
+fun formatDate(millis: Long): String = PairingTexts.date(LocalContext.current, millis)
 
 /** "Seen today", "Seen yesterday", "Seen 3 days ago" (PLAN.md §3.11); nothing when unknown. */
 @Composable

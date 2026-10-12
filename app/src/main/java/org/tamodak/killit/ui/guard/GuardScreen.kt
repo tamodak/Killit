@@ -27,14 +27,15 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import org.tamodak.killit.R
+import org.tamodak.killit.pairing.PairingTexts
 import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.PairingEntity
 import org.tamodak.killit.pairing.store.RequestType
-import org.tamodak.killit.pairing.store.StatusEntries
 import org.tamodak.killit.pairing.store.Vote
 import org.tamodak.killit.protocol.toHex
 import org.tamodak.killit.ui.PairingUiState
@@ -97,7 +98,7 @@ fun GuardScreen(
                 if (waiting.isEmpty()) KillitBody(stringResource(R.string.guard_requests_none))
                 waiting.forEach { request ->
                     val from = pairing.pairings.firstOrNull { it.pairId.contentEquals(request.pairId) } ?: return@forEach
-                    RequestCard(request, from, pairing) { onOpenRequest(request.pairId.toHex(), request.requestId.toHex()) }
+                    RequestCard(request, from) { onOpenRequest(request.pairId.toHex(), request.requestId.toHex()) }
                 }
             }
 
@@ -120,11 +121,12 @@ fun GuardScreen(
 }
 
 /**
- * One request in a list: who, what, when, and where it stands (E4: the explanation stays inside).
- * A live unlock is marked only while it is open, since its requester waits on screen.
+ * One request in a list (PLAN.md §15.6): who, what, a line of the explanation, when, and where it
+ * stands. An app is named by its package too, since its label is its own choice (§5.4). A live
+ * unlock is marked only while it is open, since its requester waits on screen.
  */
 @Composable
-internal fun RequestCard(request: IncomingRequestEntity, from: PairingEntity, pairing: PairingUiState, onClick: () -> Unit) {
+internal fun RequestCard(request: IncomingRequestEntity, from: PairingEntity, onClick: () -> Unit) {
     val live = request.type == RequestType.UNLOCK && request.state.isOpen
     val standing = closedText(request) ?: when (request.myVote) {
         Vote.APPROVED -> stringResource(R.string.request_you_approved)
@@ -142,7 +144,19 @@ internal fun RequestCard(request: IncomingRequestEntity, from: PairingEntity, pa
     ) {
         PeerBadge(fp = from.peerFp, size = 36.dp)
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = requestSummary(request, from, pairing), style = MaterialTheme.typography.titleSmall, color = KillitForeground)
+            Text(text = requestSummary(request, from), style = MaterialTheme.typography.titleSmall, color = KillitForeground)
+            if (request.type == RequestType.UNBLOCK_APP) {
+                Text(text = request.packageName.orEmpty(), style = MaterialTheme.typography.bodySmall, color = KillitTextFaint)
+            }
+            if (request.explanation.isNotEmpty()) {
+                Text(
+                    text = "“${request.explanation}”",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = KillitTextMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             Text(
                 text = if (live) stringResource(R.string.request_waiting_now) else formatWhen(request.receivedAt),
                 style = MaterialTheme.typography.bodySmall,
@@ -156,21 +170,8 @@ internal fun RequestCard(request: IncomingRequestEntity, from: PairingEntity, pa
 
 /** "Ali wants to unblock TikTok", "…wants to unlock Killit", "…wants to remove Dad / you". */
 @Composable
-internal fun requestSummary(request: IncomingRequestEntity, from: PairingEntity, pairing: PairingUiState): String =
-    when (request.type) {
-        RequestType.UNBLOCK_APP -> stringResource(R.string.request_unblock, from.nickname, request.appLabel?.ifEmpty { null } ?: request.packageName.orEmpty())
-        RequestType.UNLOCK -> stringResource(R.string.request_unlock, from.nickname)
-        RequestType.UNPAIR -> {
-            val target = request.targetPairId
-            // The guardian to remove is named by the protected phone's STATUS, in its own words.
-            val targetName = StatusEntries.decode(request.statusEntries).firstOrNull { it.fp == request.targetFp?.toHex() }?.name
-            when {
-                target != null && target.contentEquals(from.pairId) -> stringResource(R.string.request_unpair_you, from.nickname)
-                targetName != null -> stringResource(R.string.request_unpair_named, from.nickname, targetName)
-                else -> stringResource(R.string.request_unpair_other, from.nickname)
-            }
-        }
-    }
+internal fun requestSummary(request: IncomingRequestEntity, from: PairingEntity): String =
+    PairingTexts.request(LocalContext.current, request, from)
 
 @Composable
 private fun WardRow(ward: PairingEntity, pending: Int, onClick: () -> Unit) {

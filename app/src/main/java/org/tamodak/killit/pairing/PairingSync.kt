@@ -83,7 +83,6 @@ class PairingSyncWorker(context: Context, params: WorkerParameters) : CoroutineW
         }
         return try {
             engine.sync()
-            engine.requests.nextTimer()?.let { PairingSync.at(applicationContext, it) }
             Result.success()
         } catch (e: IOException) {
             KillitLog.d(KillitLog.SYNC) { "Background sync failed: ${e.message}" }

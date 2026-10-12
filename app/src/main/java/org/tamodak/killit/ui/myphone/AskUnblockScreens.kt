@@ -135,6 +135,30 @@ fun AskUnblockListScreen(
     }
 }
 
+/**
+ * Where asking the guardians stands for every app that has been asked about, for the app list of
+ * an unlocked session (PLAN.md §15.5): waiting, or denied with the requests left.
+ */
+@Composable
+fun requestStatusByApp(pairing: PairingUiState): Map<String, String> {
+    val waiting = stringResource(R.string.ask_state_waiting)
+    val latest = pairing.outgoing
+        .filter { it.request.type == RequestType.UNBLOCK_APP && it.request.packageName != null }
+        .groupBy { it.request.packageName!! }
+        .mapValues { (_, requests) -> requests.first().request }
+    return latest.mapNotNull { (packageName, request) ->
+        val text = when (request.state) {
+            RequestState.OPEN -> waiting
+            RequestState.DENIED -> {
+                val chances = pairing.chancesFor(packageName, request.certDigest ?: return@mapNotNull null)
+                pluralStringResource(R.plurals.ask_state_denied, chances, chances)
+            }
+            RequestState.APPROVED, RequestState.CANCELLED -> return@mapNotNull null
+        }
+        packageName to text
+    }.toMap()
+}
+
 @Composable
 private fun askState(app: AskableApp): String = when {
     app.open != null -> stringResource(R.string.ask_state_waiting)
@@ -231,8 +255,9 @@ internal fun OpenRequestPanel(request: OutgoingRequestWithCopies, pairing: Pairi
 @Composable
 private fun GuardianAnswers(request: OutgoingRequestWithCopies, pairing: PairingUiState) {
     request.copies.forEach { copy ->
-        // A guardian who has left since keeps its answer, under a placeholder name.
-        val name = pairing.pairings.firstOrNull { it.pairId.contentEquals(copy.pairId) }?.nickname ?: "?"
+        // A guardian who has left since keeps its answer, without a name to show.
+        val name = pairing.pairings.firstOrNull { it.pairId.contentEquals(copy.pairId) }?.nickname
+            ?: stringResource(R.string.former_guardian)
         val (text, color) = when (copy.vote) {
             Vote.WAITING -> stringResource(R.string.vote_waiting) to KillitTextFaint
             Vote.APPROVED -> stringResource(R.string.vote_approved) to KillitGreen

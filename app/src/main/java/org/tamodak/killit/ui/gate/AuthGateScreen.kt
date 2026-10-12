@@ -47,6 +47,8 @@ import org.tamodak.killit.ui.theme.KillitIcons
  * @param enabled false while a verification is in flight. Verification is deliberately slow (see
  *   `CredentialStore.hash`), so the inputs stay disabled for a noticeable moment on a low-end device,
  *   and a progress indicator shows that the entry is being checked rather than ignored.
+ * @param forGuardian true on the way into Phones I guard, where the passkey answers for this phone
+ *   as a guardian (PLAN.md §15.11) rather than unblocking its apps.
  */
 @Composable
 fun AuthGateScreen(
@@ -55,6 +57,7 @@ fun AuthGateScreen(
     feedback: GateFeedback?,
     onSubmit: (String) -> Unit,
     modifier: Modifier = Modifier,
+    forGuardian: Boolean = false,
 ) {
     Column(
         modifier = modifier
@@ -81,7 +84,7 @@ fun AuthGateScreen(
             textAlign = TextAlign.Center,
         )
         KillitBody(
-            text = stringResource(R.string.gate_subtitle),
+            text = stringResource(if (forGuardian) R.string.gate_subtitle_guard else R.string.gate_subtitle),
             textAlign = TextAlign.Center,
             modifier = Modifier.widthIn(max = 340.dp),
         )

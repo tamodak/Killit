@@ -84,7 +84,7 @@ fun RequestScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
                 PeerBadge(fp = from.peerFp)
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = requestSummary(request, from, pairing), style = MaterialTheme.typography.titleMedium, color = KillitForeground)
+                    Text(text = requestSummary(request, from), style = MaterialTheme.typography.titleMedium, color = KillitForeground)
                     Text(text = formatWhen(request.receivedAt), style = MaterialTheme.typography.bodySmall, color = KillitTextFaint)
                 }
             }

@@ -160,8 +160,6 @@
 
     <string name="notif_channel_protection">Защита</string>
     <string name="notif_channel_protection_desc">Показывается, пока Killit следит за новыми установленными приложениями.</string>
-    <string name="notif_channel_new_apps">Новые приложения</string>
-    <string name="notif_channel_new_apps_desc">Сообщает, когда Killit блокирует только что установленное приложение.</string>
     <string name="notif_protection_title">Killit защищает этот телефон</string>
     <string name="notif_protection_text">Новые приложения остаются заблокированными, пока вы их не разрешите.</string>
     <string name="notif_blocked_one_title">Приложение %1$s заблокировано</string>
@@ -458,4 +456,62 @@
     <string name="msg_sent">Отправлено опекунам.</string>
     <string name="msg_no_guardians">Этот телефон никто не опекает.</string>
     <string name="msg_bad_explanation">Напишите от 10 до 500 символов.</string>
+
+    <!-- Notifications (§15.8) -->
+    <string name="notif_channel_my_phone">Мой телефон</string>
+    <string name="notif_channel_my_phone_desc">Заблокированные приложения, ответы ваших опекунов и изменения в списке опекунов.</string>
+    <string name="notif_channel_requests">Запросы с телефонов под моей опекой</string>
+    <string name="notif_channel_requests_desc">Запросы, которые ждут вашего ответа, и ежедневное напоминание, пока они ждут.</string>
+    <string name="notif_channel_news">Новости с телефонов под моей опекой</string>
+    <string name="notif_channel_news_desc">Новые приложения, изменения защиты и телефоны, которые замолчали.</string>
+    <string name="notif_blocked_one_text_guarded">Попросите опекунов разрешить его.</string>
+    <string name="notif_blocked_many_text_guarded">Попросите опекунов разрешить их.</string>
+    <plurals name="notif_reminder_title">
+        <item quantity="one">%1$d запрос ждёт вашего ответа</item>
+        <item quantity="few">%1$d запроса ждут вашего ответа</item>
+        <item quantity="many">%1$d запросов ждут вашего ответа</item>
+        <item quantity="other">%1$d запроса ждут вашего ответа</item>
+    </plurals>
+    <string name="notif_reminder_text">Откройте «Телефоны под моей опекой», чтобы ответить.</string>
+    <string name="notif_answer_approved">%1$s одобряет %2$s</string>
+    <string name="notif_answer_waiting">Ждём ваших других опекунов.</string>
+    <string name="notif_app_allowed_title">%1$s разрешено</string>
+    <string name="notif_app_allowed_text">Ваши опекуны одобрили его.</string>
+    <string name="notif_app_denied_title">%1$s остаётся заблокированным</string>
+    <plurals name="notif_denied_chances">
+        <item quantity="one">Опекун отказал. Остался %1$d запрос из 3.</item>
+        <item quantity="few">Опекун отказал. Осталось %1$d запроса из 3.</item>
+        <item quantity="many">Опекун отказал. Осталось %1$d запросов из 3.</item>
+        <item quantity="other">Опекун отказал. Осталось %1$d запроса из 3.</item>
+    </plurals>
+    <string name="notif_denied_no_chances">Опекун отказал. Запросов не осталось.</string>
+    <string name="notif_note">%1$s: “%2$s”</string>
+    <string name="notif_guardian_removed_title">%1$s больше не ваш опекун</string>
+    <string name="notif_guardian_removed_text">Все опекуны одобрили.</string>
+    <string name="notif_guardian_removed_timer">Никто не отказал вовремя.</string>
+    <string name="notif_guardian_kept_title">%1$s остаётся вашим опекуном</string>
+    <string name="notif_guardian_left_title">%1$s больше не опекает этот телефон</string>
+    <string name="notif_unguarded_text">Теперь этот телефон никто не опекает.</string>
+    <string name="notif_removed_title">%1$s: вас удалили из опекунов</string>
+    <string name="notif_released_title">%1$s: защита Killit выключена</string>
+    <string name="notif_no_longer_guard">Вы больше не опекаете этот телефон.</string>
+    <string name="notif_silence_title">%1$s не выходит на связь</string>
+    <string name="notif_silence_text">Killit на этом телефоне давно не был в сети. Возможно, телефон выключен или Killit удалён.</string>
+    <string name="notif_update_title">Обновите Killit</string>
+
+    <!-- Gate and guardians -->
+    <string name="gate_subtitle_guard">Ваш ключ — это ключ опекуна: тот, кто его знает, может отвечать от вашего имени.</string>
+    <string name="former_guardian">Бывший опекун</string>
+
+    <!-- First launch (§15.9) -->
+    <string name="onboarding_language">Выберите язык</string>
+    <string name="onboarding_what_title">Что делает Killit</string>
+    <string name="onboarding_what_body">Killit блокирует приложения, чтобы их нельзя было открыть, и не даёт снять блокировку. Новое приложение остаётся заблокированным, пока его не разрешат.</string>
+    <string name="onboarding_protect_title">Защитите свой телефон</string>
+    <string name="onboarding_protect_body">Выберите, что блокировать, и закройте Killit ключом. Добавьте опекуна, если хотите, чтобы человек, которому вы доверяете, решал вместе с вами.</string>
+    <string name="onboarding_guard_title">Опекайте близкого человека</string>
+    <string name="onboarding_guard_body">Свяжитесь с другим телефоном, чтобы опекать его. Его владелец спросит вас, прежде чем разблокировать приложение, а вы ответите здесь.</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_start">Начать</string>
 </resources>

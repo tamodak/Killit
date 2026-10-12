@@ -78,6 +78,11 @@ sealed interface Screen {
         override val parent: Screen? get() = null
     }
 
+    /** First launch (PLAN.md §15.9): the language, then three cards about what Killit does. */
+    data object Onboarding : Screen {
+        override val parent: Screen? get() = null
+    }
+
     /** No passkey yet: choose a method and set one. Reached from a Hub card. */
     data object Setup : Screen
 
@@ -262,6 +267,7 @@ sealed interface ShizukuOutcome {
  *   approved. A display hint only; every action checks again against storage.
  * @param unlockedByGuardians whether the full control came from a live unlock, for the banner
  *   that says it ends on leaving.
+ * @param gateForGuardian whether the gate leads into Phones I guard, which it explains differently.
  */
 data class KillitUiState(
     val screen: Screen = Screen.Loading,
@@ -283,6 +289,7 @@ data class KillitUiState(
     val guardianCount: Int? = null,
     val fullControl: Boolean = false,
     val unlockedByGuardians: Boolean = false,
+    val gateForGuardian: Boolean = false,
 ) {
     /** How many checkboxes differ from what is applied: newly ticked plus newly cleared. */
     val pendingChanges: Int
@@ -455,8 +462,9 @@ class KillitViewModel(
 
         if (record != null || !isOwner) {
             // A record here came back from durable storage — the restore after a "Clear data".
-            // Without one, the Hub's cards lead to setting the first passkey.
-            val screen = Screen.Hub
+            // Without one, this may be the first launch; after it, the Hub's cards lead to setting
+            // the first passkey.
+            val screen = if (record == null && !repository.onboarded()) Screen.Onboarding else Screen.Hub
             KillitLog.i(KillitLog.VM, "Bootstrap: owner=$isOwner lock=${record?.lockType} -> $screen")
             _state.update { it.copy(screen = screen) }
             startBackgroundLoad(reconcile = false)
@@ -468,7 +476,11 @@ class KillitViewModel(
         viewModelScope.launch { loadHardening() }
         loadApps()
         val blocked = _state.value.blocked
-        val screen = if (blocked.isNotEmpty()) Screen.Tampered else Screen.Hub
+        val screen = when {
+            blocked.isNotEmpty() -> Screen.Tampered
+            !repository.onboarded() -> Screen.Onboarding
+            else -> Screen.Hub
+        }
         KillitLog.i(KillitLog.VM, "Bootstrap: blocked=${blocked.size} -> $screen")
         _state.update { it.copy(screen = screen) }
     }
@@ -756,9 +768,12 @@ class KillitViewModel(
             // the one prompt on the way in.
             _state.value.lockType != null && _state.value.screen != Screen.Loading -> {
                 destinationAfterUnlock = screen
-                _state.update { it.copy(screen = Screen.Gate, gateFeedback = null) }
+                _state.update { it.copy(screen = Screen.Gate, gateFeedback = null, gateForGuardian = screen.isGuardSide()) }
             }
-            else -> destinationAfterUnlock = screen
+            else -> {
+                destinationAfterUnlock = screen
+                _state.update { it.copy(gateForGuardian = screen.isGuardSide()) }
+            }
         }
     }
 
@@ -777,9 +792,16 @@ class KillitViewModel(
             }
             else -> {
                 destinationAfterUnlock = screen
-                _state.update { it.copy(screen = Screen.Gate, gateFeedback = null) }
+                _state.update { it.copy(screen = Screen.Gate, gateFeedback = null, gateForGuardian = screen.isGuardSide()) }
             }
         }
+    }
+
+    /** True for the screens of Phones I guard, where the passkey is a guardian's key. */
+    private fun Screen.isGuardSide(): Boolean = when (this) {
+        Screen.Guard, Screen.GuardSettings, is Screen.Request, is Screen.Phone -> true
+        is Screen.Wizard -> role == PairRole.GUARDIAN
+        else -> false
     }
 
     // ---------------------------------------------------------------- app blocking
@@ -988,6 +1010,13 @@ class KillitViewModel(
         viewModelScope.launch { repository.setLanguage(language) }
     }
 
+    /** Leaves the first-launch cards for the Hub, finished or skipped, and never shows them again. */
+    fun finishOnboarding() {
+        if (_state.value.screen != Screen.Onboarding) return
+        _state.update { it.copy(screen = Screen.Hub) }
+        viewModelScope.launch { repository.finishOnboarding() }
+    }
+
     // ---------------------------------------------------------------- delayed release
 
     /**
@@ -1002,7 +1031,7 @@ class KillitViewModel(
             val request = repository.requestRelease(BuildConfig.RELEASE_DELAY_MILLIS)
             _state.update { it.copy(releaseRequest = request) }
             // C8: guardians hear when it would complete.
-            if (request != null) pairing.notifyGuardians(NoticeBody.ReleaseStarted(request.availableAtMillis))
+            pairing.notifyGuardians(NoticeBody.ReleaseStarted(request.availableAtMillis))
         }
     }
 

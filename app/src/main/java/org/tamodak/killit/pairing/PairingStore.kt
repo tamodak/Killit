@@ -60,6 +60,9 @@ class PairingStore(
     /** This phone's guardians. */
     suspend fun guardians(): List<PairingEntity> = dao.guardians()
 
+    /** The phones this phone guards. */
+    suspend fun wards(): List<PairingEntity> = dao.wards()
+
     /**
      * Adds a pairing, and copies it durably when the peer guards this phone.
      *

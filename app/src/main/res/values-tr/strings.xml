@@ -154,8 +154,6 @@
 
     <string name="notif_channel_protection">Koruma</string>
     <string name="notif_channel_protection_desc">Killit yeni yüklenen uygulamaları izlerken gösterilir.</string>
-    <string name="notif_channel_new_apps">Yeni uygulamalar</string>
-    <string name="notif_channel_new_apps_desc">Killit yeni yüklenen bir uygulamayı engellediğinde sana haber verir.</string>
     <string name="notif_protection_title">Killit bu telefonu koruyor</string>
     <string name="notif_protection_text">Yeni uygulamalar sen izin verene kadar engelli kalır.</string>
     <string name="notif_blocked_one_title">%1$s engellendi</string>
@@ -424,4 +422,58 @@
     <string name="msg_sent">Koruyucularına gönderildi.</string>
     <string name="msg_no_guardians">Bu telefonu kimse korumuyor.</string>
     <string name="msg_bad_explanation">10 ile 500 karakter arasında yaz.</string>
+
+    <!-- Notifications (§15.8) -->
+    <string name="notif_channel_my_phone">Telefonum</string>
+    <string name="notif_channel_my_phone_desc">Engellenen uygulamalar, koruyucularının cevapları ve koruyucularındaki değişiklikler.</string>
+    <string name="notif_channel_requests">Koruduğum telefonlardan istekler</string>
+    <string name="notif_channel_requests_desc">Cevabını bekleyen istekler ve beklerken her gün bir hatırlatma.</string>
+    <string name="notif_channel_news">Koruduğum telefonlardan haberler</string>
+    <string name="notif_channel_news_desc">Yeni uygulamalar, koruma değişiklikleri ve sessizleşen telefonlar.</string>
+    <string name="notif_blocked_one_text_guarded">İzin vermeleri için koruyucularına sor.</string>
+    <string name="notif_blocked_many_text_guarded">İzin vermeleri için koruyucularına sor.</string>
+    <plurals name="notif_reminder_title">
+        <item quantity="one">Cevabını bekleyen %1$d istek var</item>
+        <item quantity="other">Cevabını bekleyen %1$d istek var</item>
+    </plurals>
+    <string name="notif_reminder_text">Cevaplamak için Koruduğum telefonlar\'ı aç.</string>
+    <string name="notif_answer_approved">%1$s, %2$s için onay verdi</string>
+    <string name="notif_answer_waiting">Diğer koruyucuların bekleniyor.</string>
+    <string name="notif_app_allowed_title">%1$s artık serbest</string>
+    <string name="notif_app_allowed_text">Koruyucuların onayladı.</string>
+    <string name="notif_app_denied_title">%1$s engelli kalıyor</string>
+    <plurals name="notif_denied_chances">
+        <item quantity="one">Bir koruyucu hayır dedi. 3 istekten %1$d tane kaldı.</item>
+        <item quantity="other">Bir koruyucu hayır dedi. 3 istekten %1$d tane kaldı.</item>
+    </plurals>
+    <string name="notif_denied_no_chances">Bir koruyucu hayır dedi. İstek hakkı kalmadı.</string>
+    <string name="notif_note">%1$s: “%2$s”</string>
+    <string name="notif_guardian_removed_title">%1$s artık koruyucun değil</string>
+    <string name="notif_guardian_removed_text">Tüm koruyucular onayladı.</string>
+    <string name="notif_guardian_removed_timer">Zamanında kimse hayır demedi.</string>
+    <string name="notif_guardian_kept_title">%1$s koruyucun olarak kalıyor</string>
+    <string name="notif_guardian_left_title">%1$s bu telefonu korumayı bıraktı</string>
+    <string name="notif_unguarded_text">Artık bu telefonu kimse korumuyor.</string>
+    <string name="notif_removed_title">%1$s seni koruyucu olarak çıkardı</string>
+    <string name="notif_released_title">%1$s, Killit korumasını kapattı</string>
+    <string name="notif_no_longer_guard">Artık bu telefonu korumuyorsun.</string>
+    <string name="notif_silence_title">%1$s sessizleşti</string>
+    <string name="notif_silence_text">O telefondaki Killit bir süredir çevrimiçi olmadı. Telefon kapalı olabilir ya da Killit kaldırılmış olabilir.</string>
+    <string name="notif_update_title">Killit\'i güncelle</string>
+
+    <!-- Gate and guardians -->
+    <string name="gate_subtitle_guard">Şifren koruyucu anahtarın: onu bilen herkes senin adına cevap verebilir.</string>
+    <string name="former_guardian">Eski bir koruyucu</string>
+
+    <!-- First launch (§15.9) -->
+    <string name="onboarding_language">Dilini seç</string>
+    <string name="onboarding_what_title">Killit ne yapar</string>
+    <string name="onboarding_what_body">Killit uygulamaları açılamayacak şekilde engeller ve engelli tutar. Yeni yüklenen bir uygulama, izin verilene kadar engelli kalır.</string>
+    <string name="onboarding_protect_title">Telefonunu koru</string>
+    <string name="onboarding_protect_body">Neyin engelleneceğini seç ve Killit\'i bir şifreyle kilitle. Güvendiğin biri seninle birlikte karar versin istersen bir koruyucu ekle.</string>
+    <string name="onboarding_guard_title">Değer verdiğin birini koru</string>
+    <string name="onboarding_guard_body">Korumak için başka bir telefonla eşleş. Sahibi bir uygulamanın engelini kaldırmadan önce sana sorar, sen de buradan cevap verirsin.</string>
+    <string name="onboarding_next">İleri</string>
+    <string name="onboarding_skip">Geç</string>
+    <string name="onboarding_start">Başla</string>
 </resources>

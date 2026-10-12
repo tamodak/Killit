@@ -145,6 +145,17 @@ class DevicePolicyController(
         }
     }
 
+    /**
+     * Switches adb and developer options off or back on (PLAN.md H2): while a phone has
+     * guardians, adb could install, uninstall and reconfigure around Killit.
+     *
+     * @param blocked true to disallow debugging features.
+     */
+    suspend fun setDebuggingBlocked(blocked: Boolean) = withContext(ioDispatcher) {
+        if (!isDeviceOwnerBlocking()) return@withContext
+        setRestriction(UserManager.DISALLOW_DEBUGGING_FEATURES, blocked)
+    }
+
     // ---------------------------------------------------------------- durable storage
 
     /**
@@ -253,6 +264,8 @@ class DevicePolicyController(
                     blockDateTime = false,
                 )
             )
+            // Set while the phone had guardians; nobody guards it once it is released.
+            setRestriction(UserManager.DISALLOW_DEBUGGING_FEATURES, false)
 
             KillitLog.i(KillitLog.DPC, "Releasing device owner: step 3/3, clearDeviceOwnerApp")
             runCatching { dpm.clearDeviceOwnerApp(ownPackage) }

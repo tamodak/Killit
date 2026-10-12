@@ -83,6 +83,8 @@ import org.tamodak.killit.ui.theme.KillitTextFaint
  * @param onKeepBlocked keeps every waiting new app blocked.
  * @param iconLoader decodes a row's icon on demand, so only visible rows cost anything.
  * @param modifier applied to the screen.
+ * @param requestStatus where asking the guardians stands for each app that has been asked about
+ *   (§15.5), by package name.
  */
 @Composable
 fun AppListScreen(
@@ -95,6 +97,7 @@ fun AppListScreen(
     onKeepBlocked: () -> Unit,
     iconLoader: suspend (String) -> ImageBitmap?,
     modifier: Modifier = Modifier,
+    requestStatus: Map<String, String> = emptyMap(),
 ) {
     var query by remember { mutableStateOf("") }
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -238,6 +241,7 @@ fun AppListScreen(
                             enabled = rowsEnabled,
                             onCheckedChange = { onToggle(app.packageName, it) },
                             iconLoader = iconLoader,
+                            requestStatus = requestStatus[app.packageName],
                         )
                     }
                 }
@@ -362,6 +366,7 @@ private fun AppRow(
     enabled: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     iconLoader: suspend (String) -> ImageBitmap?,
+    requestStatus: String?,
 ) {
     Column(
         modifier = Modifier
@@ -399,6 +404,9 @@ private fun AppRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                if (requestStatus != null) {
+                    Text(text = requestStatus, style = MaterialTheme.typography.bodySmall, color = KillitBlue)
+                }
             }
 
             KillitCheckbox(checked = checked, enabled = enabled)

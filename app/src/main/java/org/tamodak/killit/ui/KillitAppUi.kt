@@ -36,6 +36,8 @@ import org.tamodak.killit.ui.myphone.GuardiansScreen
 import org.tamodak.killit.ui.myphone.MyPhoneScreen
 import org.tamodak.killit.ui.myphone.SettingsScreen
 import org.tamodak.killit.ui.myphone.UnlockWaitingScreen
+import org.tamodak.killit.ui.myphone.requestStatusByApp
+import org.tamodak.killit.ui.onboarding.OnboardingScreen
 import org.tamodak.killit.ui.pairing.WizardScreen
 import org.tamodak.killit.ui.setup.CredentialSetupScreen
 import org.tamodak.killit.ui.tamper.TamperedScreen
@@ -96,6 +98,8 @@ private fun KillitAppContent(
     // runs if this content leaves the composition, which locks — the safe direction.
     LifecycleStartEffect(viewModel) {
         viewModel.onForeground()
+        // Coming back to Killit reads the mailbox (PLAN.md §7), whichever screen it shows.
+        pairingViewModel.refresh()
         onStopOrDispose { viewModel.lockOnBackground() }
     }
 
@@ -124,7 +128,7 @@ private fun KillitAppContent(
 
     // One line per screen change — the cheapest way to reconstruct a user's path through the app
     // from a log dump. Opening a screen that shows pairing state also fetches what arrived, so
-    // nothing on it is older than the visit (PLAN.md §7: the mailbox is read on every app open).
+    // nothing on it is older than the moment it opened.
     LaunchedEffect(state.screen) {
         KillitLog.i(KillitLog.UI, "Screen -> ${state.screen}")
         if (state.screen.showsPairing()) pairingViewModel.refresh()
@@ -154,6 +158,12 @@ private fun Screens(
         ) { CircularProgressIndicator(color = KillitGreen) }
 
         Screen.Tampered -> TamperedScreen()
+
+        Screen.Onboarding -> OnboardingScreen(
+            language = state.language,
+            onLanguage = viewModel::setLanguage,
+            onDone = viewModel::finishOnboarding,
+        )
 
         Screen.Hub -> HubScreen(
             state = state,
@@ -191,6 +201,7 @@ private fun Screens(
                     enabled = !state.busy,
                     feedback = state.gateFeedback,
                     onSubmit = viewModel::submitGate,
+                    forGuardian = state.gateForGuardian,
                 )
             } else {
                 // Nothing to check against; fall through to setting a passkey. Renders nothing
@@ -237,6 +248,7 @@ private fun Screens(
             onDismissFailures = viewModel::dismissSaveFailures,
             onKeepBlocked = viewModel::keepWaitingAppsBlocked,
             iconLoader = viewModel::iconFor,
+            requestStatus = requestStatusByApp(pairing),
         )
 
         Screen.Guardians -> GuardiansScreen(

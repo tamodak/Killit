@@ -30,6 +30,10 @@ interface PairingDao {
     @Query("SELECT * FROM pairings WHERE my_role = 'PROTECTED' ORDER BY created_at")
     suspend fun guardians(): List<PairingEntity>
 
+    /** The phones this phone guards: the pairings in which it is the guardian. */
+    @Query("SELECT * FROM pairings WHERE my_role = 'GUARDIAN' ORDER BY created_at")
+    suspend fun wards(): List<PairingEntity>
+
     @Upsert
     suspend fun upsertPairing(pairing: PairingEntity)
 

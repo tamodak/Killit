@@ -157,8 +157,6 @@
 
     <string name="notif_channel_protection">Protection</string>
     <string name="notif_channel_protection_desc">Affichée tant que Killit surveille les applis nouvellement installées.</string>
-    <string name="notif_channel_new_apps">Nouvelles applis</string>
-    <string name="notif_channel_new_apps_desc">Te prévient quand Killit bloque une appli nouvellement installée.</string>
     <string name="notif_protection_title">Killit protège ce téléphone</string>
     <string name="notif_protection_text">Les nouvelles applis restent bloquées jusqu\'à ce que tu les autorises.</string>
     <string name="notif_blocked_one_title">%1$s a été bloquée</string>
@@ -441,4 +439,60 @@
     <string name="msg_sent">Envoyé à tes gardiens.</string>
     <string name="msg_no_guardians">Personne ne garde ce téléphone.</string>
     <string name="msg_bad_explanation">Écris entre 10 et 500 caractères.</string>
+
+    <!-- Notifications (§15.8) -->
+    <string name="notif_channel_my_phone">Mon téléphone</string>
+    <string name="notif_channel_my_phone_desc">Applis bloquées, réponses de tes gardiens et changements parmi tes gardiens.</string>
+    <string name="notif_channel_requests">Demandes des téléphones que je garde</string>
+    <string name="notif_channel_requests_desc">Les demandes qui attendent ta réponse, et un rappel quotidien tant qu\'elles attendent.</string>
+    <string name="notif_channel_news">Nouvelles des téléphones que je garde</string>
+    <string name="notif_channel_news_desc">Nouvelles applis, changements de protection et téléphones devenus silencieux.</string>
+    <string name="notif_blocked_one_text_guarded">Demande à tes gardiens de l\'autoriser.</string>
+    <string name="notif_blocked_many_text_guarded">Demande à tes gardiens de les autoriser.</string>
+    <plurals name="notif_reminder_title">
+        <item quantity="one">%1$d demande attend ta réponse</item>
+        <item quantity="many">%1$d demandes attendent ta réponse</item>
+        <item quantity="other">%1$d demandes attendent ta réponse</item>
+    </plurals>
+    <string name="notif_reminder_text">Ouvre Téléphones que je garde pour répondre.</string>
+    <string name="notif_answer_approved">%1$s a approuvé %2$s</string>
+    <string name="notif_answer_waiting">En attente de tes autres gardiens.</string>
+    <string name="notif_app_allowed_title">%1$s est autorisée</string>
+    <string name="notif_app_allowed_text">Tes gardiens l\'ont approuvée.</string>
+    <string name="notif_app_denied_title">%1$s reste bloquée</string>
+    <plurals name="notif_denied_chances">
+        <item quantity="one">Un gardien a dit non. Il te reste %1$d demande sur 3.</item>
+        <item quantity="many">Un gardien a dit non. Il te reste %1$d demandes sur 3.</item>
+        <item quantity="other">Un gardien a dit non. Il te reste %1$d demandes sur 3.</item>
+    </plurals>
+    <string name="notif_denied_no_chances">Un gardien a dit non. Il ne te reste aucune demande.</string>
+    <string name="notif_note">%1$s : “%2$s”</string>
+    <string name="notif_guardian_removed_title">%1$s n\'est plus ton gardien</string>
+    <string name="notif_guardian_removed_text">Tous les gardiens ont approuvé.</string>
+    <string name="notif_guardian_removed_timer">Personne n\'a dit non à temps.</string>
+    <string name="notif_guardian_kept_title">%1$s reste ton gardien</string>
+    <string name="notif_guardian_left_title">%1$s ne garde plus ce téléphone</string>
+    <string name="notif_unguarded_text">Plus personne ne garde ce téléphone.</string>
+    <string name="notif_removed_title">%1$s t\'a retiré de ses gardiens</string>
+    <string name="notif_released_title">%1$s a désactivé la protection de Killit</string>
+    <string name="notif_no_longer_guard">Tu ne gardes plus ce téléphone.</string>
+    <string name="notif_silence_title">%1$s ne donne plus de nouvelles</string>
+    <string name="notif_silence_text">Killit sur ce téléphone n\'a pas été en ligne depuis un moment. Le téléphone est peut-être éteint, ou Killit a été supprimé.</string>
+    <string name="notif_update_title">Mets Killit à jour</string>
+
+    <!-- Gate and guardians -->
+    <string name="gate_subtitle_guard">Ta clé est ta clé de gardien : qui la connaît peut répondre en ton nom.</string>
+    <string name="former_guardian">Un ancien gardien</string>
+
+    <!-- First launch (§15.9) -->
+    <string name="onboarding_language">Choisis ta langue</string>
+    <string name="onboarding_what_title">Ce que fait Killit</string>
+    <string name="onboarding_what_body">Killit bloque les applis pour qu\'elles ne puissent pas s\'ouvrir, et les garde bloquées. Une appli nouvellement installée reste bloquée jusqu\'à ce qu\'elle soit autorisée.</string>
+    <string name="onboarding_protect_title">Protège ton téléphone</string>
+    <string name="onboarding_protect_body">Choisis quoi bloquer et verrouille Killit avec une clé. Ajoute un gardien si tu veux que quelqu\'un de confiance décide avec toi.</string>
+    <string name="onboarding_guard_title">Garde quelqu\'un qui compte pour toi</string>
+    <string name="onboarding_guard_body">Associe-toi à un autre téléphone pour le garder. Son propriétaire te demande avant de débloquer une appli, et tu réponds d\'ici.</string>
+    <string name="onboarding_next">Suivant</string>
+    <string name="onboarding_skip">Passer</string>
+    <string name="onboarding_start">Commencer</string>
 </resources>

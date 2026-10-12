@@ -156,6 +156,37 @@ class PairingEngineTest {
     }
 
     @Test
+    fun aReminderNamesWhatStillWaits(): Unit = runBlocking {
+        pair(mom, PairRole.GUARDIAN, ali, PairRole.PROTECTED)
+        ali.apps.install("com.example.game")
+        ali.engine.askToUnblock("com.example.game", "My club posts its news there.")
+        ali.engine.startUnlock("")
+        mom.engine.sync()
+
+        // A live unlock is never part of a reminder.
+        assertEquals(listOf(RequestType.UNBLOCK_APP), mom.engine.remind(onlyOnce = true).map { it.first.type })
+        // Debug builds remind once; release builds every day while the request waits.
+        assertTrue(mom.engine.remind(onlyOnce = true).isEmpty())
+        assertEquals(1, mom.engine.remind(onlyOnce = false).size)
+
+        val request = mom.dao.observeIncomingOnce().single { it.type == RequestType.UNBLOCK_APP }
+        mom.engine.decide(request.pairId, request.requestId, approve = false, note = "")
+        assertTrue(mom.engine.remind(onlyOnce = false).isEmpty())
+    }
+
+    @Test
+    fun guardedPoliciesFollowTheGuardians(): Unit = runBlocking {
+        pair(mom, PairRole.GUARDIAN, ali, PairRole.PROTECTED)
+        assertEquals(true, ali.guarded.last())
+        // A guardian guards nobody else by guarding: its own phone stays unguarded.
+        assertTrue(mom.guarded.none { it })
+
+        mom.engine.leave(mom.pairingWith(ali)!!.pairId)
+        ali.engine.sync()
+        assertEquals(false, ali.guarded.last())
+    }
+
+    @Test
     fun eachDenialCostsAChance(): Unit = runBlocking {
         pair(mom, PairRole.GUARDIAN, ali, PairRole.PROTECTED)
         ali.apps.install("com.example.game")

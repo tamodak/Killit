@@ -154,8 +154,6 @@
 
     <string name="notif_channel_protection">Schutz</string>
     <string name="notif_channel_protection_desc">Wird angezeigt, solange Killit auf neu installierte Apps achtet.</string>
-    <string name="notif_channel_new_apps">Neue Apps</string>
-    <string name="notif_channel_new_apps_desc">Sagt dir, wenn Killit eine neu installierte App blockiert.</string>
     <string name="notif_protection_title">Killit schützt dieses Telefon</string>
     <string name="notif_protection_text">Neue Apps bleiben blockiert, bis du sie erlaubst.</string>
     <string name="notif_blocked_one_title">%1$s wurde blockiert</string>
@@ -424,4 +422,58 @@
     <string name="msg_sent">An deine Wächter gesendet.</string>
     <string name="msg_no_guardians">Niemand bewacht dieses Handy.</string>
     <string name="msg_bad_explanation">Schreib zwischen 10 und 500 Zeichen.</string>
+
+    <!-- Notifications (§15.8) -->
+    <string name="notif_channel_my_phone">Mein Handy</string>
+    <string name="notif_channel_my_phone_desc">Blockierte Apps, die Antworten deiner Wächter und Änderungen bei deinen Wächtern.</string>
+    <string name="notif_channel_requests">Anfragen von Handys, die ich bewache</string>
+    <string name="notif_channel_requests_desc">Anfragen, die auf deine Antwort warten, und eine tägliche Erinnerung, solange sie warten.</string>
+    <string name="notif_channel_news">Neues von Handys, die ich bewache</string>
+    <string name="notif_channel_news_desc">Neue Apps, geänderter Schutz und Handys, die verstummt sind.</string>
+    <string name="notif_blocked_one_text_guarded">Bitte deine Wächter, sie zu erlauben.</string>
+    <string name="notif_blocked_many_text_guarded">Bitte deine Wächter, sie zu erlauben.</string>
+    <plurals name="notif_reminder_title">
+        <item quantity="one">%1$d Anfrage wartet auf deine Antwort</item>
+        <item quantity="other">%1$d Anfragen warten auf deine Antwort</item>
+    </plurals>
+    <string name="notif_reminder_text">Öffne „Handys, die ich bewache“, um zu antworten.</string>
+    <string name="notif_answer_approved">%1$s hat %2$s zugestimmt</string>
+    <string name="notif_answer_waiting">Warten auf deine anderen Wächter.</string>
+    <string name="notif_app_allowed_title">%1$s ist erlaubt</string>
+    <string name="notif_app_allowed_text">Deine Wächter haben zugestimmt.</string>
+    <string name="notif_app_denied_title">%1$s bleibt blockiert</string>
+    <plurals name="notif_denied_chances">
+        <item quantity="one">Ein Wächter hat Nein gesagt. Noch %1$d von 3 Anfragen.</item>
+        <item quantity="other">Ein Wächter hat Nein gesagt. Noch %1$d von 3 Anfragen.</item>
+    </plurals>
+    <string name="notif_denied_no_chances">Ein Wächter hat Nein gesagt. Keine Anfragen mehr.</string>
+    <string name="notif_note">%1$s: “%2$s”</string>
+    <string name="notif_guardian_removed_title">%1$s ist nicht mehr dein Wächter</string>
+    <string name="notif_guardian_removed_text">Alle Wächter haben zugestimmt.</string>
+    <string name="notif_guardian_removed_timer">Niemand hat rechtzeitig Nein gesagt.</string>
+    <string name="notif_guardian_kept_title">%1$s bleibt dein Wächter</string>
+    <string name="notif_guardian_left_title">%1$s bewacht dieses Handy nicht mehr</string>
+    <string name="notif_unguarded_text">Jetzt bewacht niemand dieses Handy.</string>
+    <string name="notif_removed_title">%1$s hat dich als Wächter entfernt</string>
+    <string name="notif_released_title">%1$s hat den Schutz von Killit ausgeschaltet</string>
+    <string name="notif_no_longer_guard">Du bewachst dieses Handy nicht mehr.</string>
+    <string name="notif_silence_title">%1$s meldet sich nicht mehr</string>
+    <string name="notif_silence_text">Killit auf diesem Handy war eine Weile nicht online. Das Handy ist vielleicht aus, oder Killit wurde entfernt.</string>
+    <string name="notif_update_title">Killit aktualisieren</string>
+
+    <!-- Gate and guardians -->
+    <string name="gate_subtitle_guard">Dein Schlüssel ist dein Wächterschlüssel: Wer ihn kennt, kann in deinem Namen antworten.</string>
+    <string name="former_guardian">Ein früherer Wächter</string>
+
+    <!-- First launch (§15.9) -->
+    <string name="onboarding_language">Wähle deine Sprache</string>
+    <string name="onboarding_what_title">Was Killit macht</string>
+    <string name="onboarding_what_body">Killit blockiert Apps, sodass sie sich nicht öffnen lassen, und hält sie blockiert. Eine neu installierte App bleibt blockiert, bis sie erlaubt wird.</string>
+    <string name="onboarding_protect_title">Schütze dein Handy</string>
+    <string name="onboarding_protect_body">Wähle, was blockiert wird, und sperre Killit mit einem Schlüssel. Füge einen Wächter hinzu, wenn jemand, dem du vertraust, mitentscheiden soll.</string>
+    <string name="onboarding_guard_title">Bewache jemanden, der dir wichtig ist</string>
+    <string name="onboarding_guard_body">Verbinde dich mit einem anderen Handy, um es zu bewachen. Sein Besitzer fragt dich, bevor eine App freigegeben wird, und du antwortest hier.</string>
+    <string name="onboarding_next">Weiter</string>
+    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_start">Los geht\'s</string>
 </resources>

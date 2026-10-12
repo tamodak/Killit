@@ -163,8 +163,6 @@
     <!-- Default-blocking: notifications -->
     <string name="notif_channel_protection">Protection</string>
     <string name="notif_channel_protection_desc">Shown while Killit watches for newly installed apps.</string>
-    <string name="notif_channel_new_apps">New apps</string>
-    <string name="notif_channel_new_apps_desc">Tells you when Killit blocks a newly installed app.</string>
     <string name="notif_protection_title">Killit is protecting this phone</string>
     <string name="notif_protection_text">New apps stay blocked until you allow them.</string>
     <string name="notif_blocked_one_title">%1$s was blocked</string>
@@ -435,4 +433,58 @@
     <string name="msg_sent">Sent to your guardians.</string>
     <string name="msg_no_guardians">Nobody guards this phone.</string>
     <string name="msg_bad_explanation">Write between 10 and 500 characters.</string>
+
+    <!-- Notifications (§15.8) -->
+    <string name="notif_channel_my_phone">My phone</string>
+    <string name="notif_channel_my_phone_desc">Blocked apps, your guardians\' answers, and changes to your guardians.</string>
+    <string name="notif_channel_requests">Requests from phones I guard</string>
+    <string name="notif_channel_requests_desc">Requests waiting for your answer, and a daily reminder while they wait.</string>
+    <string name="notif_channel_news">News from phones I guard</string>
+    <string name="notif_channel_news_desc">New apps, protection changes, and phones that have gone quiet.</string>
+    <string name="notif_blocked_one_text_guarded">Ask your guardians to allow it.</string>
+    <string name="notif_blocked_many_text_guarded">Ask your guardians to allow them.</string>
+    <plurals name="notif_reminder_title">
+        <item quantity="one">%1$d request is waiting for your answer</item>
+        <item quantity="other">%1$d requests are waiting for your answer</item>
+    </plurals>
+    <string name="notif_reminder_text">Open Phones I guard to answer.</string>
+    <string name="notif_answer_approved">%1$s approved %2$s</string>
+    <string name="notif_answer_waiting">Waiting for your other guardians.</string>
+    <string name="notif_app_allowed_title">%1$s is allowed</string>
+    <string name="notif_app_allowed_text">Your guardians approved it.</string>
+    <string name="notif_app_denied_title">%1$s stays blocked</string>
+    <plurals name="notif_denied_chances">
+        <item quantity="one">A guardian said no. %1$d of 3 requests left.</item>
+        <item quantity="other">A guardian said no. %1$d of 3 requests left.</item>
+    </plurals>
+    <string name="notif_denied_no_chances">A guardian said no. No requests left.</string>
+    <string name="notif_note">%1$s: “%2$s”</string>
+    <string name="notif_guardian_removed_title">%1$s is no longer your guardian</string>
+    <string name="notif_guardian_removed_text">Every guardian approved.</string>
+    <string name="notif_guardian_removed_timer">Nobody said no in time.</string>
+    <string name="notif_guardian_kept_title">%1$s stays your guardian</string>
+    <string name="notif_guardian_left_title">%1$s stopped guarding this phone</string>
+    <string name="notif_unguarded_text">Nobody guards this phone now.</string>
+    <string name="notif_removed_title">%1$s removed you as a guardian</string>
+    <string name="notif_released_title">%1$s turned off Killit\'s protection</string>
+    <string name="notif_no_longer_guard">You no longer guard this phone.</string>
+    <string name="notif_silence_title">%1$s has gone quiet</string>
+    <string name="notif_silence_text">Killit on that phone hasn\'t been online for a while. The phone may be off, or Killit may have been removed.</string>
+    <string name="notif_update_title">Update Killit</string>
+
+    <!-- Gate and guardians -->
+    <string name="gate_subtitle_guard">Your passkey is your guardian key: whoever knows it can answer in your name.</string>
+    <string name="former_guardian">A former guardian</string>
+
+    <!-- First launch (§15.9) -->
+    <string name="onboarding_language">Choose your language</string>
+    <string name="onboarding_what_title">What Killit does</string>
+    <string name="onboarding_what_body">Killit blocks apps so they can\'t be opened, and keeps them blocked. A newly installed app stays blocked until it is allowed.</string>
+    <string name="onboarding_protect_title">Protect your phone</string>
+    <string name="onboarding_protect_body">Choose what to block and lock Killit with a passkey. Add a guardian if you want someone you trust to decide with you.</string>
+    <string name="onboarding_guard_title">Guard someone you care about</string>
+    <string name="onboarding_guard_body">Pair with another phone to guard it. Its owner asks you before an app is unblocked, and you answer from here.</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_start">Start</string>
 </resources>

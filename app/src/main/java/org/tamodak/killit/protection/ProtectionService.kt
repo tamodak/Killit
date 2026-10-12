@@ -118,6 +118,8 @@ class ProtectionService : Service() {
             }
             notifications.showInAppLanguage()
             guard.checkAll("service start")
+            // Restrictions that come with guardians are applied again, in case any were lost.
+            ServiceLocator.pairing.enforceGuarded(force = true)
         }
         return START_STICKY
     }

@@ -239,6 +239,12 @@ class LockRepository(
         prefs.writeLanguage(language)
     }
 
+    /** Whether the first-launch cards were shown (PLAN.md §15.9). */
+    suspend fun onboarded(): Boolean = prefs.readOnboarded()
+
+    /** Remembers that the first-launch cards were shown. */
+    suspend fun finishOnboarding() = prefs.writeOnboarded()
+
     // ---------------------------------------------------------------- delayed release
 
     /**

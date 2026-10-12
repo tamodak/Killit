@@ -2,6 +2,7 @@ package org.tamodak.killit
 
 import android.content.Context
 import org.tamodak.killit.admin.DevicePolicyController
+import org.tamodak.killit.admin.GuardedPolicies
 import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.data.AppInventory
 import org.tamodak.killit.data.CredentialStore
@@ -14,11 +15,12 @@ import org.tamodak.killit.net.ApiClient
 import org.tamodak.killit.pairing.DeviceKeys
 import org.tamodak.killit.pairing.GuardAppBlocker
 import org.tamodak.killit.pairing.PairingEngine
-import org.tamodak.killit.pairing.PairingNotifier
+import org.tamodak.killit.pairing.PairingNotifications
 import org.tamodak.killit.pairing.PairingPreferences
 import org.tamodak.killit.pairing.PairingStore
 import org.tamodak.killit.pairing.PairingSync
 import org.tamodak.killit.pairing.Registration
+import org.tamodak.killit.pairing.Reminders
 import org.tamodak.killit.protection.PackageGuard
 import org.tamodak.killit.protection.PackageScanner
 import org.tamodak.killit.protection.ProtectionNotifications
@@ -88,6 +90,10 @@ object ServiceLocator {
     lateinit var pairing: PairingEngine
         private set
 
+    /** Pairing's notifications, and the guardian's daily reminder. */
+    lateinit var pairingNotifications: PairingNotifications
+        private set
+
     /**
      * Builds the graph.
      *
@@ -119,7 +125,11 @@ object ServiceLocator {
             // Argon2id hashing of the passkey.
             credentials = CredentialStore(),
         )
-        protectionNotifications = ProtectionNotifications(appContext, language = { lockRepository.language() })
+        protectionNotifications = ProtectionNotifications(
+            appContext,
+            language = { lockRepository.language() },
+            guarded = { database.pairing().guardians().isNotEmpty() },
+        )
         packageGuard = PackageGuard(
             context = appContext,
             dpc = devicePolicyController,
@@ -139,13 +149,19 @@ object ServiceLocator {
         )
         val pairingStore = PairingStore(database.pairing(), durable)
         registration = Registration(deviceKeys, api, pairingPreferences, hasPairings = { database.pairing().pairings().isNotEmpty() })
+        pairingNotifications = PairingNotifications(
+            appContext,
+            language = { lockRepository.language() },
+            dao = database.pairing(),
+            onRequestWaiting = { Reminders.schedule(appContext) },
+        )
         pairing = PairingEngine(
             store = pairingStore,
             server = api,
             identity = { registration.ensureRegistered() },
             apps = GuardAppBlocker(appContext, packageGuard, PackageScanner(appContext)),
             durable = durable,
-            notifier = object : PairingNotifier {},
+            notifier = pairingNotifications,
             config = PairingEngine.Config(
                 deviceModel = deviceModel(),
                 unpairTimerMillis = BuildConfig.UNPAIR_TIMER_MILLIS,
@@ -154,7 +170,14 @@ object ServiceLocator {
                 silenceAlertMillis = BuildConfig.SILENCE_ALERT_MILLIS,
             ),
             canBeProtected = { devicePolicyController.isDeviceOwner() },
-            onQueued = { PairingSync.soon(appContext) },
+            scheduler = object : PairingEngine.Scheduler {
+                override fun soon() = PairingSync.soon(appContext)
+
+                override fun periodic() = PairingSync.schedulePeriodic(appContext)
+
+                override fun at(atMillis: Long) = PairingSync.at(appContext, atMillis)
+            },
+            onGuarded = GuardedPolicies(devicePolicyController, lockRepository)::apply,
         )
         packageGuard.listener = PackageGuard.Listener { pairing.onAppsBlocked(it) }
 

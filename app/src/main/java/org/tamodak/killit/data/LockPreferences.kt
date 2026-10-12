@@ -183,6 +183,17 @@ class LockPreferences(context: Context) {
         store.edit { prefs -> prefs[KEY_LANGUAGE] = language.name }
     }
 
+    /**
+     * Whether the first-launch cards were shown (PLAN.md §15.9). Local only: after a "Clear data"
+     * they are shown again, which costs one tap.
+     */
+    suspend fun readOnboarded(): Boolean = store.data.first()[KEY_ONBOARDED] == true
+
+    /** Remembers that the first-launch cards were shown, finished or skipped. */
+    suspend fun writeOnboarded() {
+        store.edit { prefs -> prefs[KEY_ONBOARDED] = true }
+    }
+
     // ---------------------------------------------------------------- release request
 
     /**
@@ -248,6 +259,7 @@ class LockPreferences(context: Context) {
         val KEY_RELEASE_AVAILABLE_AT = longPreferencesKey("release_available_at")
 
         val KEY_LANGUAGE = stringPreferencesKey("language")
+        val KEY_ONBOARDED = booleanPreferencesKey("onboarded")
 
         val KEY_HARDEN_UNINSTALL = booleanPreferencesKey("harden_uninstall")
         val KEY_HARDEN_FORCE_STOP = booleanPreferencesKey("harden_force_stop")

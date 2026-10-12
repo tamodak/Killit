@@ -41,6 +41,9 @@ class EnginePhone(
     val database: KillitDatabase = database ?: Room.inMemoryDatabaseBuilder(context, KillitDatabase::class.java).build()
     val apps = FakeApps()
     val notifier = RecordingNotifier()
+
+    /** Each time the guarded policies were applied: true with guardians, false without. */
+    val guarded = mutableListOf<Boolean>()
     val store = PairingStore(this.database.pairing(), durable)
     val engine = PairingEngine(
         store = store,
@@ -57,6 +60,7 @@ class EnginePhone(
             silenceAlertMillis = 7L * 24 * 60 * 60 * 1000,
         ),
         canBeProtected = { true },
+        onGuarded = { guarded += it },
         now = clock.now,
     )
     val dao = this.database.pairing()
@@ -135,35 +139,35 @@ class FakeDurable(var available: Boolean = true) : DurablePairingStore {
 class RecordingNotifier : PairingNotifier {
     val events = mutableListOf<String>()
 
-    override fun requestArrived(from: PairingEntity, request: IncomingRequestEntity) {
+    override suspend fun requestArrived(from: PairingEntity, request: IncomingRequestEntity) {
         events += "arrived ${request.type}"
     }
 
-    override fun requestSettled(from: PairingEntity, request: IncomingRequestEntity) {
+    override suspend fun requestSettled(from: PairingEntity, request: IncomingRequestEntity) {
         events += "settled ${request.type}"
     }
 
-    override fun requestClosed(request: OutgoingRequestEntity) {
+    override suspend fun requestClosed(request: OutgoingRequestEntity) {
         events += "closed ${request.type} ${request.state}"
     }
 
-    override fun guardianAnswered(guardian: PairingEntity, request: OutgoingRequestEntity, approved: Boolean, note: String) {
+    override suspend fun guardianAnswered(guardian: PairingEntity, request: OutgoingRequestEntity, approved: Boolean, note: String) {
         events += "answered ${request.type} $approved"
     }
 
-    override fun pairingEnded(pairing: PairingEntity, event: EventEntity) {
+    override suspend fun pairingEnded(pairing: PairingEntity, event: EventEntity) {
         events += "ended ${event.type}"
     }
 
-    override fun noticeArrived(from: PairingEntity, event: EventEntity) {
+    override suspend fun noticeArrived(from: PairingEntity, event: EventEntity) {
         events += "notice ${event.type}"
     }
 
-    override fun silence(pairing: PairingEntity) {
+    override suspend fun silence(pairing: PairingEntity) {
         events += "silence"
     }
 
-    override fun updateNeeded() {
+    override suspend fun updateNeeded() {
         events += "update needed"
     }
 }

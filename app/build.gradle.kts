@@ -64,6 +64,9 @@ android {
         buildConfigField("long", "REMINDER_DELAY_MILLIS", "3_000L")
         // How long a protected phone may stay silent before its guardians are told (H8).
         buildConfigField("long", "SILENCE_ALERT_MILLIS", "3_000L")
+        // Whether adb and developer options are switched off while the phone has guardians (H2).
+        // Off while developing: a test phone with guardians still needs adb.
+        buildConfigField("boolean", "BLOCK_DEBUGGING_WHILE_GUARDED", "false")
 
         buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
         buildConfigField("String", "API_AUDIENCE", "\"${audienceOf(debugApiBaseUrl)}\"")
@@ -87,6 +90,7 @@ android {
             buildConfigField("int", "UNLOCKS_PER_DAY", "6")
             buildConfigField("long", "REMINDER_DELAY_MILLIS", "0L")
             buildConfigField("long", "SILENCE_ALERT_MILLIS", "604_800_000L")
+            buildConfigField("boolean", "BLOCK_DEBUGGING_WHILE_GUARDED", "true")
             buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
             buildConfigField("String", "API_AUDIENCE", "\"${audienceOf(releaseApiBaseUrl)}\"")
         }

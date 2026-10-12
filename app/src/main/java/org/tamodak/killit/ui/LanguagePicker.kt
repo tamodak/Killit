@@ -45,23 +45,33 @@ fun LanguagePicker(
             modifier = Modifier
                 .heightIn(max = 320.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            AppLanguage.entries.forEach { language ->
-                val selected = language == current
-                KillitRow(
-                    title = language.label(),
-                    // The tick is always in the layout and only sometimes visible: dropping the
-                    // icon on unselected rows would collapse its slot and indent the one selected
-                    // label 48dp past every other.
-                    icon = KillitIcons.Check,
-                    iconTint = if (selected) KillitGreen else Color.Transparent,
-                    borderColor = if (selected) KillitGreen else KillitBorderDim,
-                    background = if (selected) KillitGreen.copy(alpha = 0.10f) else Color.Transparent,
-                    showChevron = false,
-                    onClick = { onPick(language) },
-                )
-            }
+            LanguageList(current = current, onPick = onPick)
+        }
+    }
+}
+
+/**
+ * Every language as a row, each written in itself, with [current] ticked: the picker's list, and
+ * the first step of the first launch (PLAN.md §15.9).
+ */
+@Composable
+fun LanguageList(current: AppLanguage, onPick: (AppLanguage) -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        AppLanguage.entries.forEach { language ->
+            val selected = language == current
+            KillitRow(
+                title = language.label(),
+                // The tick is always in the layout and only sometimes visible: dropping the icon
+                // on unselected rows would collapse its slot and indent the one selected label
+                // 48dp past every other.
+                icon = KillitIcons.Check,
+                iconTint = if (selected) KillitGreen else Color.Transparent,
+                borderColor = if (selected) KillitGreen else KillitBorderDim,
+                background = if (selected) KillitGreen.copy(alpha = 0.10f) else Color.Transparent,
+                showChevron = false,
+                onClick = { onPick(language) },
+            )
         }
     }
 }

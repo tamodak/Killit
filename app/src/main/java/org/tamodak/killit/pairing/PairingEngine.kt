@@ -7,10 +7,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.data.DurablePairingStore
+import org.tamodak.killit.pairing.store.CeremonyStage
 import org.tamodak.killit.pairing.store.EventEntity
 import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.OutgoingRequestWithCopies
 import org.tamodak.killit.pairing.store.PairRole
+import org.tamodak.killit.pairing.store.PairingEntity
+import org.tamodak.killit.pairing.store.RequestType
 import org.tamodak.killit.pairing.store.UnknownMessageEntity
 import org.tamodak.killit.protocol.MessageBody
 import org.tamodak.killit.protocol.NoticeBody
@@ -24,11 +27,13 @@ import org.tamodak.killit.protocol.NoticeBody
  * Waiting on the network never holds it.
  *
  * After anything that queues a message it tries to send at once, and if the network isn't there,
- * [onQueued] makes sure a background sync will.
+ * [scheduler] makes sure a background sync will.
  *
  * @param identity this phone's registered identity ([Registration.ensureRegistered]).
  * @param canBeProtected whether this phone can take the protected role: it must be device owner.
- * @param onQueued called when messages are waiting to be sent, to schedule a sync.
+ * @param scheduler the background work pairing needs.
+ * @param onGuarded applies the device policies that follow from having guardians, or not
+ *   (H2, I1); called whenever that changes, and when [enforceGuarded] is asked to.
  */
 class PairingEngine(
     val store: PairingStore,
@@ -39,9 +44,25 @@ class PairingEngine(
     private val notifier: PairingNotifier,
     private val config: Config,
     canBeProtected: suspend () -> Boolean,
-    private val onQueued: () -> Unit = {},
+    private val scheduler: Scheduler = object : Scheduler {},
+    private val onGuarded: suspend (Boolean) -> Unit = {},
     private val now: () -> Long = System::currentTimeMillis,
 ) {
+    /**
+     * The background work pairing needs (PLAN.md §7), kept out of the engine so it runs in tests
+     * without WorkManager. Each call is cheap to repeat.
+     */
+    interface Scheduler {
+        /** Messages are queued and couldn't be sent: sync once the network is back. */
+        fun soon() {}
+
+        /** There is a pairing: sync in the background from now on. */
+        fun periodic() {}
+
+        /** An UNPAIR timer runs out at [atMillis]: sync then, not at the next periodic sync. */
+        fun at(atMillis: Long) {}
+    }
+
     /**
      * Durations and device facts the engine needs.
      *
@@ -76,6 +97,18 @@ class PairingEngine(
 
     @Volatile
     private var prunedAt = 0L
+
+    /** Whether this process has made sure the periodic sync is scheduled. */
+    @Volatile
+    private var periodicScheduled = false
+
+    /** The UNPAIR timer a sync was last scheduled for. */
+    @Volatile
+    private var scheduledTimer: Long? = null
+
+    /** Whether the guarded policies were last applied for a phone with guardians; null before. */
+    @Volatile
+    private var guardedApplied: Boolean? = null
 
     val outgoing: Flow<List<OutgoingRequestWithCopies>> = dao.observeOutgoing()
     val incoming: Flow<List<IncomingRequestEntity>> = dao.observeIncoming()
@@ -138,6 +171,37 @@ class PairingEngine(
         peers.deleteFinishedLinks()
         if (now() - lastSeenRefreshedAt > LAST_SEEN_INTERVAL_MILLIS) refreshLastSeen()
         if (now() - prunedAt > PRUNE_INTERVAL_MILLIS) prune()
+        keepScheduled()
+        enforceGuarded()
+    }
+
+    /**
+     * Applies the device policies that follow from having guardians (H2, I1) when that changed
+     * since they were last applied in this process, or always when [force] is set: at startup,
+     * where they may have been lost.
+     */
+    suspend fun enforceGuarded(force: Boolean = false) {
+        if (force) store.reconcile()
+        val guarded = store.guardians().isNotEmpty()
+        if (!force && guarded == guardedApplied) return
+        onGuarded(guarded)
+        guardedApplied = guarded
+    }
+
+    /**
+     * Keeps the background work in step with what there is: the periodic sync while anything is
+     * paired, and a sync for the next UNPAIR timer. The worker cancels itself once nothing is.
+     */
+    private suspend fun keepScheduled() {
+        if (!periodicScheduled && dao.pairings().isNotEmpty()) {
+            scheduler.periodic()
+            periodicScheduled = true
+        }
+        val timer = requests.nextTimer()
+        if (timer != null && timer != scheduledTimer) {
+            scheduler.at(timer)
+            scheduledTimer = timer
+        }
     }
 
     /** Asks the server how recently each peer was seen (§3.11), for the pairs screens. */
@@ -152,7 +216,7 @@ class PairingEngine(
     /** Follows the ceremony: the invite until linked, then the mailbox for the offer and answer. */
     suspend fun followCeremony(waitSeconds: Int) {
         val current = dao.ceremony() ?: return
-        if (current.stage == org.tamodak.killit.pairing.store.CeremonyStage.LINKED) {
+        if (current.stage == CeremonyStage.LINKED) {
             sync(waitSeconds)
         } else {
             ceremony.poll(waitSeconds)
@@ -166,7 +230,7 @@ class PairingEngine(
         locked { requests.askToUnblock(packageName, explanation) }
 
     suspend fun askToRemove(targetPairId: ByteArray, explanation: String): RequestEngine.AskResult =
-        locked { requests.askToRemove(targetPairId, explanation) }
+        locked { requests.askToRemove(targetPairId, explanation) }.also { keepScheduled() }
 
     suspend fun withdraw(requestId: ByteArray) = locked { requests.withdraw(requestId) }
 
@@ -215,17 +279,36 @@ class PairingEngine(
 
     suspend fun leave(pairId: ByteArray) = locked { peers.leave(pairId) }
 
+    /**
+     * The requests a reminder names (D9): waiting for this phone's answer, other than live
+     * unlocks, and, when reminders come only once, not reminded before. They are marked reminded.
+     *
+     * @return each request with the phone it came from.
+     */
+    suspend fun remind(onlyOnce: Boolean): List<Pair<IncomingRequestEntity, PairingEntity>> =
+        lock.withLock {
+            val at = now()
+            dao.waitingForMe()
+                .filter { it.type != RequestType.UNLOCK && (!onlyOnce || it.remindedAt == null) }
+                .mapNotNull { request -> dao.pairing(request.pairId)?.let { request to it } }
+                .onEach { (request, _) -> dao.setReminded(request.pairId, request.requestId, at) }
+        }
+
     // ---------------------------------------------------------------- either side
 
     suspend fun rename(pairId: ByteArray, nickname: String) = lock.withLock { peers.rename(pairId, nickname) }
 
     /** True when this phone guards at least one phone. */
-    suspend fun isGuardian(): Boolean = dao.pairings().any { it.myRole == PairRole.GUARDIAN }
+    suspend fun isGuardian(): Boolean = dao.wards().isNotEmpty()
 
-    /** Runs [block] under the lock, then tries to send whatever it queued. */
+    /**
+     * Runs [block] under the lock, then tries to send whatever it queued, and applies what a
+     * change of guardians means.
+     */
     private suspend fun <T> locked(block: suspend () -> T): T {
         val result = lock.withLock { block() }
         send()
+        enforceGuarded()
         return result
     }
 
@@ -236,7 +319,7 @@ class PairingEngine(
             mailbox.flush()
         } catch (e: IOException) {
             KillitLog.d(KillitLog.SYNC) { "Sending deferred: ${e.message}" }
-            onQueued()
+            scheduler.soon()
         }
     }
 

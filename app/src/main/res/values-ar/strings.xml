@@ -169,8 +169,6 @@
 
     <string name="notif_channel_protection">الحماية</string>
     <string name="notif_channel_protection_desc">يظهر ما دام Killit يراقب التطبيقات المثبّتة حديثًا.</string>
-    <string name="notif_channel_new_apps">التطبيقات الجديدة</string>
-    <string name="notif_channel_new_apps_desc">يخبرك عندما يحظر Killit تطبيقًا مثبّتًا حديثًا.</string>
     <string name="notif_protection_title">Killit يحمي هذا الهاتف</string>
     <string name="notif_protection_text">تبقى التطبيقات الجديدة محظورة حتى تسمح بها.</string>
     <string name="notif_blocked_one_title">تم حظر %1$s</string>
@@ -495,4 +493,66 @@
     <string name="msg_sent">أُرسل إلى حرّاسك.</string>
     <string name="msg_no_guardians">لا أحد يحرس هذا الهاتف.</string>
     <string name="msg_bad_explanation">اكتب بين 10 و500 حرف.</string>
+
+    <!-- Notifications (§15.8) -->
+    <string name="notif_channel_my_phone">هاتفي</string>
+    <string name="notif_channel_my_phone_desc">التطبيقات المحظورة، وردود حرّاسك، والتغييرات على حرّاسك.</string>
+    <string name="notif_channel_requests">طلبات من الهواتف التي أحرسها</string>
+    <string name="notif_channel_requests_desc">طلبات تنتظر ردّك، وتذكير يومي ما دامت تنتظر.</string>
+    <string name="notif_channel_news">أخبار الهواتف التي أحرسها</string>
+    <string name="notif_channel_news_desc">تطبيقات جديدة، وتغييرات في الحماية، وهواتف انقطعت أخبارها.</string>
+    <string name="notif_blocked_one_text_guarded">اطلب من حرّاسك السماح به.</string>
+    <string name="notif_blocked_many_text_guarded">اطلب من حرّاسك السماح بها.</string>
+    <plurals name="notif_reminder_title">
+        <item quantity="zero">لا طلبات تنتظر ردّك</item>
+        <item quantity="one">طلب واحد ينتظر ردّك</item>
+        <item quantity="two">طلبان ينتظران ردّك</item>
+        <item quantity="few">%1$d طلبات تنتظر ردّك</item>
+        <item quantity="many">%1$d طلبًا ينتظر ردّك</item>
+        <item quantity="other">%1$d طلب ينتظر ردّك</item>
+    </plurals>
+    <string name="notif_reminder_text">افتح «الهواتف التي أحرسها» للرد.</string>
+    <string name="notif_answer_approved">%1$s وافق على %2$s</string>
+    <string name="notif_answer_waiting">بانتظار حرّاسك الآخرين.</string>
+    <string name="notif_app_allowed_title">تم السماح بـ %1$s</string>
+    <string name="notif_app_allowed_text">وافق حرّاسك عليه.</string>
+    <string name="notif_app_denied_title">%1$s يبقى محظورًا</string>
+    <plurals name="notif_denied_chances">
+        <item quantity="zero">رفض أحد الحرّاس. لم يتبقَّ أي طلب من 3.</item>
+        <item quantity="one">رفض أحد الحرّاس. تبقّى طلب واحد من 3.</item>
+        <item quantity="two">رفض أحد الحرّاس. تبقّى طلبان من 3.</item>
+        <item quantity="few">رفض أحد الحرّاس. تبقّت %1$d طلبات من 3.</item>
+        <item quantity="many">رفض أحد الحرّاس. تبقّى %1$d طلبًا من 3.</item>
+        <item quantity="other">رفض أحد الحرّاس. تبقّى %1$d طلب من 3.</item>
+    </plurals>
+    <string name="notif_denied_no_chances">رفض أحد الحرّاس. لم يتبقَّ أي طلب.</string>
+    <string name="notif_note">%1$s: “%2$s”</string>
+    <string name="notif_guardian_removed_title">لم يعد %1$s حارسًا لك</string>
+    <string name="notif_guardian_removed_text">وافق جميع الحرّاس.</string>
+    <string name="notif_guardian_removed_timer">لم يرفض أحد في الوقت المحدد.</string>
+    <string name="notif_guardian_kept_title">يبقى %1$s حارسًا لك</string>
+    <string name="notif_guardian_left_title">توقّف %1$s عن حراسة هذا الهاتف</string>
+    <string name="notif_unguarded_text">لا أحد يحرس هذا الهاتف الآن.</string>
+    <string name="notif_removed_title">أزالك %1$s من حرّاسه</string>
+    <string name="notif_released_title">أوقف %1$s حماية Killit</string>
+    <string name="notif_no_longer_guard">لم تعد تحرس هذا الهاتف.</string>
+    <string name="notif_silence_title">انقطعت أخبار %1$s</string>
+    <string name="notif_silence_text">لم يتصل Killit على ذلك الهاتف بالإنترنت منذ مدة. ربما الهاتف مطفأ، أو أُزيل Killit.</string>
+    <string name="notif_update_title">حدّث Killit</string>
+
+    <!-- Gate and guardians -->
+    <string name="gate_subtitle_guard">مفتاحك هو مفتاح الحارس: من يعرفه يستطيع الرد باسمك.</string>
+    <string name="former_guardian">حارس سابق</string>
+
+    <!-- First launch (§15.9) -->
+    <string name="onboarding_language">اختر لغتك</string>
+    <string name="onboarding_what_title">ما يفعله Killit</string>
+    <string name="onboarding_what_body">يحظر Killit التطبيقات فلا يمكن فتحها، ويبقيها محظورة. يبقى التطبيق المثبّت حديثًا محظورًا حتى يُسمح به.</string>
+    <string name="onboarding_protect_title">احمِ هاتفك</string>
+    <string name="onboarding_protect_body">اختر ما تريد حظره واقفل Killit بمفتاح. أضف حارسًا إن أردت أن يقرّر معك شخص تثق به.</string>
+    <string name="onboarding_guard_title">احرس شخصًا يهمّك</string>
+    <string name="onboarding_guard_body">اقترن بهاتف آخر لتحرسه. يسألك صاحبه قبل رفع الحظر عن أي تطبيق، وتردّ من هنا.</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_skip">تخطَّ</string>
+    <string name="onboarding_start">ابدأ</string>
 </resources>
