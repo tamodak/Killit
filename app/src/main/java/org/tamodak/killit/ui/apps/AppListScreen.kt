@@ -437,7 +437,7 @@ private fun NewMark() {
  * icon, so announcing it too would just repeat them.
  */
 @Composable
-private fun AppIcon(packageName: String, iconLoader: suspend (String) -> ImageBitmap?) {
+internal fun AppIcon(packageName: String, iconLoader: suspend (String) -> ImageBitmap?) {
     val icon by produceState<ImageBitmap?>(initialValue = null, packageName) {
         value = iconLoader(packageName)
     }

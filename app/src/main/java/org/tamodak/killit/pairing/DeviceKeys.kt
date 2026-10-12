@@ -5,6 +5,7 @@ import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.security.keystore.StrongBoxUnavailableException
+import androidx.core.content.edit
 import com.google.crypto.tink.HybridDecrypt
 import com.google.crypto.tink.KeyTemplate
 import com.google.crypto.tink.hybrid.HybridConfig
@@ -145,7 +146,8 @@ class DeviceKeys(
             cached = null
             val store = keyStore()
             if (store.containsAlias(signAlias)) store.deleteEntry(signAlias)
-            appContext.getSharedPreferences(keysetPrefs, Context.MODE_PRIVATE).edit().clear().commit()
+            // On disk before the master key goes, so no keyset outlives the key that decrypts it.
+            appContext.getSharedPreferences(keysetPrefs, Context.MODE_PRIVATE).edit(commit = true) { clear() }
             if (store.containsAlias(masterKeyAlias)) store.deleteEntry(masterKeyAlias)
             KillitLog.i(KillitLog.KEYS, "Identity deleted")
         }

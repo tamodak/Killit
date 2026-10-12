@@ -59,7 +59,6 @@
     <string name="setup_saved">تم تعيين المفتاح.</string>
 
     <!-- Home -->
-    <string name="home_status_owner_yes">مالك الجهاز مُفعّل</string>
     <string name="home_status_owner_no">ليس مالك الجهاز</string>
     <string name="home_status_owner_yes_desc">يستطيع Killit حظر التطبيقات ورفع الحظر عنها.</string>
     <string name="home_status_owner_no_desc">لا يستطيع Killit حظر أي شيء حتى يُعيَّن مالكًا للجهاز. اختر إحدى الطرق الثلاث أدناه.</string>
@@ -204,4 +203,296 @@
     <string name="home_notifications_title">السماح بالإشعارات</string>
     <string name="home_notifications_body">يخبرك Killit عندما يحظر تطبيقًا مثبّتًا حديثًا.</string>
     <string name="home_notifications_allow">السماح</string>
+
+    <!-- ============================== Pairing (PLAN.md §15) ============================== -->
+
+    <!-- Hub (PLAN.md §15.3). Counts only, never names, before the passkey (I5). -->
+    <string name="hub_my_phone">هاتفي</string>
+    <string name="hub_my_phone_setup">غير محميّ بعد · إعداد</string>
+    <string name="hub_my_phone_protected">محميّ بمفتاحك</string>
+    <plurals name="hub_my_phone_guardians">
+        <item quantity="zero">محميّ · لا حرّاس</item>
+        <item quantity="one">محميّ · حارس واحد</item>
+        <item quantity="two">محميّ · حارسان</item>
+        <item quantity="few">محميّ · %1$d حرّاس</item>
+        <item quantity="many">محميّ · %1$d حارسًا</item>
+        <item quantity="other">محميّ · %1$d حارس</item>
+    </plurals>
+    <plurals name="hub_my_requests_open">
+        <item quantity="zero">لم يُرسَل أي طلب إلى حرّاسك</item>
+        <item quantity="one">أُرسل طلب واحد إلى حرّاسك</item>
+        <item quantity="two">أُرسل طلبان إلى حرّاسك</item>
+        <item quantity="few">أُرسلت %1$d طلبات إلى حرّاسك</item>
+        <item quantity="many">أُرسل %1$d طلبًا إلى حرّاسك</item>
+        <item quantity="other">أُرسل %1$d طلب إلى حرّاسك</item>
+    </plurals>
+    <string name="hub_guard">الهواتف التي أحرسها</string>
+    <string name="hub_guard_none">لا تحرس أي هاتف بعد</string>
+    <plurals name="hub_guard_phones">
+        <item quantity="zero">لا هواتف</item>
+        <item quantity="one">هاتف واحد</item>
+        <item quantity="two">هاتفان</item>
+        <item quantity="few">%1$d هواتف</item>
+        <item quantity="many">%1$d هاتفًا</item>
+        <item quantity="other">%1$d هاتف</item>
+    </plurals>
+    <plurals name="hub_guard_waiting">
+        <item quantity="zero">لا طلبات بانتظارك</item>
+        <item quantity="one">طلب واحد بانتظارك</item>
+        <item quantity="two">طلبان بانتظارك</item>
+        <item quantity="few">%1$d طلبات بانتظارك</item>
+        <item quantity="many">%1$d طلبًا بانتظارك</item>
+        <item quantity="other">%1$d طلب بانتظارك</item>
+    </plurals>
+    <string name="update_needed">حدّث Killit لترى هذا</string>
+    <string name="update_needed_long">بعض الرسائل تحتاج إلى إصدار أحدث من Killit. حدّث Killit لتراها.</string>
+
+    <!-- My phone (§15.4, §15.5) -->
+    <string name="my_phone_guardians">الحرّاس</string>
+    <string name="my_phone_guardians_none">لا أحد يحرس هذا الهاتف</string>
+    <string name="my_phone_settings">الإعدادات</string>
+    <string name="my_phone_settings_desc">خيارات الحماية، اللغة، المفتاح</string>
+    <string name="my_phone_unlocked_title">فتحه حرّاسك</string>
+    <string name="my_phone_unlocked_body">لديك تحكّم كامل حتى تغادر Killit. عند المغادرة يُقفل من جديد.</string>
+    <string name="my_phone_locked_body">حرّاسك يحمون هذا الهاتف. لتغيير الإعدادات، تحدّث معهم أولًا ثم أرسل طلب فتح.</string>
+    <string name="my_phone_unlock">فتح Killit</string>
+    <string name="my_phone_ask_unblock">طلب رفع الحظر عن تطبيق</string>
+    <string name="my_phone_ask_unblock_desc">حرّاسك يقرّرون</string>
+    <string name="my_phone_block_more">حظر المزيد من التطبيقات</string>
+    <string name="my_phone_block_more_desc">دون أن تسأل أحدًا</string>
+    <string name="my_phone_my_guardians">حرّاسي</string>
+    <string name="harden_date_time_guarded">إلزامي ما دام لديك حرّاس.</string>
+    <string name="release_guardians_note">يُبلَّغ حرّاسك، ويُزالون عند اكتمال العملية.</string>
+
+    <!-- The live unlock (§3.4) -->
+    <string name="unlock_title">فتح Killit</string>
+    <string name="unlock_intro">تحدّث مع حرّاسك أولًا. ثم أرسل الطلب وابقَ في هذه الشاشة: يُفتح Killit عندما يوافقون جميعًا.</string>
+    <string name="unlock_explanation_hint">ملاحظة لحرّاسك (اختيارية)</string>
+    <string name="unlock_send">إرسال طلب الفتح</string>
+    <string name="unlock_waiting_title">بانتظار حرّاسك</string>
+    <string name="unlock_waiting_body">ابقَ في هذه الشاشة. مغادرتها تلغي الطلب.</string>
+    <string name="unlock_denied_title">رُفض الطلب</string>
+    <string name="unlock_cooldown">يمكنك الطلب مجددًا بعد %1$s.</string>
+    <string name="unlock_daily_limit">أرسلت طلبات الفتح المسموح بها اليوم. حاول غدًا.</string>
+    <string name="unlock_approved">تمت الموافقة. جارٍ الفتح…</string>
+    <string name="vote_waiting">بالانتظار</string>
+    <string name="vote_approved">وافق</string>
+    <string name="vote_denied">رفض</string>
+
+    <!-- Asking to unblock an app (§3.6) -->
+    <string name="ask_unblock_intro">هذه التطبيقات محظورة. اطلب من حرّاسك السماح بأحدها، واذكر السبب.</string>
+    <string name="ask_unblock_none">لا توجد تطبيقات محظورة.</string>
+    <string name="ask_unblock_not_blocked">لم يعد هذا التطبيق محظورًا.</string>
+    <plurals name="ask_chances_left">
+        <item quantity="zero">لم يتبقَّ أي طلب من 3</item>
+        <item quantity="one">تبقّى طلب واحد من 3</item>
+        <item quantity="two">تبقّى طلبان من 3</item>
+        <item quantity="few">تبقّت %1$d طلبات من 3</item>
+        <item quantity="many">تبقّى %1$d طلبًا من 3</item>
+        <item quantity="other">تبقّى %1$d طلب من 3</item>
+    </plurals>
+    <plurals name="ask_state_denied">
+        <item quantity="zero">رُفض · لم يتبقَّ أي طلب من 3</item>
+        <item quantity="one">رُفض · تبقّى طلب واحد من 3</item>
+        <item quantity="two">رُفض · تبقّى طلبان من 3</item>
+        <item quantity="few">رُفض · تبقّت %1$d طلبات من 3</item>
+        <item quantity="many">رُفض · تبقّى %1$d طلبًا من 3</item>
+        <item quantity="other">رُفض · تبقّى %1$d طلب من 3</item>
+    </plurals>
+    <string name="ask_state_waiting">بانتظار حرّاسك</string>
+    <string name="ask_state_no_chances">لم تتبقَّ طلبات</string>
+    <string name="ask_state_no_chances_long">رُفضت الطلبات الثلاثة لهذا التطبيق. الآن لا يسمح به إلا Killit مفتوح.</string>
+    <string name="ask_unblock_hint">لماذا تحتاج هذا التطبيق؟ 10 أحرف على الأقل.</string>
+    <string name="ask_unblock_what_they_see">يرى حرّاسك اسم التطبيق وحزمته ومصدر تثبيته، وما تكتبه.</string>
+    <string name="ask_send">إرسال إلى حرّاسك</string>
+    <string name="ask_withdraw">سحب الطلب</string>
+    <string name="ask_last_denied">رُفض طلبك الأخير</string>
+    <string name="text_counter">%1$d / %2$d</string>
+
+    <!-- Blocking more apps (D7) -->
+    <string name="block_more_intro">احظر تطبيقات دون أن تسأل أحدًا. رفع الحظر عنها لاحقًا يحتاج إلى حرّاسك.</string>
+    <plurals name="block_more_button">
+        <item quantity="zero">حظر %1$d تطبيق</item>
+        <item quantity="one">حظر تطبيق واحد</item>
+        <item quantity="two">حظر تطبيقين</item>
+        <item quantity="few">حظر %1$d تطبيقات</item>
+        <item quantity="many">حظر %1$d تطبيقًا</item>
+        <item quantity="other">حظر %1$d تطبيق</item>
+    </plurals>
+    <plurals name="block_more_confirm_title">
+        <item quantity="zero">حظر %1$d تطبيق؟</item>
+        <item quantity="one">حظر تطبيق واحد؟</item>
+        <item quantity="two">حظر تطبيقين؟</item>
+        <item quantity="few">حظر %1$d تطبيقات؟</item>
+        <item quantity="many">حظر %1$d تطبيقًا؟</item>
+        <item quantity="other">حظر %1$d تطبيق؟</item>
+    </plurals>
+    <string name="block_more_confirm_body">لن تستطيع رفع الحظر عنها بنفسك. رفع الحظر سيحتاج إلى موافقة حرّاسك.</string>
+    <string name="block_more_confirm">حظر</string>
+
+    <!-- Guardians (§15.4) -->
+    <string name="guardians_none">لا أحد يحرس هذا الهاتف بعد.</string>
+    <string name="guardians_add">إضافة حارس</string>
+    <string name="guardians_add_needs_owner">أعدّ الحماية في «هاتفي» أولًا</string>
+    <string name="guardians_ask_remove">طلب الإزالة</string>
+    <string name="guardians_removal_pending">طُلبت الإزالة. ما لم يرفضها أحد، تحدث في %1$s.</string>
+    <string name="guardians_no_chances">رُفضت طلبات الإزالة الثلاثة.</string>
+    <string name="guardians_hint_second">إضافة حارس ثانٍ تمنحك حماية أكبر.</string>
+    <string name="guardians_hint_many">نادرًا ما تحتاج إلى أكثر من 4 حرّاس، وكل طلب يصبح أصعب في الموافقة.</string>
+    <string name="guardians_gone">هذا الاقتران لم يعد موجودًا.</string>
+    <string name="rename">إعادة التسمية</string>
+    <string name="rename_hint">الاسم</string>
+    <string name="unpair_rules">يُسأل كل الحرّاس، ومنهم هذا الحارس. إذا وافقوا جميعًا يُزال الحارس فورًا. إذا رفض أحدهم ينتهي الطلب ويُحتسب من طلباتك الثلاثة. إذا لم يرفض أحد خلال 30 يومًا يُزال الحارس.</string>
+    <string name="unpair_hint">لماذا يجب أن يغادر هذا الحارس؟ 10 أحرف على الأقل.</string>
+
+    <!-- Phones I guard (§15.6) -->
+    <string name="guard_requests">الطلبات</string>
+    <string name="guard_requests_none">لا شيء بانتظارك.</string>
+    <string name="guard_phones">الهواتف</string>
+    <string name="guard_new">حراسة هاتف جديد</string>
+    <string name="guard_leave">التوقف عن الحراسة</string>
+    <string name="guard_leave_title">التوقف عن الحراسة؟</string>
+    <string name="guard_leave_body">سيُبلَّغ %1$s. إذا كنت آخر حرّاسه، يصبح هاتفه بلا حماية.</string>
+    <string name="guard_battery_title">اسمح لـ Killit بالعمل في الخلفية</string>
+    <string name="guard_battery_body">قد يؤخّر توفير البطارية الطلبات القادمة من الهواتف التي تحرسها.</string>
+    <string name="history">السجلّ</string>
+    <string name="guardian_notice_title">مفتاحك الآن هو مفتاح الحارس</string>
+    <string name="guardian_notice_body">ستحتاجه في كل مرة توافق فيها أو ترفض أو تحظر شيئًا للهواتف التي تحرسها. أي شخص يعرفه يستطيع الموافقة على الطلبات باسمك، فاحتفظ به لنفسك. واضبط قفل شاشة على هاتفك أيضًا. إذا نسيته، فعليك إعادة تثبيت Killit والاقتران من جديد.</string>
+    <string name="guardian_notice_ok">فهمت</string>
+
+    <!-- A request, as a guardian sees it (§15.6) -->
+    <string name="request_unblock">%1$s يريد رفع الحظر عن %2$s</string>
+    <string name="request_unlock">%1$s يريد فتح Killit</string>
+    <string name="request_unpair_you">%1$s يريد إزالتك من الحرّاس</string>
+    <string name="request_unpair_named">%1$s يريد إزالة %2$s من الحرّاس</string>
+    <string name="request_unpair_other">%1$s يريد إزالة أحد الحرّاس</string>
+    <string name="request_waiting_now">بالانتظار الآن</string>
+    <string name="request_unlock_meaning">الموافقة تمنح %1$s تحكّمًا كاملًا في Killit حتى يغادر التطبيق.</string>
+    <string name="request_unpair_target_unknown">الأمر يخصّ حارسًا لا تعرفه.</string>
+    <string name="request_unpair_timer">ما لم يرفض أحد، يُزال الحارس في %1$s.</string>
+    <plurals name="request_chances">
+        <item quantity="zero">لم يتبقَّ أي طلب من 3</item>
+        <item quantity="one">تبقّى طلب واحد من 3، بما فيه هذا</item>
+        <item quantity="two">تبقّى طلبان من 3، بما فيهما هذا</item>
+        <item quantity="few">تبقّت %1$d طلبات من 3، بما فيها هذا</item>
+        <item quantity="many">تبقّى %1$d طلبًا من 3، بما فيها هذا</item>
+        <item quantity="other">تبقّى %1$d طلب من 3، بما فيها هذا</item>
+    </plurals>
+    <string name="request_installer_play">مثبّت من Google Play</string>
+    <string name="request_installer_unknown">مثبّت من مصدر غير معروف</string>
+    <string name="request_installer_other">مثبّت بواسطة %1$s</string>
+    <string name="request_package_note">الاسم والأيقونة يأتيان من التطبيق نفسه. تحقّق من اسم الحزمة.</string>
+    <string name="request_view_play">عرض في Google Play</string>
+    <string name="request_guardians">الحرّاس</string>
+    <string name="request_add_note">إضافة ملاحظة (اختيارية)</string>
+    <string name="request_note_hint">ملاحظة تُرى مع ردّك</string>
+    <string name="request_deny">رفض</string>
+    <string name="request_approve">موافقة</string>
+    <string name="request_you_approved">وافقت على هذا.</string>
+    <string name="request_you_denied">رفضت هذا.</string>
+    <string name="request_closed_approved">وافق عليه كل الحرّاس.</string>
+    <string name="request_closed_denied">رُفض.</string>
+    <string name="request_closed_withdrawn">سُحب.</string>
+    <string name="request_closed_uninstalled">أُزيل تثبيت التطبيق.</string>
+    <string name="request_closed_resolved">حُسم على الهاتف نفسه أثناء فتحه.</string>
+    <string name="request_closed_guardian_removed">لم يعد لازمًا: أُزيل أحد الحرّاس.</string>
+    <string name="request_gone">هذا الطلب لم يعد موجودًا.</string>
+
+    <!-- History lines (I10), written on this phone in its own language (E-F3) -->
+    <string name="event_paired">تمّ الاقتران</string>
+    <string name="event_left">توقّفت الحراسة</string>
+    <string name="event_guardian_removed">أُزيل أحد الحرّاس</string>
+    <string name="event_removed_you">أُزلت من الحرّاس</string>
+    <string name="event_other_left">توقّف %1$s عن الحراسة</string>
+    <string name="event_other_removed">أُزيل %1$s من الحرّاس</string>
+    <string name="event_guardian_added">أصبح %1$s حارسًا</string>
+    <string name="event_app_installed_blocked">ثُبّت %1$s وحُظر</string>
+    <string name="event_app_installed">ثُبّت %1$s</string>
+    <string name="event_release_started">بدأت إزالة Killit؛ تكتمل في %1$s</string>
+    <string name="event_release_cancelled">توقّفت إزالة Killit</string>
+    <string name="event_protection_on">شُغّل: %1$s</string>
+    <string name="event_protection_off">أُوقف: %1$s</string>
+    <string name="event_management_on">شُغّلت إدارة التطبيقات</string>
+    <string name="event_management_off">أُوقفت إدارة التطبيقات</string>
+    <string name="event_request_approved">تمت الموافقة: %1$s</string>
+    <string name="event_request_denied">رُفض: %1$s</string>
+    <string name="event_request_cancelled">سُحب: %1$s</string>
+
+    <!-- Time -->
+    <string name="when_just_now">الآن</string>
+    <plurals name="when_minutes_ago">
+        <item quantity="zero">قبل %1$d دقيقة</item>
+        <item quantity="one">قبل دقيقة</item>
+        <item quantity="two">قبل دقيقتين</item>
+        <item quantity="few">قبل %1$d دقائق</item>
+        <item quantity="many">قبل %1$d دقيقة</item>
+        <item quantity="other">قبل %1$d دقيقة</item>
+    </plurals>
+    <plurals name="when_hours_ago">
+        <item quantity="zero">قبل %1$d ساعة</item>
+        <item quantity="one">قبل ساعة</item>
+        <item quantity="two">قبل ساعتين</item>
+        <item quantity="few">قبل %1$d ساعات</item>
+        <item quantity="many">قبل %1$d ساعة</item>
+        <item quantity="other">قبل %1$d ساعة</item>
+    </plurals>
+    <string name="last_seen_today">شوهد اليوم</string>
+    <string name="last_seen_yesterday">شوهد أمس</string>
+    <plurals name="last_seen_days">
+        <item quantity="zero">شوهد قبل %1$d يوم</item>
+        <item quantity="one">شوهد قبل يوم</item>
+        <item quantity="two">شوهد قبل يومين</item>
+        <item quantity="few">شوهد قبل %1$d أيام</item>
+        <item quantity="many">شوهد قبل %1$d يومًا</item>
+        <item quantity="other">شوهد قبل %1$d يوم</item>
+    </plurals>
+
+    <!-- The pairing wizard (§15.7) -->
+    <string name="wizard_intro_guardian">ستحرس هاتفًا آخر. سيحتاج صاحبه إلى موافقتك لرفع الحظر عن التطبيقات، ولفتح Killit، ولإزالتك من الحرّاس.</string>
+    <string name="wizard_intro_protected">سيوافق حارسك على طلباتك أو يرفضها. مع وجود حارس، لا يفتح مفتاحك إعدادات Killit بعد الآن: الفتح يحتاج إلى موافقة كل حارس.</string>
+    <string name="wizard_needs_owner">لم تُعدّ الحماية على هذا الهاتف بعد. أعدّها أولًا، ثم أضف حارسًا.</string>
+    <string name="wizard_set_up">إعداد الحماية</string>
+    <string name="wizard_warning">لا تقترن إلا بأشخاص تعرفهم جيدًا والتقيتهم في الواقع. إذا رفض حارس فكّ الاقتران، فلن تخرج إلا بمسح الهاتف.</string>
+    <string name="wizard_your_name">اسمك</string>
+    <string name="wizard_your_name_hint">كيف سيراك الهاتف الآخر</string>
+    <string name="wizard_show_code">عرض رمز</string>
+    <string name="wizard_have_code">لديّ رمز</string>
+    <string name="wizard_enter_code">اكتب الرمز الظاهر على الهاتف الآخر</string>
+    <string name="wizard_join">انضمام</string>
+    <string name="wizard_show_code_instead">عرض رمز بدلًا من ذلك</string>
+    <string name="wizard_give_code">أعطِ هذا الرمز للشخص الآخر. يكتبه على هاتفه.</string>
+    <string name="wizard_code_expires">صالح لمدة %1$s أخرى</string>
+    <string name="wizard_share">مشاركة الرمز</string>
+    <string name="wizard_share_text">رمز اقتران Killit الخاص بي: %1$s (صالح 15 دقيقة)</string>
+    <string name="wizard_waiting_joiner">بانتظار الهاتف الآخر…</string>
+    <string name="wizard_connecting">جارٍ وصل الهاتفين…</string>
+    <string name="wizard_call_title">اتصلا ببعضكما الآن</string>
+    <string name="wizard_call_body">اقرآ أرقامكما الستة لبعضكما. يجب أن تكون متطابقة على الهاتفين.</string>
+    <string name="wizard_no_match">غير متطابقة</string>
+    <string name="wizard_match">متطابقة</string>
+    <string name="wizard_waiting_confirm">بانتظار تأكيد الهاتف الآخر…</string>
+    <string name="wizard_finishing">جارٍ الإنهاء…</string>
+    <string name="wizard_paired_title">تمّ الاقتران</string>
+    <string name="wizard_paired_guardian">أنت تحرس الآن %1$s.</string>
+    <string name="wizard_paired_protected">%1$s يحرس هذا الهاتف الآن.</string>
+    <string name="wizard_nickname_note">هذا الاسم يظهر على هاتفك فقط.</string>
+    <string name="wizard_done">تمّ</string>
+    <string name="wizard_again">حاول مجددًا</string>
+    <string name="wizard_failed_mismatch">لم تتطابق الرموز، لذلك لم يتمّ أي اقتران. ربما يتدخّل أحدهم. ابدآ من جديد وقارنا الرموز خلال مكالمة.</string>
+    <string name="wizard_failed_expired">انتهت صلاحية الرمز. ابدأ من جديد.</string>
+    <string name="wizard_failed_code">هذا الرمز خاطئ أو مستخدم أو منتهي الصلاحية.</string>
+    <string name="wizard_failed_invalid">تعذّر التحقق من شيء ما في الهاتف الآخر، لذلك لم يتمّ أي اقتران.</string>
+    <string name="wizard_failed_roles">اخترتما الدور نفسه. يبدأ أحدكما من «هاتفي» والآخر من «الهواتف التي أحرسها».</string>
+    <string name="wizard_failed_declined">رفض الهاتف الآخر.</string>
+    <string name="wizard_failed_limit">أحد الهاتفين مقترن بالفعل بعدد كبير جدًا من الهواتف.</string>
+    <string name="wizard_failed_cancelled">أُلغي الاقتران.</string>
+
+    <!-- Messages -->
+    <string name="msg_offline">تعذّر الوصول إلى خادم Killit. سيحاول Killit مجددًا.</string>
+    <string name="msg_cant_pair">لا يستطيع هذا الهاتف الاقتران: لا يمكنه إثبات أن مفاتيحه محفوظة بأمان في العتاد.</string>
+    <string name="msg_identity_lost">لم يعد الخادم يعرف هذا الهاتف. اقترن من جديد.</string>
+    <string name="msg_rate_limited">محاولات كثيرة جدًا. حاول لاحقًا.</string>
+    <string name="msg_sent">أُرسل إلى حرّاسك.</string>
+    <string name="msg_no_guardians">لا أحد يحرس هذا الهاتف.</string>
+    <string name="msg_bad_explanation">اكتب بين 10 و500 حرف.</string>
 </resources>

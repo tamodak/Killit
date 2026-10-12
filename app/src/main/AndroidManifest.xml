@@ -31,6 +31,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!--
+        A guardian's phone has to hear about requests while it sits idle, so Phones I guard asks to
+        be exempt from battery optimisation (PLAN.md H9) with the system's own prompt, which needs
+        this permission. Play limits it to apps that need it to work; Killit isn't shipped there.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <!--
         allowBackup is false because Killit's state belongs to this device: the credential record
         carries the lockout counters, so restoring an older copy would roll back failed attempts,
         and on another handset it would describe a device owner and a blocklist that are not there.

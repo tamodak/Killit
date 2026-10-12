@@ -54,7 +54,6 @@
     <string name="setup_saved">Ключ задан.</string>
 
     <!-- Home -->
-    <string name="home_status_owner_yes">Владелец устройства активен</string>
     <string name="home_status_owner_no">Не владелец устройства</string>
     <string name="home_status_owner_yes_desc">Killit может блокировать и разблокировать приложения.</string>
     <string name="home_status_owner_no_desc">Killit ничего не сможет заблокировать, пока не будет назначен владельцем устройства. Выберите один из трёх способов ниже.</string>
@@ -191,4 +190,272 @@
     <string name="home_notifications_title">Разрешить уведомления</string>
     <string name="home_notifications_body">Killit сообщает, когда блокирует только что установленное приложение.</string>
     <string name="home_notifications_allow">Разрешить</string>
+
+    <!-- ============================== Pairing (PLAN.md §15) ============================== -->
+
+    <!-- Hub (PLAN.md §15.3). Counts only, never names, before the passkey (I5). -->
+    <string name="hub_my_phone">Мой телефон</string>
+    <string name="hub_my_phone_setup">Ещё не защищён · Настроить</string>
+    <string name="hub_my_phone_protected">Защищён вашим ключом</string>
+    <plurals name="hub_my_phone_guardians">
+        <item quantity="one">Защищён · %1$d опекун</item>
+        <item quantity="few">Защищён · %1$d опекуна</item>
+        <item quantity="many">Защищён · %1$d опекунов</item>
+        <item quantity="other">Защищён · %1$d опекуна</item>
+    </plurals>
+    <plurals name="hub_my_requests_open">
+        <item quantity="one">%1$d запрос отправлен опекунам</item>
+        <item quantity="few">%1$d запроса отправлено опекунам</item>
+        <item quantity="many">%1$d запросов отправлено опекунам</item>
+        <item quantity="other">%1$d запроса отправлено опекунам</item>
+    </plurals>
+    <string name="hub_guard">Телефоны под моей опекой</string>
+    <string name="hub_guard_none">Вы пока не опекаете ни одного телефона</string>
+    <plurals name="hub_guard_phones">
+        <item quantity="one">%1$d телефон</item>
+        <item quantity="few">%1$d телефона</item>
+        <item quantity="many">%1$d телефонов</item>
+        <item quantity="other">%1$d телефона</item>
+    </plurals>
+    <plurals name="hub_guard_waiting">
+        <item quantity="one">%1$d запрос ждёт</item>
+        <item quantity="few">%1$d запроса ждут</item>
+        <item quantity="many">%1$d запросов ждут</item>
+        <item quantity="other">%1$d запроса ждут</item>
+    </plurals>
+    <string name="update_needed">Обновите Killit, чтобы увидеть это</string>
+    <string name="update_needed_long">Для некоторых сообщений нужна более новая версия Killit. Обновите Killit, чтобы их увидеть.</string>
+
+    <!-- My phone (§15.4, §15.5) -->
+    <string name="my_phone_guardians">Опекуны</string>
+    <string name="my_phone_guardians_none">Этот телефон никто не опекает</string>
+    <string name="my_phone_settings">Настройки</string>
+    <string name="my_phone_settings_desc">Параметры защиты, язык, ключ</string>
+    <string name="my_phone_unlocked_title">Разблокировано опекунами</string>
+    <string name="my_phone_unlocked_body">У вас полный контроль, пока вы не выйдете из Killit. После выхода он снова заблокируется.</string>
+    <string name="my_phone_locked_body">Ваши опекуны защищают этот телефон. Чтобы изменить настройки, сначала поговорите с ними, а потом отправьте запрос на разблокировку.</string>
+    <string name="my_phone_unlock">Разблокировать Killit</string>
+    <string name="my_phone_ask_unblock">Попросить разблокировать приложение</string>
+    <string name="my_phone_ask_unblock_desc">Решают ваши опекуны</string>
+    <string name="my_phone_block_more">Заблокировать ещё приложения</string>
+    <string name="my_phone_block_more_desc">Ни у кого не спрашивая</string>
+    <string name="my_phone_my_guardians">Мои опекуны</string>
+    <string name="harden_date_time_guarded">Обязательно, пока у вас есть опекуны.</string>
+    <string name="release_guardians_note">Опекуны получат уведомление и будут удалены в конце.</string>
+
+    <!-- The live unlock (§3.4) -->
+    <string name="unlock_title">Разблокировать Killit</string>
+    <string name="unlock_intro">Сначала поговорите с опекунами. Потом отправьте запрос и оставайтесь на этом экране: Killit откроется, когда все одобрят.</string>
+    <string name="unlock_explanation_hint">Записка для опекунов (необязательно)</string>
+    <string name="unlock_send">Отправить запрос на разблокировку</string>
+    <string name="unlock_waiting_title">Ждём ваших опекунов</string>
+    <string name="unlock_waiting_body">Оставайтесь на этом экране. Если уйти, запрос отменится.</string>
+    <string name="unlock_denied_title">Запрос отклонён</string>
+    <string name="unlock_cooldown">Попросить снова можно через %1$s.</string>
+    <string name="unlock_daily_limit">Вы уже отправили все запросы на разблокировку на сегодня. Попробуйте завтра.</string>
+    <string name="unlock_approved">Одобрено. Открываем…</string>
+    <string name="vote_waiting">Ждём</string>
+    <string name="vote_approved">Одобрил</string>
+    <string name="vote_denied">Отклонил</string>
+
+    <!-- Asking to unblock an app (§3.6) -->
+    <string name="ask_unblock_intro">Эти приложения заблокированы. Попросите опекунов разрешить одно из них и объясните зачем.</string>
+    <string name="ask_unblock_none">Нет заблокированных приложений.</string>
+    <string name="ask_unblock_not_blocked">Это приложение больше не заблокировано.</string>
+    <plurals name="ask_chances_left">
+        <item quantity="one">Остался %1$d запрос из 3</item>
+        <item quantity="few">Осталось %1$d запроса из 3</item>
+        <item quantity="many">Осталось %1$d запросов из 3</item>
+        <item quantity="other">Осталось %1$d запроса из 3</item>
+    </plurals>
+    <plurals name="ask_state_denied">
+        <item quantity="one">Отклонено · остался %1$d запрос из 3</item>
+        <item quantity="few">Отклонено · осталось %1$d запроса из 3</item>
+        <item quantity="many">Отклонено · осталось %1$d запросов из 3</item>
+        <item quantity="other">Отклонено · осталось %1$d запроса из 3</item>
+    </plurals>
+    <string name="ask_state_waiting">Ждём ваших опекунов</string>
+    <string name="ask_state_no_chances">Запросов не осталось</string>
+    <string name="ask_state_no_chances_long">Все 3 запроса для этого приложения отклонены. Теперь разрешить его может только разблокированный Killit.</string>
+    <string name="ask_unblock_hint">Зачем вам это приложение? Не меньше 10 символов.</string>
+    <string name="ask_unblock_what_they_see">Опекуны видят название, пакет и источник установки приложения, а также ваш текст.</string>
+    <string name="ask_send">Отправить опекунам</string>
+    <string name="ask_withdraw">Отозвать запрос</string>
+    <string name="ask_last_denied">Ваш последний запрос отклонён</string>
+    <string name="text_counter">%1$d / %2$d</string>
+
+    <!-- Blocking more apps (D7) -->
+    <string name="block_more_intro">Блокируйте приложения, ни у кого не спрашивая. Чтобы разблокировать их потом, понадобятся опекуны.</string>
+    <plurals name="block_more_button">
+        <item quantity="one">Заблокировать %1$d приложение</item>
+        <item quantity="few">Заблокировать %1$d приложения</item>
+        <item quantity="many">Заблокировать %1$d приложений</item>
+        <item quantity="other">Заблокировать %1$d приложения</item>
+    </plurals>
+    <plurals name="block_more_confirm_title">
+        <item quantity="one">Заблокировать %1$d приложение?</item>
+        <item quantity="few">Заблокировать %1$d приложения?</item>
+        <item quantity="many">Заблокировать %1$d приложений?</item>
+        <item quantity="other">Заблокировать %1$d приложения?</item>
+    </plurals>
+    <string name="block_more_confirm_body">Вы не сможете разблокировать их сами. Для этого понадобится одобрение опекунов.</string>
+    <string name="block_more_confirm">Заблокировать</string>
+
+    <!-- Guardians (§15.4) -->
+    <string name="guardians_none">Этот телефон пока никто не опекает.</string>
+    <string name="guardians_add">Добавить опекуна</string>
+    <string name="guardians_add_needs_owner">Сначала настройте защиту в разделе «Мой телефон»</string>
+    <string name="guardians_ask_remove">Попросить удалить</string>
+    <string name="guardians_removal_pending">Удаление запрошено. Если никто не откажет, оно произойдёт %1$s.</string>
+    <string name="guardians_no_chances">Все 3 запроса на удаление отклонены.</string>
+    <string name="guardians_hint_second">Второй опекун защитит вас надёжнее.</string>
+    <string name="guardians_hint_many">Больше 4 опекунов нужно редко, и одобрить каждый запрос становится труднее.</string>
+    <string name="guardians_gone">Этой связи больше нет.</string>
+    <string name="rename">Переименовать</string>
+    <string name="rename_hint">Имя</string>
+    <string name="unpair_rules">Спрашивают всех опекунов, включая этого. Если все одобрят, опекун удаляется сразу. Если кто-то откажет, запрос завершится и израсходует один из ваших 3 запросов. Если в течение 30 дней никто не откажет, опекун будет удалён.</string>
+    <string name="unpair_hint">Почему этот опекун должен уйти? Не меньше 10 символов.</string>
+
+    <!-- Phones I guard (§15.6) -->
+    <string name="guard_requests">Запросы</string>
+    <string name="guard_requests_none">Вас ничего не ждёт.</string>
+    <string name="guard_phones">Телефоны</string>
+    <string name="guard_new">Опекать новый телефон</string>
+    <string name="guard_leave">Перестать опекать</string>
+    <string name="guard_leave_title">Перестать опекать?</string>
+    <string name="guard_leave_body">%1$s получит уведомление. Если вы последний опекун, телефон останется без защиты.</string>
+    <string name="guard_battery_title">Разрешите Killit работать в фоне</string>
+    <string name="guard_battery_body">Экономия заряда может задерживать запросы от телефонов, которые вы опекаете.</string>
+    <string name="history">История</string>
+    <string name="guardian_notice_title">Ваш ключ теперь — ключ опекуна</string>
+    <string name="guardian_notice_body">Он понадобится каждый раз, когда вы одобряете, отклоняете или блокируете что-то для телефонов, которые опекаете. Любой, кто его знает, может одобрять запросы от вашего имени, поэтому держите его при себе. Также установите блокировку экрана на телефоне. Если забудете ключ, придётся переустановить Killit и связать телефоны заново.</string>
+    <string name="guardian_notice_ok">Понятно</string>
+
+    <!-- A request, as a guardian sees it (§15.6) -->
+    <string name="request_unblock">%1$s хочет разблокировать %2$s</string>
+    <string name="request_unlock">%1$s хочет разблокировать Killit</string>
+    <string name="request_unpair_you">%1$s хочет удалить вас из опекунов</string>
+    <string name="request_unpair_named">%1$s хочет удалить %2$s из опекунов</string>
+    <string name="request_unpair_other">%1$s хочет удалить опекуна</string>
+    <string name="request_waiting_now">Ждёт сейчас</string>
+    <string name="request_unlock_meaning">Если одобрить, %1$s получит полный контроль над Killit, пока не выйдет из приложения.</string>
+    <string name="request_unpair_target_unknown">Речь о незнакомом вам опекуне.</string>
+    <string name="request_unpair_timer">Если никто не откажет, опекун будет удалён %1$s.</string>
+    <plurals name="request_chances">
+        <item quantity="one">Остался %1$d запрос из 3, включая этот</item>
+        <item quantity="few">Осталось %1$d запроса из 3, включая этот</item>
+        <item quantity="many">Осталось %1$d запросов из 3, включая этот</item>
+        <item quantity="other">Осталось %1$d запроса из 3, включая этот</item>
+    </plurals>
+    <string name="request_installer_play">Установлено из Google Play</string>
+    <string name="request_installer_unknown">Установлено из неизвестного источника</string>
+    <string name="request_installer_other">Установлено через %1$s</string>
+    <string name="request_package_note">Название и значок задаёт само приложение. Проверьте имя пакета.</string>
+    <string name="request_view_play">Открыть в Google Play</string>
+    <string name="request_guardians">Опекуны</string>
+    <string name="request_add_note">Добавить записку (необязательно)</string>
+    <string name="request_note_hint">Записка, которую увидят вместе с ответом</string>
+    <string name="request_deny">Отклонить</string>
+    <string name="request_approve">Одобрить</string>
+    <string name="request_you_approved">Вы одобрили.</string>
+    <string name="request_you_denied">Вы отклонили.</string>
+    <string name="request_closed_approved">Одобрено всеми опекунами.</string>
+    <string name="request_closed_denied">Отклонено.</string>
+    <string name="request_closed_withdrawn">Отозвано.</string>
+    <string name="request_closed_uninstalled">Приложение удалено.</string>
+    <string name="request_closed_resolved">Решено на самом телефоне, пока он был разблокирован.</string>
+    <string name="request_closed_guardian_removed">Больше не нужно: опекун был удалён.</string>
+    <string name="request_gone">Этого запроса больше нет.</string>
+
+    <!-- History lines (I10), written on this phone in its own language (E-F3) -->
+    <string name="event_paired">Связаны</string>
+    <string name="event_left">Опека прекращена</string>
+    <string name="event_guardian_removed">Опекун удалён</string>
+    <string name="event_removed_you">Вас удалили из опекунов</string>
+    <string name="event_other_left">%1$s перестал(а) опекать</string>
+    <string name="event_other_removed">%1$s удалён(а) из опекунов</string>
+    <string name="event_guardian_added">%1$s стал(а) опекуном</string>
+    <string name="event_app_installed_blocked">Установлено и заблокировано: %1$s</string>
+    <string name="event_app_installed">Установлено: %1$s</string>
+    <string name="event_release_started">Начато удаление Killit; завершится %1$s</string>
+    <string name="event_release_cancelled">Удаление Killit остановлено</string>
+    <string name="event_protection_on">Включено: %1$s</string>
+    <string name="event_protection_off">Выключено: %1$s</string>
+    <string name="event_management_on">Управление приложениями включено</string>
+    <string name="event_management_off">Управление приложениями выключено</string>
+    <string name="event_request_approved">Одобрено: %1$s</string>
+    <string name="event_request_denied">Отклонено: %1$s</string>
+    <string name="event_request_cancelled">Отозвано: %1$s</string>
+
+    <!-- Time -->
+    <string name="when_just_now">Только что</string>
+    <plurals name="when_minutes_ago">
+        <item quantity="one">%1$d минуту назад</item>
+        <item quantity="few">%1$d минуты назад</item>
+        <item quantity="many">%1$d минут назад</item>
+        <item quantity="other">%1$d минуты назад</item>
+    </plurals>
+    <plurals name="when_hours_ago">
+        <item quantity="one">%1$d час назад</item>
+        <item quantity="few">%1$d часа назад</item>
+        <item quantity="many">%1$d часов назад</item>
+        <item quantity="other">%1$d часа назад</item>
+    </plurals>
+    <string name="last_seen_today">Был(а) в сети сегодня</string>
+    <string name="last_seen_yesterday">Был(а) в сети вчера</string>
+    <plurals name="last_seen_days">
+        <item quantity="one">Был(а) в сети %1$d день назад</item>
+        <item quantity="few">Был(а) в сети %1$d дня назад</item>
+        <item quantity="many">Был(а) в сети %1$d дней назад</item>
+        <item quantity="other">Был(а) в сети %1$d дня назад</item>
+    </plurals>
+
+    <!-- The pairing wizard (§15.7) -->
+    <string name="wizard_intro_guardian">Вы будете опекать другой телефон. Его владельцу понадобится ваше одобрение, чтобы разблокировать приложения, разблокировать Killit или удалить вас из опекунов.</string>
+    <string name="wizard_intro_protected">Ваш опекун будет одобрять или отклонять ваши запросы. С опекуном ваш ключ больше не открывает настройки Killit: для разблокировки нужно одобрение каждого опекуна.</string>
+    <string name="wizard_needs_owner">Защита на этом телефоне ещё не настроена. Сначала настройте её, а потом добавьте опекуна.</string>
+    <string name="wizard_set_up">Настроить защиту</string>
+    <string name="wizard_warning">Связывайте телефон только с теми, кого хорошо знаете и встречали лично. Если опекун откажется разорвать связь, выйти можно будет только стерев телефон.</string>
+    <string name="wizard_your_name">Ваше имя</string>
+    <string name="wizard_your_name_hint">Как вас увидит другой телефон</string>
+    <string name="wizard_show_code">Показать код</string>
+    <string name="wizard_have_code">У меня есть код</string>
+    <string name="wizard_enter_code">Введите код с другого телефона</string>
+    <string name="wizard_join">Подключиться</string>
+    <string name="wizard_show_code_instead">Лучше показать код</string>
+    <string name="wizard_give_code">Передайте этот код другому человеку. Он введёт его на своём телефоне.</string>
+    <string name="wizard_code_expires">Действует ещё %1$s</string>
+    <string name="wizard_share">Поделиться кодом</string>
+    <string name="wizard_share_text">Мой код связи Killit: %1$s (действует 15 минут)</string>
+    <string name="wizard_waiting_joiner">Ждём другой телефон…</string>
+    <string name="wizard_connecting">Соединяем два телефона…</string>
+    <string name="wizard_call_title">Позвоните друг другу</string>
+    <string name="wizard_call_body">Прочитайте друг другу ваши 6 цифр. На обоих телефонах они должны совпадать.</string>
+    <string name="wizard_no_match">Не совпадают</string>
+    <string name="wizard_match">Совпадают</string>
+    <string name="wizard_waiting_confirm">Ждём подтверждения с другого телефона…</string>
+    <string name="wizard_finishing">Завершаем…</string>
+    <string name="wizard_paired_title">Связаны</string>
+    <string name="wizard_paired_guardian">Теперь вы опекаете: %1$s.</string>
+    <string name="wizard_paired_protected">Теперь этот телефон опекает: %1$s.</string>
+    <string name="wizard_nickname_note">Это имя видно только на вашем телефоне.</string>
+    <string name="wizard_done">Готово</string>
+    <string name="wizard_again">Попробовать снова</string>
+    <string name="wizard_failed_mismatch">Коды не совпали, поэтому связь не создана. Возможно, кто-то вмешивается. Начните заново и сравните коды во время звонка.</string>
+    <string name="wizard_failed_expired">Срок действия кода истёк. Начните заново.</string>
+    <string name="wizard_failed_code">Этот код неверный, уже использован или истёк.</string>
+    <string name="wizard_failed_invalid">Что-то на другом телефоне не прошло проверку, поэтому связь не создана.</string>
+    <string name="wizard_failed_roles">Вы оба выбрали одну и ту же роль. Один начинает с раздела «Мой телефон», другой — с раздела «Телефоны под моей опекой».</string>
+    <string name="wizard_failed_declined">Другой телефон отказался.</string>
+    <string name="wizard_failed_limit">Один из телефонов уже связан со слишком многими телефонами.</string>
+    <string name="wizard_failed_cancelled">Связывание отменено.</string>
+
+    <!-- Messages -->
+    <string name="msg_offline">Не удалось связаться с сервером Killit. Killit попробует ещё раз.</string>
+    <string name="msg_cant_pair">Этот телефон не может связаться: он не может доказать, что его ключи надёжно хранятся в оборудовании.</string>
+    <string name="msg_identity_lost">Сервер больше не знает этот телефон. Свяжите телефоны заново.</string>
+    <string name="msg_rate_limited">Слишком много попыток. Попробуйте позже.</string>
+    <string name="msg_sent">Отправлено опекунам.</string>
+    <string name="msg_no_guardians">Этот телефон никто не опекает.</string>
+    <string name="msg_bad_explanation">Напишите от 10 до 500 символов.</string>
 </resources>

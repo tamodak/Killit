@@ -113,6 +113,15 @@ class PairingStore(
         if (durable.isAvailable()) durable.writeAppChances(dao.appChances().map { it.toDurable() })
     }
 
+    /**
+     * Forgets what only a protected phone keeps: the chance counters, in both copies, and the
+     * unlock limits' durable copy. Its guardians are already gone when this runs.
+     */
+    suspend fun clearProtection() = lock.withLock {
+        dao.deleteAppChances()
+        if (durable.isAvailable()) durable.clearPairing()
+    }
+
     /** Forgets every pairing and counter, in both copies. Used when device owner is released. */
     suspend fun clear() = lock.withLock {
         dao.clearAll()

@@ -1,5 +1,6 @@
 package org.tamodak.killit.pairing
 
+import java.io.IOException
 import java.util.UUID
 import org.tamodak.killit.net.ApiError
 import org.tamodak.killit.net.InboxMessage
@@ -53,6 +54,10 @@ class FakeServer(private val now: () -> Long) {
 
     /** Every envelope ever accepted, for replay tests. */
     val delivered = mutableListOf<Pair<String, ByteArray>>()
+
+    /** False to make the mailbox calls fail as if the network or the server were gone. */
+    @Volatile
+    var reachable = true
 
     /** The client a phone with [fp] uses. */
     fun client(fp: ByteArray): PairingServer = Client(deviceId(fp))
@@ -152,6 +157,7 @@ class FakeServer(private val now: () -> Long) {
         }
 
         override suspend fun send(messages: List<Pair<ByteArray, ByteArray>>): Int = synchronized(this@FakeServer) {
+            reach()
             val unlinked = messages.map { deviceId(it.first) }.distinct().filter { setOf(me, it) !in links }
             if (unlinked.isNotEmpty()) throw ApiError(403, "not_linked", peers = unlinked)
             for ((to, envelope) in messages) {
@@ -163,13 +169,19 @@ class FakeServer(private val now: () -> Long) {
         }
 
         override suspend fun fetch(waitSeconds: Int): List<InboxMessage> = synchronized(this@FakeServer) {
+            reach()
             this@FakeServer.messages.filter { it.to == me }.take(32).map {
                 InboxMessage(it.id, it.from, it.envelope.toBase64Url(), now())
             }
         }
 
         override suspend fun ack(ids: List<String>): Unit = synchronized(this@FakeServer) {
+            reach()
             this@FakeServer.messages.removeAll { it.to == me && it.id in ids }
+        }
+
+        private fun reach() {
+            if (!reachable) throw IOException("server unreachable")
         }
 
         private fun participant(id: String): Invite =

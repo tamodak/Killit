@@ -1,4 +1,4 @@
-package org.tamodak.killit.ui.home
+package org.tamodak.killit.ui.myphone
 
 import android.Manifest
 import android.content.ClipData
@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -53,6 +54,7 @@ import org.tamodak.killit.admin.HardeningConfig
 import org.tamodak.killit.admin.KillitDeviceAdminReceiver
 import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.ui.KillitUiState
+import org.tamodak.killit.ui.PairingUiState
 import org.tamodak.killit.ui.ShizukuOutcome
 import org.tamodak.killit.ui.components.KillitBody
 import org.tamodak.killit.ui.components.KillitButton
@@ -95,44 +97,33 @@ import kotlinx.coroutines.delay
 private enum class SetupMethod { Adb, Shizuku, Qr }
 
 /**
- * The authenticated landing screen.
+ * This phone (PLAN.md §15.2), behind the passkey. It has three faces:
  *
- * Shows one of two faces depending on [KillitUiState.isDeviceOwner]: before provisioning it offers
- * the three ways to become device owner, each opening its own step-by-step page; afterwards it is
- * the tamper protection toggles. The app list is reachable in both states — browsable as a
- * read-only preview beforehand — so the user can see what Killit will manage before committing to a
- * factory reset.
+ * - **Not device owner yet:** the three ways to become one, each a step-by-step page, and the app
+ *   list as a read-only preview, so the user can see what Killit will manage before committing to
+ *   a factory reset.
+ * - **Full control** (no guardians, or every guardian approved a live unlock): the status, and
+ *   Apps · Guardians · Settings (§15.5).
+ * - **Locked** (has guardians): what the protected user can still do on their own — ask to unlock,
+ *   ask about an app, block more, see their guardians (§15.4).
  *
- * Once Killit is device owner it also points at new apps waiting for a decision, and asks for the
- * notification permission for as long as Killit cannot tell the user what it blocked.
- *
- * @param state supplies owner status, the hardening toggles, the release request and the waiting
- *   apps.
- * @param onManageApps opens the app picker.
- * @param onChangePasskey opens the change-passkey flow.
- * @param onHardeningChange called with the full config whenever one toggle moves.
- * @param onProvisionViaShizuku runs the no-computer provisioning path.
- * @param onDismissShizukuOutcome closes the dialog showing what the command reported.
- * @param onRefreshStatus re-checks owner status after provisioning outside the app.
- * @param onRequestRelease starts the wait before device owner can be given up.
- * @param onCancelRelease abandons that wait.
- * @param onReleaseDeviceOwner carries out the release, once the wait has elapsed.
- * @param onLanguageChange switches the language the whole UI is shown in.
- * @param modifier applied to the screen.
+ * Nothing is drawn until the number of guardians is known, so a guarded phone never flashes its
+ * unlocked face.
  */
 @Composable
-fun HomeScreen(
+fun MyPhoneScreen(
     state: KillitUiState,
+    pairing: PairingUiState,
+    onBack: () -> Unit,
     onManageApps: () -> Unit,
-    onChangePasskey: () -> Unit,
-    onHardeningChange: (HardeningConfig) -> Unit,
+    onGuardians: () -> Unit,
+    onSettings: () -> Unit,
+    onUnlock: () -> Unit,
+    onAskUnblock: () -> Unit,
+    onBlockMore: () -> Unit,
     onProvisionViaShizuku: () -> Unit,
     onDismissShizukuOutcome: () -> Unit,
     onRefreshStatus: () -> Unit,
-    onRequestRelease: () -> Unit,
-    onCancelRelease: () -> Unit,
-    onReleaseDeviceOwner: () -> Unit,
-    onLanguageChange: (AppLanguage) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -140,25 +131,9 @@ fun HomeScreen(
         KillitDeviceAdminReceiver.componentName(context).flattenToString()
     }
     var setupMethod by remember { mutableStateOf<SetupMethod?>(null) }
-    // Two separate confirmations: one to start the wait, another to actually release once it is
-    // over. The second is the irreversible one.
-    var confirmRelease by remember { mutableStateOf(false) }
-    var confirmReleaseNow by remember { mutableStateOf(false) }
-    var pickingLanguage by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.isDeviceOwner) {
         if (state.isDeviceOwner) setupMethod = null
-    }
-
-    if (pickingLanguage) {
-        LanguagePicker(
-            current = state.language,
-            onPick = {
-                onLanguageChange(it)
-                pickingLanguage = false
-            },
-            onDismiss = { pickingLanguage = false },
-        )
     }
 
     val method = setupMethod
@@ -175,7 +150,8 @@ fun HomeScreen(
             onBack = { setupMethod = null },
         )
     } else {
-        KillitScreen(title = stringResource(R.string.app_name), modifier = modifier) {
+        BackHandler(onBack = onBack)
+        KillitScreen(title = stringResource(R.string.hub_my_phone), onBack = onBack, modifier = modifier) {
             Column(
                 modifier = Modifier.padding(
                     start = KillitGutter,
@@ -183,81 +159,16 @@ fun HomeScreen(
                     top = 24.dp,
                     bottom = 40.dp,
                 ),
-                verticalArrangement = Arrangement.spacedBy(28.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
-                KillitRow(
-                    title = stringResource(R.string.home_language),
-                    subtitle = state.language.label(),
-                    icon = KillitIcons.Globe,
-                    onClick = { pickingLanguage = true },
-                )
-
-                StatusPanel(state = state, onRefresh = onRefreshStatus)
-
-                if (state.isDeviceOwner && state.waitingApps.isNotEmpty()) {
-                    KillitRow(
-                        title = pluralStringResource(
-                            R.plurals.home_waiting_apps,
-                            state.waitingApps.size,
-                            state.waitingApps.size,
-                        ),
-                        subtitle = stringResource(R.string.home_waiting_apps_desc),
-                        icon = KillitIcons.Apps,
-                        iconTint = KillitBlue,
-                        borderColor = KillitBlue,
-                        onClick = onManageApps,
-                    )
-                }
-
-                // Only once protection can run: before that there is nothing to announce.
-                if (state.isDeviceOwner) NotificationPermissionPanel()
-
-                // Browsable before provisioning too: the list shows a banner and leaves the
-                // checkboxes disabled, so the user can see what Killit will manage first.
-                KillitRow(
-                    title = stringResource(R.string.home_manage_apps),
-                    subtitle = if (state.isDeviceOwner) {
-                        null
-                    } else {
-                        stringResource(R.string.home_manage_apps_locked)
-                    },
-                    icon = KillitIcons.Apps,
-                    iconTint = if (state.isDeviceOwner) KillitGreen else KillitForeground,
-                    borderColor = if (state.isDeviceOwner) KillitGreen else KillitBorderDim,
-                    background = if (state.isDeviceOwner) {
-                        KillitGreen.copy(alpha = 0.10f)
-                    } else {
-                        Color.Transparent
-                    },
-                    onClick = onManageApps,
-                )
-
-                if (state.isDeviceOwner) {
-                    HardeningPanel(
-                        config = state.hardening,
-                        onChange = onHardeningChange,
-                    )
-                } else {
-                    SetupSection(onOpen = { setupMethod = it })
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    KillitRule()
-
-                    if (state.isDeviceOwner) {
-                        ReleaseSection(
-                            state = state,
-                            onRequestRelease = { confirmRelease = true },
-                            onCancelRelease = onCancelRelease,
-                            onReleaseNow = { confirmReleaseNow = true },
-                        )
+                val guardians = state.guardianCount
+                when {
+                    guardians == null -> Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = KillitGreen)
                     }
-
-                    KillitRow(
-                        title = stringResource(R.string.home_change_passkey),
-                        icon = KillitIcons.Key,
-                        onClick = onChangePasskey,
-                    )
+                    !state.isDeviceOwner -> SetupFace(state, onRefreshStatus, onManageApps) { setupMethod = it }
+                    state.fullControl -> UnlockedFace(state, guardians, onRefreshStatus, onManageApps, onGuardians, onSettings)
+                    else -> LockedFace(state, pairing, guardians, onUnlock, onAskUnblock, onBlockMore, onGuardians)
                 }
             }
         }
@@ -297,38 +208,146 @@ fun HomeScreen(
             }
         }
     }
+}
 
-    if (confirmRelease) {
-        KillitDialog(
-            title = stringResource(R.string.home_release_confirm_title),
-            body = stringResource(R.string.home_release_confirm_body),
-            accent = KillitRed,
-            onDismiss = { confirmRelease = false },
-            confirmText = stringResource(R.string.home_release_start),
-            onConfirm = {
-                KillitLog.i(KillitLog.UI, "User started the release waiting period")
-                confirmRelease = false
-                onRequestRelease()
-            },
-            dismissText = stringResource(R.string.cancel),
+/** Before device owner: the status, the app list as a preview, and the three ways to set up. */
+@Composable
+private fun SetupFace(
+    state: KillitUiState,
+    onRefreshStatus: () -> Unit,
+    onManageApps: () -> Unit,
+    onOpen: (SetupMethod) -> Unit,
+) {
+    StatusPanel(state = state, guardians = 0, onRefresh = onRefreshStatus)
+    // Browsable before provisioning too: the list shows a banner and leaves the checkboxes
+    // disabled, so the user can see what Killit will manage first.
+    KillitRow(
+        title = stringResource(R.string.home_manage_apps),
+        subtitle = stringResource(R.string.home_manage_apps_locked),
+        icon = KillitIcons.Apps,
+        onClick = onManageApps,
+    )
+    SetupSection(onOpen = onOpen)
+}
+
+/** Full control: the status, new apps, and the way into Apps, Guardians and Settings (§15.5). */
+@Composable
+private fun UnlockedFace(
+    state: KillitUiState,
+    guardians: Int,
+    onRefreshStatus: () -> Unit,
+    onManageApps: () -> Unit,
+    onGuardians: () -> Unit,
+    onSettings: () -> Unit,
+) {
+    if (state.unlockedByGuardians) {
+        KillitPanel(borderColor = KillitBlue, spacing = 6.dp) {
+            KillitSectionTitle(stringResource(R.string.my_phone_unlocked_title))
+            KillitBody(stringResource(R.string.my_phone_unlocked_body))
+        }
+    }
+
+    StatusPanel(state = state, guardians = guardians, onRefresh = onRefreshStatus)
+
+    if (state.waitingApps.isNotEmpty()) {
+        KillitRow(
+            title = pluralStringResource(R.plurals.home_waiting_apps, state.waitingApps.size, state.waitingApps.size),
+            subtitle = stringResource(R.string.home_waiting_apps_desc),
+            icon = KillitIcons.Apps,
+            iconTint = KillitBlue,
+            borderColor = KillitBlue,
+            onClick = onManageApps,
         )
     }
 
-    if (confirmReleaseNow) {
-        KillitDialog(
-            title = stringResource(R.string.home_release_now_confirm_title),
-            body = stringResource(R.string.home_release_now_confirm_body),
-            accent = KillitRed,
-            onDismiss = { confirmReleaseNow = false },
-            confirmText = stringResource(R.string.home_release_now),
-            onConfirm = {
-                KillitLog.i(KillitLog.UI, "User confirmed device owner release after the wait")
-                confirmReleaseNow = false
-                onReleaseDeviceOwner()
+    NotificationPermissionPanel()
+
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        KillitRow(
+            title = stringResource(R.string.home_manage_apps),
+            icon = KillitIcons.Apps,
+            iconTint = KillitGreen,
+            borderColor = KillitGreen,
+            background = KillitGreen.copy(alpha = 0.10f),
+            onClick = onManageApps,
+        )
+        KillitRow(
+            title = stringResource(R.string.my_phone_guardians),
+            subtitle = if (guardians == 0) {
+                stringResource(R.string.my_phone_guardians_none)
+            } else {
+                pluralStringResource(R.plurals.hub_my_phone_guardians, guardians, guardians)
             },
-            dismissText = stringResource(R.string.cancel),
+            icon = KillitIcons.People,
+            onClick = onGuardians,
+        )
+        KillitRow(
+            title = stringResource(R.string.my_phone_settings),
+            subtitle = stringResource(R.string.my_phone_settings_desc),
+            icon = KillitIcons.Settings,
+            onClick = onSettings,
         )
     }
+}
+
+/**
+ * A guarded phone behind its passkey (§15.4): every action here is available without asking
+ * again, and none of them weakens anything on its own.
+ */
+@Composable
+private fun LockedFace(
+    state: KillitUiState,
+    pairing: PairingUiState,
+    guardians: Int,
+    onUnlock: () -> Unit,
+    onAskUnblock: () -> Unit,
+    onBlockMore: () -> Unit,
+    onGuardians: () -> Unit,
+) {
+    KillitStatusPanel(
+        icon = KillitIcons.Lock,
+        title = pluralStringResource(R.plurals.hub_my_phone_guardians, guardians, guardians),
+        subtitle = stringResource(R.string.my_phone_locked_body),
+        accent = KillitGreen,
+    ) {
+        KillitBody(
+            text = pluralStringResource(R.plurals.home_blocked_count, state.blocked.size, state.blocked.size),
+            color = KillitForeground,
+        )
+    }
+
+    KillitPrimaryButton(text = stringResource(R.string.my_phone_unlock), onClick = onUnlock)
+
+    val waiting = state.waitingApps.size
+    val asking = pairing.outgoing.count { it.request.state.isOpen && it.request.type == org.tamodak.killit.pairing.store.RequestType.UNBLOCK_APP }
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        KillitRow(
+            title = stringResource(R.string.my_phone_ask_unblock),
+            subtitle = when {
+                asking > 0 -> pluralStringResource(R.plurals.hub_my_requests_open, asking, asking)
+                waiting > 0 -> pluralStringResource(R.plurals.home_waiting_apps, waiting, waiting)
+                else -> stringResource(R.string.my_phone_ask_unblock_desc)
+            },
+            icon = KillitIcons.Apps,
+            iconTint = if (waiting > 0) KillitBlue else KillitForeground,
+            borderColor = if (waiting > 0) KillitBlue else KillitBorderDim,
+            onClick = onAskUnblock,
+        )
+        KillitRow(
+            title = stringResource(R.string.my_phone_block_more),
+            subtitle = stringResource(R.string.my_phone_block_more_desc),
+            icon = KillitIcons.Lock,
+            onClick = onBlockMore,
+        )
+        KillitRow(
+            title = stringResource(R.string.my_phone_my_guardians),
+            subtitle = pluralStringResource(R.plurals.hub_my_phone_guardians, guardians, guardians),
+            icon = KillitIcons.People,
+            onClick = onGuardians,
+        )
+    }
+
+    NotificationPermissionPanel()
 }
 
 /**
@@ -338,20 +357,22 @@ fun HomeScreen(
  * take effect at all.
  *
  * @param state supplies owner status and the blocked count.
+ * @param guardians how many guardians this phone has.
  * @param onRefresh re-checks owner status, for when the user has provisioned outside the app.
  */
 @Composable
-private fun StatusPanel(state: KillitUiState, onRefresh: () -> Unit) {
+private fun StatusPanel(state: KillitUiState, guardians: Int, onRefresh: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         KillitStatusPanel(
             icon = KillitIcons.Shield,
-            title = stringResource(
-                if (state.isDeviceOwner) R.string.home_status_owner_yes
-                else R.string.home_status_owner_no
-            ),
+            title = when {
+                !state.isDeviceOwner -> stringResource(R.string.home_status_owner_no)
+                guardians == 0 -> stringResource(R.string.hub_my_phone_protected)
+                else -> pluralStringResource(R.plurals.hub_my_phone_guardians, guardians, guardians)
+            },
             subtitle = stringResource(
                 if (state.isDeviceOwner) R.string.home_status_owner_yes_desc
                 else R.string.home_status_owner_no_desc
@@ -385,7 +406,7 @@ private fun StatusPanel(state: KillitUiState, onRefresh: () -> Unit) {
  * because it only pauses the activity.
  */
 @Composable
-private fun NotificationPermissionPanel() {
+internal fun NotificationPermissionPanel() {
     val context = LocalContext.current
     var allowed by remember { mutableStateOf(context.notificationsAllowed()) }
     var declined by rememberSaveable { mutableStateOf(false) }
@@ -628,196 +649,6 @@ private fun MonospaceBlock(text: String) {
             fontFamily = FontFamily.Monospace,
             color = KillitForeground,
         )
-    }
-}
-
-/**
- * The three states of giving up device owner: not requested, waiting, ready.
- *
- * The waiting state is the point of the whole feature, so it is shown as a panel with a live
- * countdown rather than a disabled button — the user should be able to see exactly how long is
- * left, and that cancelling is available at any time.
- *
- * @param state supplies the pending request, and whether an action is already in flight.
- * @param onRequestRelease starts the wait.
- * @param onCancelRelease abandons it.
- * @param onReleaseNow carries out the release, once the wait has elapsed.
- */
-@Composable
-private fun ReleaseSection(
-    state: KillitUiState,
-    onRequestRelease: () -> Unit,
-    onCancelRelease: () -> Unit,
-    onReleaseNow: () -> Unit,
-) {
-    val request = state.releaseRequest
-
-    if (request == null) {
-        KillitRow(
-            title = stringResource(R.string.home_release),
-            icon = KillitIcons.Lock,
-            iconTint = KillitRed,
-            accent = KillitRed,
-            borderColor = KillitRed,
-            enabled = !state.busy,
-            showChevron = false,
-            onClick = onRequestRelease,
-        )
-        return
-    }
-
-    // Re-reads the clock once a second so the countdown is live. Keyed on the deadline so a
-    // cancel-then-request cycle restarts it rather than reusing a stale coroutine.
-    var now by remember(request.availableAtMillis) { mutableLongStateOf(System.currentTimeMillis()) }
-    LaunchedEffect(request.availableAtMillis) {
-        while (true) {
-            now = System.currentTimeMillis()
-            if (now >= request.availableAtMillis) break
-            delay(1_000)
-        }
-    }
-
-    val remaining = request.remainingMillis(now)
-    val ready = request.isReady(now)
-
-    KillitPanel(borderColor = if (ready) KillitRed else KillitBlue, spacing = 16.dp) {
-        KillitSectionTitle(
-            stringResource(
-                if (ready) R.string.home_release_ready_title else R.string.home_release_pending_title
-            )
-        )
-
-        if (ready) {
-            KillitBody(stringResource(R.string.home_release_ready_body))
-            KillitDangerButton(
-                text = stringResource(R.string.home_release_now),
-                onClick = onReleaseNow,
-                enabled = !state.busy,
-            )
-        } else {
-            KillitBody(
-                text = stringResource(
-                    R.string.home_release_pending_body,
-                    formatDuration(remaining),
-                ),
-                color = KillitForeground,
-            )
-        }
-
-        KillitButton(
-            text = stringResource(R.string.home_release_cancel),
-            onClick = onCancelRelease,
-            enabled = !state.busy,
-        )
-    }
-}
-
-/**
- * The anti-tamper toggles.
- *
- * @param config the toggles as stored.
- * @param onChange called with the full config whenever one toggle moves.
- */
-@Composable
-private fun HardeningPanel(
-    config: HardeningConfig,
-    onChange: (HardeningConfig) -> Unit,
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        KillitSectionTitle(stringResource(R.string.home_hardening))
-
-        KillitPanel(padding = 18.dp, spacing = 0.dp) {
-            KillitToggleRow(
-                title = stringResource(R.string.harden_uninstall),
-                description = stringResource(R.string.harden_uninstall_desc),
-                checked = config.blockUninstall,
-                onCheckedChange = { onChange(config.copy(blockUninstall = it)) },
-            )
-            KillitRule(color = KillitRowDivider)
-            KillitToggleRow(
-                title = stringResource(R.string.harden_force_stop),
-                description = stringResource(R.string.harden_force_stop_desc),
-                checked = config.blockForceStop,
-                enabled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R,
-                onCheckedChange = { onChange(config.copy(blockForceStop = it)) },
-            )
-            KillitRule(color = KillitRowDivider)
-            KillitToggleRow(
-                title = stringResource(R.string.harden_safe_boot),
-                description = stringResource(R.string.harden_safe_boot_desc),
-                checked = config.blockSafeBoot,
-                onCheckedChange = { onChange(config.copy(blockSafeBoot = it)) },
-            )
-            KillitRule(color = KillitRowDivider)
-            KillitToggleRow(
-                title = stringResource(R.string.harden_factory_reset),
-                description = stringResource(R.string.harden_factory_reset_desc),
-                checked = config.blockFactoryReset,
-                onCheckedChange = { onChange(config.copy(blockFactoryReset = it)) },
-            )
-            KillitRule(color = KillitRowDivider)
-            KillitToggleRow(
-                title = stringResource(R.string.harden_apps_control),
-                description = stringResource(R.string.harden_apps_control_desc),
-                checked = config.blockAppsControl,
-                onCheckedChange = { onChange(config.copy(blockAppsControl = it)) },
-            )
-            KillitRule(color = KillitRowDivider)
-            KillitToggleRow(
-                title = stringResource(R.string.harden_date_time),
-                description = stringResource(R.string.harden_date_time_desc),
-                checked = config.blockDateTime,
-                onCheckedChange = { onChange(config.copy(blockDateTime = it)) },
-            )
-        }
-    }
-}
-
-/**
- * The language list.
- *
- * Each entry is written in its own language (see [AppLanguage]), so the list stays usable when the
- * app is currently showing one the reader cannot decipher — which is the whole situation the picker
- * exists for. It is capped and scrollable because ten entries plus a dismiss button will not fit on
- * a short screen, and a dialog that runs off the bottom hides the way out of itself.
- *
- * @param current the language in force, marked in the list.
- * @param onPick called with the chosen language.
- * @param onDismiss called when the dialog is dismissed without choosing.
- */
-@Composable
-private fun LanguagePicker(
-    current: AppLanguage,
-    onPick: (AppLanguage) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    KillitDialog(
-        title = stringResource(R.string.home_language),
-        onDismiss = onDismiss,
-        dismissText = stringResource(R.string.cancel),
-    ) {
-        Column(
-            modifier = Modifier
-                .heightIn(max = 320.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            AppLanguage.entries.forEach { language ->
-                val selected = language == current
-                KillitRow(
-                    title = language.label(),
-                    // The tick is always in the layout and only sometimes visible: dropping the
-                    // icon on unselected rows would collapse its slot and indent the one selected
-                    // label 48dp past every other.
-                    icon = KillitIcons.Check,
-                    iconTint = if (selected) KillitGreen else Color.Transparent,
-                    borderColor = if (selected) KillitGreen else KillitBorderDim,
-                    background = if (selected) KillitGreen.copy(alpha = 0.10f) else Color.Transparent,
-                    showChevron = false,
-                    onClick = { onPick(language) },
-                )
-            }
-        }
     }
 }
 

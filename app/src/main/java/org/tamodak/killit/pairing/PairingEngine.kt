@@ -1,6 +1,7 @@
 package org.tamodak.killit.pairing
 
 import java.io.IOException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -103,8 +104,12 @@ class PairingEngine(
         dao.pairings().isNotEmpty() || dao.ceremony() != null || dao.outbox(1).isNotEmpty() || dao.linkDeletions().isNotEmpty()
 
     /**
-     * One round of synchronisation: timers and cleanup, then everything queued goes out, then
-     * everything waiting comes in.
+     * One round of synchronisation: cleanup, then everything queued goes out, everything waiting
+     * comes in, and the UNPAIR timers are checked.
+     *
+     * The timers come after the inbox, so a denial already waiting there stops an UNPAIR whose
+     * time has run out (B2). A server that can't be reached, or answers nonsense, doesn't hold them
+     * back: they are purely local, so the server going away never locks anyone in (PLAN.md §6.4).
      *
      * @param waitSeconds how long to wait for messages if none are waiting; the live screens
      *   (an unlock in progress, a ceremony) wait, background syncs don't.
@@ -116,11 +121,19 @@ class PairingEngine(
         store.reconcile()
         lock.withLock {
             unlock.cleanUp()
-            requests.checkTimers()
             requests.applyPendingApprovals()
         }
-        mailbox.flush()
-        mailbox.receive(waitSeconds)
+        val failure = try {
+            mailbox.flush()
+            mailbox.receive(waitSeconds)
+            null
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            e
+        }
+        lock.withLock { requests.checkTimers() }
+        if (failure != null) throw failure
         mailbox.flush()
         peers.deleteFinishedLinks()
         if (now() - lastSeenRefreshedAt > LAST_SEEN_INTERVAL_MILLIS) refreshLastSeen()
@@ -186,9 +199,13 @@ class PairingEngine(
     /** G11: apps were unblocked directly in an unlocked session. */
     suspend fun onUnblockedLocally(packageNames: Collection<String>) = locked { requests.onUnblockedLocally(packageNames) }
 
-    /** H7: device owner is about to be released; every guardian is removed and told. */
+    /**
+     * H7: device owner is about to be released. Every guardian is removed and told, and what only
+     * a protected phone keeps is forgotten, so protecting it again later starts afresh.
+     */
     suspend fun releaseAll() {
         locked { peers.releaseAll() }
+        store.clearProtection()
     }
 
     // ---------------------------------------------------------------- guardian side

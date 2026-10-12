@@ -54,7 +54,6 @@
     <string name="setup_saved">Kunci ditetapkan.</string>
 
     <!-- Home -->
-    <string name="home_status_owner_yes">Pemilik Perangkat aktif</string>
     <string name="home_status_owner_no">Bukan Pemilik Perangkat</string>
     <string name="home_status_owner_yes_desc">Killit bisa memblokir dan membuka blokir aplikasi.</string>
     <string name="home_status_owner_no_desc">Killit tidak bisa memblokir apa pun sebelum disiapkan sebagai Pemilik Perangkat. Pilih salah satu dari tiga cara di bawah.</string>
@@ -179,4 +178,236 @@
     <string name="home_notifications_title">Izinkan notifikasi</string>
     <string name="home_notifications_body">Killit memberitahumu saat memblokir aplikasi yang baru dipasang.</string>
     <string name="home_notifications_allow">Izinkan</string>
+
+    <!-- ============================== Pairing (PLAN.md §15) ============================== -->
+
+    <!-- Hub (PLAN.md §15.3). Counts only, never names, before the passkey (I5). -->
+    <string name="hub_my_phone">Ponselku</string>
+    <string name="hub_my_phone_setup">Belum terlindungi · Siapkan</string>
+    <string name="hub_my_phone_protected">Dilindungi kuncimu</string>
+    <plurals name="hub_my_phone_guardians">
+        <item quantity="other">Terlindungi · %1$d penjaga</item>
+    </plurals>
+    <plurals name="hub_my_requests_open">
+        <item quantity="other">%1$d permintaan terkirim ke penjagamu</item>
+    </plurals>
+    <string name="hub_guard">Ponsel yang kujaga</string>
+    <string name="hub_guard_none">Kamu belum menjaga ponsel mana pun</string>
+    <plurals name="hub_guard_phones">
+        <item quantity="other">%1$d ponsel</item>
+    </plurals>
+    <plurals name="hub_guard_waiting">
+        <item quantity="other">%1$d permintaan menunggu</item>
+    </plurals>
+    <string name="update_needed">Perbarui Killit untuk melihat ini</string>
+    <string name="update_needed_long">Beberapa pesan butuh Killit yang lebih baru. Perbarui Killit untuk melihatnya.</string>
+
+    <!-- My phone (§15.4, §15.5) -->
+    <string name="my_phone_guardians">Penjaga</string>
+    <string name="my_phone_guardians_none">Tidak ada yang menjaga ponsel ini</string>
+    <string name="my_phone_settings">Setelan</string>
+    <string name="my_phone_settings_desc">Opsi perlindungan, bahasa, kunci</string>
+    <string name="my_phone_unlocked_title">Dibuka oleh penjagamu</string>
+    <string name="my_phone_unlocked_body">Kamu punya kendali penuh sampai keluar dari Killit. Saat keluar, Killit terkunci lagi.</string>
+    <string name="my_phone_locked_body">Penjagamu melindungi ponsel ini. Untuk mengubah setelan, bicaralah dulu dengan mereka, lalu kirim permintaan buka kunci.</string>
+    <string name="my_phone_unlock">Buka kunci Killit</string>
+    <string name="my_phone_ask_unblock">Minta buka blokir aplikasi</string>
+    <string name="my_phone_ask_unblock_desc">Penjagamu yang memutuskan</string>
+    <string name="my_phone_block_more">Blokir lebih banyak aplikasi</string>
+    <string name="my_phone_block_more_desc">Tanpa bertanya ke siapa pun</string>
+    <string name="my_phone_my_guardians">Penjagaku</string>
+    <string name="harden_date_time_guarded">Wajib selama kamu punya penjaga.</string>
+    <string name="release_guardians_note">Penjagamu diberi tahu, dan dihapus saat selesai.</string>
+
+    <!-- The live unlock (§3.4) -->
+    <string name="unlock_title">Buka kunci Killit</string>
+    <string name="unlock_intro">Bicaralah dulu dengan penjagamu. Lalu kirim permintaan dan tetap di layar ini: Killit terbuka saat semuanya menyetujui.</string>
+    <string name="unlock_explanation_hint">Catatan untuk penjagamu (opsional)</string>
+    <string name="unlock_send">Kirim permintaan buka kunci</string>
+    <string name="unlock_waiting_title">Menunggu penjagamu</string>
+    <string name="unlock_waiting_body">Tetap di layar ini. Keluar akan membatalkan permintaan.</string>
+    <string name="unlock_denied_title">Permintaan ditolak</string>
+    <string name="unlock_cooldown">Kamu bisa meminta lagi dalam %1$s.</string>
+    <string name="unlock_daily_limit">Kamu sudah memakai jatah permintaan buka kunci hari ini. Coba lagi besok.</string>
+    <string name="unlock_approved">Disetujui. Membuka…</string>
+    <string name="vote_waiting">Menunggu</string>
+    <string name="vote_approved">Menyetujui</string>
+    <string name="vote_denied">Menolak</string>
+
+    <!-- Asking to unblock an app (§3.6) -->
+    <string name="ask_unblock_intro">Aplikasi ini diblokir. Minta penjagamu mengizinkan salah satunya, dan jelaskan alasannya.</string>
+    <string name="ask_unblock_none">Tidak ada aplikasi yang diblokir.</string>
+    <string name="ask_unblock_not_blocked">Aplikasi ini tidak diblokir lagi.</string>
+    <plurals name="ask_chances_left">
+        <item quantity="other">Sisa %1$d dari 3 permintaan</item>
+    </plurals>
+    <plurals name="ask_state_denied">
+        <item quantity="other">Ditolak · sisa %1$d dari 3 permintaan</item>
+    </plurals>
+    <string name="ask_state_waiting">Menunggu penjagamu</string>
+    <string name="ask_state_no_chances">Tidak ada permintaan tersisa</string>
+    <string name="ask_state_no_chances_long">Ketiga permintaan untuk aplikasi ini ditolak. Sekarang hanya Killit yang dibuka yang bisa mengizinkannya.</string>
+    <string name="ask_unblock_hint">Kenapa kamu butuh aplikasi ini? Minimal 10 karakter.</string>
+    <string name="ask_unblock_what_they_see">Penjagamu melihat nama, paket, dan pemasang aplikasi, serta tulisanmu.</string>
+    <string name="ask_send">Kirim ke penjagamu</string>
+    <string name="ask_withdraw">Tarik permintaan</string>
+    <string name="ask_last_denied">Permintaan terakhirmu ditolak</string>
+    <string name="text_counter">%1$d / %2$d</string>
+
+    <!-- Blocking more apps (D7) -->
+    <string name="block_more_intro">Blokir aplikasi tanpa bertanya ke siapa pun. Membuka blokirnya nanti butuh penjagamu.</string>
+    <plurals name="block_more_button">
+        <item quantity="other">Blokir %1$d aplikasi</item>
+    </plurals>
+    <plurals name="block_more_confirm_title">
+        <item quantity="other">Blokir %1$d aplikasi?</item>
+    </plurals>
+    <string name="block_more_confirm_body">Kamu tidak akan bisa membuka blokirnya sendiri. Membuka blokir akan butuh persetujuan penjagamu.</string>
+    <string name="block_more_confirm">Blokir</string>
+
+    <!-- Guardians (§15.4) -->
+    <string name="guardians_none">Belum ada yang menjaga ponsel ini.</string>
+    <string name="guardians_add">Tambah penjaga</string>
+    <string name="guardians_add_needs_owner">Siapkan perlindungan di Ponselku dulu</string>
+    <string name="guardians_ask_remove">Minta hapus</string>
+    <string name="guardians_removal_pending">Penghapusan diminta. Kalau tidak ada yang menolak, terjadi pada %1$s.</string>
+    <string name="guardians_no_chances">Ketiga permintaan penghapusan ditolak.</string>
+    <string name="guardians_hint_second">Menambah penjaga kedua membuatmu lebih terlindungi.</string>
+    <string name="guardians_hint_many">Lebih dari 4 penjaga jarang diperlukan dan membuat setiap permintaan lebih sulit disetujui.</string>
+    <string name="guardians_gone">Pemasangan ini sudah tidak ada.</string>
+    <string name="rename">Ganti nama</string>
+    <string name="rename_hint">Nama</string>
+    <string name="unpair_rules">Semua penjaga ditanya, termasuk yang ini. Kalau semuanya setuju, penjaga langsung dihapus. Kalau satu menolak, permintaan berakhir dan memakai satu dari 3 permintaanmu. Kalau tidak ada yang menolak dalam 30 hari, penjaga dihapus.</string>
+    <string name="unpair_hint">Kenapa penjaga ini harus pergi? Minimal 10 karakter.</string>
+
+    <!-- Phones I guard (§15.6) -->
+    <string name="guard_requests">Permintaan</string>
+    <string name="guard_requests_none">Tidak ada yang menunggumu.</string>
+    <string name="guard_phones">Ponsel</string>
+    <string name="guard_new">Jaga ponsel baru</string>
+    <string name="guard_leave">Berhenti menjaga</string>
+    <string name="guard_leave_title">Berhenti menjaga?</string>
+    <string name="guard_leave_body">%1$s akan diberi tahu. Kalau kamu penjaga terakhirnya, ponselnya jadi tidak terlindungi.</string>
+    <string name="guard_battery_title">Izinkan Killit berjalan di latar belakang</string>
+    <string name="guard_battery_body">Penghemat baterai bisa menahan permintaan dari ponsel yang kamu jaga.</string>
+    <string name="history">Riwayat</string>
+    <string name="guardian_notice_title">Kuncimu sekarang jadi kunci penjaga</string>
+    <string name="guardian_notice_body">Kamu akan membutuhkannya setiap kali menyetujui, menolak, atau memblokir sesuatu untuk ponsel yang kamu jaga. Siapa pun yang tahu kunci ini bisa menyetujui permintaan atas namamu, jadi simpan untuk dirimu sendiri. Pasang juga kunci layar di ponselmu. Kalau lupa, kamu harus memasang ulang Killit dan memasangkan lagi.</string>
+    <string name="guardian_notice_ok">Saya mengerti</string>
+
+    <!-- A request, as a guardian sees it (§15.6) -->
+    <string name="request_unblock">%1$s ingin membuka blokir %2$s</string>
+    <string name="request_unlock">%1$s ingin membuka kunci Killit</string>
+    <string name="request_unpair_you">%1$s ingin menghapusmu sebagai penjaga</string>
+    <string name="request_unpair_named">%1$s ingin menghapus %2$s sebagai penjaga</string>
+    <string name="request_unpair_other">%1$s ingin menghapus seorang penjaga</string>
+    <string name="request_waiting_now">Sedang menunggu</string>
+    <string name="request_unlock_meaning">Menyetujui memberi %1$s kendali penuh atas Killit sampai mereka keluar dari aplikasi.</string>
+    <string name="request_unpair_target_unknown">Ini tentang penjaga yang tidak kamu kenal.</string>
+    <string name="request_unpair_timer">Kalau tidak ada yang menolak, penjaga dihapus pada %1$s.</string>
+    <plurals name="request_chances">
+        <item quantity="other">Sisa %1$d dari 3 permintaan, termasuk yang ini</item>
+    </plurals>
+    <string name="request_installer_play">Dipasang dari Google Play</string>
+    <string name="request_installer_unknown">Dipasang dari sumber tidak dikenal</string>
+    <string name="request_installer_other">Dipasang oleh %1$s</string>
+    <string name="request_package_note">Nama dan ikon berasal dari aplikasi itu sendiri. Periksa nama paketnya.</string>
+    <string name="request_view_play">Lihat di Google Play</string>
+    <string name="request_guardians">Penjaga</string>
+    <string name="request_add_note">Tambah catatan (opsional)</string>
+    <string name="request_note_hint">Catatan yang akan dilihat bersama jawabanmu</string>
+    <string name="request_deny">Tolak</string>
+    <string name="request_approve">Setujui</string>
+    <string name="request_you_approved">Kamu menyetujui ini.</string>
+    <string name="request_you_denied">Kamu menolak ini.</string>
+    <string name="request_closed_approved">Disetujui semua penjaga.</string>
+    <string name="request_closed_denied">Ditolak.</string>
+    <string name="request_closed_withdrawn">Ditarik.</string>
+    <string name="request_closed_uninstalled">Aplikasi sudah dihapus.</string>
+    <string name="request_closed_resolved">Diselesaikan di ponsel itu sendiri saat terbuka.</string>
+    <string name="request_closed_guardian_removed">Tidak diperlukan lagi: seorang penjaga dihapus.</string>
+    <string name="request_gone">Permintaan ini sudah tidak ada.</string>
+
+    <!-- History lines (I10), written on this phone in its own language (E-F3) -->
+    <string name="event_paired">Terpasang</string>
+    <string name="event_left">Penjagaan dihentikan</string>
+    <string name="event_guardian_removed">Seorang penjaga dihapus</string>
+    <string name="event_removed_you">Kamu dihapus sebagai penjaga</string>
+    <string name="event_other_left">%1$s berhenti menjaga</string>
+    <string name="event_other_removed">%1$s dihapus sebagai penjaga</string>
+    <string name="event_guardian_added">%1$s menjadi penjaga</string>
+    <string name="event_app_installed_blocked">%1$s dipasang dan diblokir</string>
+    <string name="event_app_installed">%1$s dipasang</string>
+    <string name="event_release_started">Penghapusan Killit dimulai; selesai pada %1$s</string>
+    <string name="event_release_cancelled">Penghapusan Killit dihentikan</string>
+    <string name="event_protection_on">Dinyalakan: %1$s</string>
+    <string name="event_protection_off">Dimatikan: %1$s</string>
+    <string name="event_management_on">Pengelolaan aplikasi dinyalakan</string>
+    <string name="event_management_off">Pengelolaan aplikasi dimatikan</string>
+    <string name="event_request_approved">Disetujui: %1$s</string>
+    <string name="event_request_denied">Ditolak: %1$s</string>
+    <string name="event_request_cancelled">Ditarik: %1$s</string>
+
+    <!-- Time -->
+    <string name="when_just_now">Baru saja</string>
+    <plurals name="when_minutes_ago">
+        <item quantity="other">%1$d menit lalu</item>
+    </plurals>
+    <plurals name="when_hours_ago">
+        <item quantity="other">%1$d jam lalu</item>
+    </plurals>
+    <string name="last_seen_today">Terlihat hari ini</string>
+    <string name="last_seen_yesterday">Terlihat kemarin</string>
+    <plurals name="last_seen_days">
+        <item quantity="other">Terlihat %1$d hari lalu</item>
+    </plurals>
+
+    <!-- The pairing wizard (§15.7) -->
+    <string name="wizard_intro_guardian">Kamu akan menjaga ponsel lain. Pemiliknya butuh persetujuanmu untuk membuka blokir aplikasi, membuka kunci Killit, atau menghapusmu sebagai penjaga.</string>
+    <string name="wizard_intro_protected">Penjagamu akan menyetujui atau menolak permintaanmu. Dengan penjaga, kuncimu tidak lagi membuka setelan Killit: membukanya butuh persetujuan setiap penjaga.</string>
+    <string name="wizard_needs_owner">Perlindungan belum disiapkan di ponsel ini. Siapkan dulu, lalu tambahkan penjaga.</string>
+    <string name="wizard_set_up">Siapkan perlindungan</string>
+    <string name="wizard_warning">Pasangkan hanya dengan orang yang kamu kenal baik dan pernah kamu temui langsung. Kalau penjaga menolak melepas pemasangan, kamu hanya bisa keluar dengan menghapus data ponsel.</string>
+    <string name="wizard_your_name">Namamu</string>
+    <string name="wizard_your_name_hint">Bagaimana ponsel lain akan melihatmu</string>
+    <string name="wizard_show_code">Tampilkan kode</string>
+    <string name="wizard_have_code">Aku punya kode</string>
+    <string name="wizard_enter_code">Ketik kode dari ponsel lain</string>
+    <string name="wizard_join">Gabung</string>
+    <string name="wizard_show_code_instead">Tampilkan kode saja</string>
+    <string name="wizard_give_code">Berikan kode ini ke orang lain itu. Mereka mengetiknya di ponsel mereka.</string>
+    <string name="wizard_code_expires">Berlaku %1$s lagi</string>
+    <string name="wizard_share">Bagikan kode</string>
+    <string name="wizard_share_text">Kode pemasangan Killit-ku: %1$s (berlaku 15 menit)</string>
+    <string name="wizard_waiting_joiner">Menunggu ponsel lain…</string>
+    <string name="wizard_connecting">Menghubungkan kedua ponsel…</string>
+    <string name="wizard_call_title">Saling telepon sekarang</string>
+    <string name="wizard_call_body">Bacakan 6 angka kalian satu sama lain. Angkanya harus sama di kedua ponsel.</string>
+    <string name="wizard_no_match">Tidak cocok</string>
+    <string name="wizard_match">Cocok</string>
+    <string name="wizard_waiting_confirm">Menunggu ponsel lain mengonfirmasi…</string>
+    <string name="wizard_finishing">Menyelesaikan…</string>
+    <string name="wizard_paired_title">Terpasang</string>
+    <string name="wizard_paired_guardian">Sekarang kamu menjaga %1$s.</string>
+    <string name="wizard_paired_protected">Sekarang %1$s menjaga ponsel ini.</string>
+    <string name="wizard_nickname_note">Nama ini hanya tampil di ponselmu.</string>
+    <string name="wizard_done">Selesai</string>
+    <string name="wizard_again">Coba lagi</string>
+    <string name="wizard_failed_mismatch">Kodenya tidak cocok, jadi tidak ada yang dipasangkan. Mungkin ada yang mengganggu. Mulai lagi dan bandingkan kodenya lewat telepon.</string>
+    <string name="wizard_failed_expired">Kodenya kedaluwarsa. Mulai lagi.</string>
+    <string name="wizard_failed_code">Kode itu salah, sudah dipakai, atau kedaluwarsa.</string>
+    <string name="wizard_failed_invalid">Ada yang tidak lolos pemeriksaan di ponsel lain, jadi tidak ada yang dipasangkan.</string>
+    <string name="wizard_failed_roles">Kalian berdua memilih peran yang sama. Satu orang mulai dari Ponselku, yang lain dari Ponsel yang kujaga.</string>
+    <string name="wizard_failed_declined">Ponsel lain menolak.</string>
+    <string name="wizard_failed_limit">Salah satu ponsel sudah dipasangkan dengan terlalu banyak ponsel.</string>
+    <string name="wizard_failed_cancelled">Pemasangan dibatalkan.</string>
+
+    <!-- Messages -->
+    <string name="msg_offline">Tidak bisa menghubungi server Killit. Killit akan mencoba lagi.</string>
+    <string name="msg_cant_pair">Ponsel ini tidak bisa dipasangkan: ponsel ini tidak bisa membuktikan bahwa kuncinya tersimpan aman di perangkat keras.</string>
+    <string name="msg_identity_lost">Server sudah tidak mengenali ponsel ini. Pasangkan lagi.</string>
+    <string name="msg_rate_limited">Terlalu banyak percobaan. Coba lagi nanti.</string>
+    <string name="msg_sent">Terkirim ke penjagamu.</string>
+    <string name="msg_no_guardians">Tidak ada yang menjaga ponsel ini.</string>
+    <string name="msg_bad_explanation">Tulis antara 10 dan 500 karakter.</string>
 </resources>

@@ -1,6 +1,7 @@
 package org.tamodak.killit.pairing
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import java.io.IOException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertArrayEquals
@@ -276,6 +277,32 @@ class PairingEngineTest {
         ali.engine.sync()
         assertNotNull(ali.pairingWith(dad))
         assertEquals(2, ali.pairingWith(dad)!!.unpairChances)
+    }
+
+    @Test
+    fun aDenialWaitingInTheMailboxStopsAnExpiredTimer(): Unit = runBlocking {
+        guardAli()
+        val dadPairing = ali.pairingWith(dad)!!
+        ali.engine.askToRemove(dadPairing.pairId, "Dad gave me this phone back.")
+        dad.engine.sync()
+        val request = dad.dao.observeIncomingOnce().single { it.type == RequestType.UNPAIR }
+        dad.engine.decide(request.pairId, request.requestId, approve = false, note = "")
+        // Ali comes back online only after the 30 days: the denial was there in time.
+        clock.millis += 31L * 24 * 60 * 60 * 1000
+        ali.engine.sync()
+        assertNotNull(ali.pairingWith(dad))
+        assertEquals(RequestState.DENIED, ali.outgoing().state)
+    }
+
+    @Test
+    fun anUnreachableServerDoesNotHoldTheTimerBack(): Unit = runBlocking {
+        guardAli()
+        val dadPairing = ali.pairingWith(dad)!!
+        ali.engine.askToRemove(dadPairing.pairId, "Dad lost his phone for good.")
+        clock.millis += 30L * 24 * 60 * 60 * 1000
+        server.reachable = false
+        assertTrue(runCatching { ali.engine.sync() }.exceptionOrNull() is IOException)
+        assertNull(ali.pairingWith(dad))
     }
 
     @Test

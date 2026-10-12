@@ -17,6 +17,11 @@ import org.tamodak.killit.data.LockPreferences
 import org.tamodak.killit.data.LockRepository
 import org.tamodak.killit.data.LockType
 import org.tamodak.killit.data.PersistedStateSnapshot
+import org.tamodak.killit.pairing.EnginePhone
+import org.tamodak.killit.pairing.FakeServer
+import org.tamodak.killit.pairing.TestClock
+import org.tamodak.killit.pairing.store.PairRole
+import org.tamodak.killit.pairing.store.PairingEntity
 import org.tamodak.killit.protection.ProtectionControl
 import org.tamodak.killit.ServiceLocator
 import kotlinx.coroutines.Dispatchers
@@ -26,17 +31,20 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Leaving Killit always locks it, whatever was in flight at the time.
+ * Leaving Killit always locks it, whatever was in flight at the time, and a session only reaches
+ * what it has earned: the passkey opens the sections, and full control needs no guardians.
  *
  * Drives the ViewModel the way the activity does — [KillitViewModel.onForeground] on ON_START,
- * [KillitViewModel.lockOnBackground] on ON_STOP — against the real stores. Each case starts an
- * operation, leaves while it is still running, and checks what is on screen once it has finished.
+ * [KillitViewModel.lockOnBackground] on ON_STOP — against the real stores and a pairing engine
+ * with its own in-memory database. Each case starts an operation, leaves while it is still
+ * running, and checks what is on screen once it has finished.
  *
  * The calls are made on the main thread, where `viewModelScope` runs a launched coroutine
  * synchronously up to its first suspension. That is what makes "leave while it is still running"
@@ -64,13 +72,16 @@ class LockOnLeaveTest {
     /** Owns the ViewModel, so [tearDown] can cancel its coroutines before the stores are restored. */
     private val viewModelStore = ViewModelStore()
 
+    /** This phone's pairing side, apart from the app's own, so a test can give it guardians. */
+    private val phone = TestClock().let { clock -> EnginePhone("B", "Ali", FakeServer(clock.now), clock) }
+
     /** The ViewModel under test, built on the main thread like the real one. */
     private lateinit var viewModel: KillitViewModel
 
     /** What both stores held before the test. */
     private lateinit var snapshot: PersistedStateSnapshot
 
-    /** Sets a known passkey and waits for the ViewModel to settle on the gate. */
+    /** Sets a known passkey and waits for the ViewModel to settle on the Hub. */
     @Before
     fun setUp() = runBlocking {
         KillitLog.verbose = true
@@ -92,39 +103,46 @@ class LockOnLeaveTest {
                             override suspend fun ensureRunning() = Unit
                             override fun stop() = Unit
                         },
+                        pairing = phone.engine,
                     )
                 }
             }
             ViewModelProvider(viewModelStore, factory)[KillitViewModel::class.java]
         }
-        awaitState { it.screen == Screen.Gate && !it.appsLoading }
+        awaitState { it.screen == Screen.Hub && !it.appsLoading }
     }
 
     /** Cancels the ViewModel's work, then puts the device's own passkey back. */
     @After
     fun tearDown() = runBlocking {
         withContext(Dispatchers.Main) { viewModelStore.clear() }
+        phone.database.close()
         snapshot.restore()
     }
 
-    /** Leaving while a save is running locks at once, and the save finishing does not reopen Home. */
+    /** Leaving while a save is running locks at once, and the save finishing does not reopen it. */
     @Test
     fun leavingDuringASaveLocks(): Unit = runBlocking {
         unlock()
 
         withContext(Dispatchers.Main) {
             viewModel.navigateTo(Screen.Apps)
+            assertEquals("A phone without guardians has full control", Screen.Apps, viewModel.state.value.screen)
             viewModel.save()
             assertTrue("The save must still be running when the user leaves", viewModel.state.value.busy)
             viewModel.lockOnBackground()
-            assertEquals(Screen.Gate, viewModel.state.value.screen)
+            assertEquals(Screen.Hub, viewModel.state.value.screen)
         }
 
         awaitState { !it.busy }
-        assertEquals("A finished save must not bring the app list back", Screen.Gate, viewModel.state.value.screen)
+        assertEquals("A finished save must not bring the app list back", Screen.Hub, viewModel.state.value.screen)
 
-        withContext(Dispatchers.Main) { viewModel.onForeground() }
-        assertEquals("Coming back must find the gate", Screen.Gate, viewModel.state.value.screen)
+        withContext(Dispatchers.Main) {
+            viewModel.onForeground()
+            assertEquals("Coming back must find the Hub", Screen.Hub, viewModel.state.value.screen)
+            viewModel.openSection(Screen.MyPhone)
+            assertEquals("The passkey must be asked for again", Screen.Gate, viewModel.state.value.screen)
+        }
     }
 
     /** A passkey check that finishes after the user left does not unlock the session. */
@@ -132,15 +150,16 @@ class LockOnLeaveTest {
     fun aPasskeyProvedAfterLeavingDoesNotUnlock(): Unit = runBlocking {
         withContext(Dispatchers.Main) {
             viewModel.onForeground()
+            viewModel.openSection(Screen.MyPhone)
             viewModel.submitGate(PASSKEY)
             assertTrue("The check must still be running when the user leaves", viewModel.state.value.busy)
             viewModel.lockOnBackground()
         }
 
         awaitState { !it.busy }
-        assertEquals(Screen.Gate, viewModel.state.value.screen)
+        assertEquals("The gate must still be waiting for the passkey", Screen.Gate, viewModel.state.value.screen)
 
-        // Proving the passkey again once back in the foreground opens Home as usual.
+        // Proving the passkey again once back in the foreground opens My phone as usual.
         unlock()
     }
 
@@ -149,21 +168,59 @@ class LockOnLeaveTest {
     fun protectedScreensNeedASession(): Unit = runBlocking {
         withContext(Dispatchers.Main) {
             viewModel.onForeground()
-            listOf(Screen.Home, Screen.Apps, Screen.ChangePasskey).forEach { screen ->
+            listOf(Screen.MyPhone, Screen.Apps, Screen.Guard, Screen.ChangePasskey(Screen.MyPhone)).forEach { screen ->
                 viewModel.navigateTo(screen)
-                assertEquals("$screen must be refused while locked", Screen.Gate, viewModel.state.value.screen)
+                assertEquals("$screen must be refused while locked", Screen.Hub, viewModel.state.value.screen)
             }
         }
     }
 
-    /** Enters the passkey with the activity in the foreground and waits for Home. */
+    /**
+     * On a phone with a guardian the passkey opens My phone locked (§3.5): the block list and the
+     * settings stay out of reach until the guardians approve an unlock.
+     */
+    @Test
+    fun aGuardedPhoneOpensLocked(): Unit = runBlocking {
+        phone.dao.upsertPairing(guardian())
+        unlock()
+        assertFalse(viewModel.state.value.fullControl)
+
+        withContext(Dispatchers.Main) {
+            listOf(Screen.Apps, Screen.Settings).forEach { screen ->
+                viewModel.navigateTo(screen)
+                assertEquals("$screen must be refused without full control", Screen.MyPhone, viewModel.state.value.screen)
+            }
+            viewModel.navigateTo(Screen.AskUnblock)
+            assertEquals(Screen.AskUnblock, viewModel.state.value.screen)
+        }
+    }
+
+    /** Enters the passkey with the activity in the foreground and waits for My phone. */
     private suspend fun unlock() {
         withContext(Dispatchers.Main) {
             viewModel.onForeground()
+            viewModel.openSection(Screen.MyPhone)
             viewModel.submitGate(PASSKEY)
         }
-        awaitState { it.screen == Screen.Home && !it.busy }
+        awaitState { it.screen == Screen.MyPhone && !it.busy }
     }
+
+    /** A guardian of this phone; its keys never sign anything here. */
+    private fun guardian() = PairingEntity(
+        pairId = ByteArray(32) { 1 },
+        peerFp = ByteArray(32) { 2 },
+        peerSignPk = ByteArray(65) { 3 },
+        peerEncPk = ByteArray(32) { 4 },
+        myRole = PairRole.PROTECTED,
+        peerName = "Mom",
+        nickname = "Mom",
+        peerModel = "Test Mom",
+        appManagement = false,
+        createdAt = 0L,
+        unpairChances = 3,
+        lastSeenDaysAgo = null,
+        silenceAlerted = false,
+    )
 
     /**
      * Waits for the ViewModel to reach a state.

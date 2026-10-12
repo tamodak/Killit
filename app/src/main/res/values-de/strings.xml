@@ -52,7 +52,6 @@
     <string name="setup_saved">Schlüssel festgelegt.</string>
 
     <!-- Home -->
-    <string name="home_status_owner_yes">Geräteeigentümer aktiv</string>
     <string name="home_status_owner_no">Kein Geräteeigentümer</string>
     <string name="home_status_owner_yes_desc">Killit kann Apps blockieren und freigeben.</string>
     <string name="home_status_owner_no_desc">Killit kann nichts blockieren, solange es nicht als Geräteeigentümer eingerichtet ist. Wähle einen der drei Wege unten.</string>
@@ -181,4 +180,248 @@
     <string name="home_notifications_title">Benachrichtigungen erlauben</string>
     <string name="home_notifications_body">Killit sagt dir, wenn es eine neu installierte App blockiert.</string>
     <string name="home_notifications_allow">Erlauben</string>
+
+    <!-- ============================== Pairing (PLAN.md §15) ============================== -->
+
+    <!-- Hub (PLAN.md §15.3). Counts only, never names, before the passkey (I5). -->
+    <string name="hub_my_phone">Mein Handy</string>
+    <string name="hub_my_phone_setup">Noch nicht geschützt · Einrichten</string>
+    <string name="hub_my_phone_protected">Durch deinen Schlüssel geschützt</string>
+    <plurals name="hub_my_phone_guardians">
+        <item quantity="one">Geschützt · %1$d Wächter</item>
+        <item quantity="other">Geschützt · %1$d Wächter</item>
+    </plurals>
+    <plurals name="hub_my_requests_open">
+        <item quantity="one">%1$d Anfrage an deine Wächter gesendet</item>
+        <item quantity="other">%1$d Anfragen an deine Wächter gesendet</item>
+    </plurals>
+    <string name="hub_guard">Handys, die ich bewache</string>
+    <string name="hub_guard_none">Du bewachst noch keine Handys</string>
+    <plurals name="hub_guard_phones">
+        <item quantity="one">%1$d Handy</item>
+        <item quantity="other">%1$d Handys</item>
+    </plurals>
+    <plurals name="hub_guard_waiting">
+        <item quantity="one">%1$d Anfrage wartet</item>
+        <item quantity="other">%1$d Anfragen warten</item>
+    </plurals>
+    <string name="update_needed">Aktualisiere Killit, um das zu sehen</string>
+    <string name="update_needed_long">Einige Nachrichten brauchen ein neueres Killit. Aktualisiere Killit, um sie zu sehen.</string>
+
+    <!-- My phone (§15.4, §15.5) -->
+    <string name="my_phone_guardians">Wächter</string>
+    <string name="my_phone_guardians_none">Niemand bewacht dieses Handy</string>
+    <string name="my_phone_settings">Einstellungen</string>
+    <string name="my_phone_settings_desc">Schutzoptionen, Sprache, Schlüssel</string>
+    <string name="my_phone_unlocked_title">Von deinen Wächtern entsperrt</string>
+    <string name="my_phone_unlocked_body">Du hast die volle Kontrolle, bis du Killit verlässt. Beim Verlassen wird es wieder gesperrt.</string>
+    <string name="my_phone_locked_body">Deine Wächter schützen dieses Handy. Um Einstellungen zu ändern, sprich zuerst mit ihnen und sende dann eine Entsperranfrage.</string>
+    <string name="my_phone_unlock">Killit entsperren</string>
+    <string name="my_phone_ask_unblock">Freigabe einer App erbitten</string>
+    <string name="my_phone_ask_unblock_desc">Deine Wächter entscheiden</string>
+    <string name="my_phone_block_more">Weitere Apps blockieren</string>
+    <string name="my_phone_block_more_desc">Ohne jemanden zu fragen</string>
+    <string name="my_phone_my_guardians">Meine Wächter</string>
+    <string name="harden_date_time_guarded">Pflicht, solange du Wächter hast.</string>
+    <string name="release_guardians_note">Deine Wächter werden benachrichtigt und am Ende entfernt.</string>
+
+    <!-- The live unlock (§3.4) -->
+    <string name="unlock_title">Killit entsperren</string>
+    <string name="unlock_intro">Sprich zuerst mit deinen Wächtern. Sende dann die Anfrage und bleib auf diesem Bildschirm: Killit öffnet sich, sobald alle zustimmen.</string>
+    <string name="unlock_explanation_hint">Eine Notiz für deine Wächter (optional)</string>
+    <string name="unlock_send">Entsperranfrage senden</string>
+    <string name="unlock_waiting_title">Warten auf deine Wächter</string>
+    <string name="unlock_waiting_body">Bleib auf diesem Bildschirm. Wenn du ihn verlässt, wird die Anfrage abgebrochen.</string>
+    <string name="unlock_denied_title">Die Anfrage wurde abgelehnt</string>
+    <string name="unlock_cooldown">Du kannst in %1$s erneut fragen.</string>
+    <string name="unlock_daily_limit">Du hast die heutigen Entsperranfragen aufgebraucht. Versuch es morgen wieder.</string>
+    <string name="unlock_approved">Zugestimmt. Wird geöffnet…</string>
+    <string name="vote_waiting">Wartet</string>
+    <string name="vote_approved">Zugestimmt</string>
+    <string name="vote_denied">Abgelehnt</string>
+
+    <!-- Asking to unblock an app (§3.6) -->
+    <string name="ask_unblock_intro">Diese Apps sind blockiert. Bitte deine Wächter, eine freizugeben, und sag warum.</string>
+    <string name="ask_unblock_none">Keine Apps sind blockiert.</string>
+    <string name="ask_unblock_not_blocked">Diese App ist nicht mehr blockiert.</string>
+    <plurals name="ask_chances_left">
+        <item quantity="one">Noch %1$d von 3 Anfragen</item>
+        <item quantity="other">Noch %1$d von 3 Anfragen</item>
+    </plurals>
+    <plurals name="ask_state_denied">
+        <item quantity="one">Abgelehnt · noch %1$d von 3 Anfragen</item>
+        <item quantity="other">Abgelehnt · noch %1$d von 3 Anfragen</item>
+    </plurals>
+    <string name="ask_state_waiting">Warten auf deine Wächter</string>
+    <string name="ask_state_no_chances">Keine Anfragen mehr übrig</string>
+    <string name="ask_state_no_chances_long">Alle 3 Anfragen für diese App wurden abgelehnt. Jetzt kann nur noch ein entsperrtes Killit sie freigeben.</string>
+    <string name="ask_unblock_hint">Wofür brauchst du diese App? Mindestens 10 Zeichen.</string>
+    <string name="ask_unblock_what_they_see">Deine Wächter sehen den Namen, das Paket und die Installationsquelle der App sowie deinen Text.</string>
+    <string name="ask_send">An deine Wächter senden</string>
+    <string name="ask_withdraw">Anfrage zurückziehen</string>
+    <string name="ask_last_denied">Deine letzte Anfrage wurde abgelehnt</string>
+    <string name="text_counter">%1$d / %2$d</string>
+
+    <!-- Blocking more apps (D7) -->
+    <string name="block_more_intro">Blockiere Apps, ohne jemanden zu fragen. Sie später freizugeben, braucht deine Wächter.</string>
+    <plurals name="block_more_button">
+        <item quantity="one">%1$d App blockieren</item>
+        <item quantity="other">%1$d Apps blockieren</item>
+    </plurals>
+    <plurals name="block_more_confirm_title">
+        <item quantity="one">%1$d App blockieren?</item>
+        <item quantity="other">%1$d Apps blockieren?</item>
+    </plurals>
+    <string name="block_more_confirm_body">Du kannst sie nicht selbst wieder freigeben. Dafür brauchst du die Zustimmung deiner Wächter.</string>
+    <string name="block_more_confirm">Blockieren</string>
+
+    <!-- Guardians (§15.4) -->
+    <string name="guardians_none">Noch bewacht niemand dieses Handy.</string>
+    <string name="guardians_add">Wächter hinzufügen</string>
+    <string name="guardians_add_needs_owner">Richte zuerst den Schutz unter Mein Handy ein</string>
+    <string name="guardians_ask_remove">Entfernen erbitten</string>
+    <string name="guardians_removal_pending">Entfernen beantragt. Wenn niemand ablehnt, geschieht es am %1$s.</string>
+    <string name="guardians_no_chances">Alle 3 Anfragen zum Entfernen wurden abgelehnt.</string>
+    <string name="guardians_hint_second">Ein zweiter Wächter schützt dich besser.</string>
+    <string name="guardians_hint_many">Mehr als 4 Wächter braucht man selten, und jede Anfrage wird schwerer zu bewilligen.</string>
+    <string name="guardians_gone">Diese Kopplung gibt es nicht mehr.</string>
+    <string name="rename">Umbenennen</string>
+    <string name="rename_hint">Name</string>
+    <string name="unpair_rules">Jeder Wächter wird gefragt, auch dieser. Stimmen alle zu, wird der Wächter sofort entfernt. Lehnt einer ab, endet die Anfrage und verbraucht eine deiner 3 Anfragen. Lehnt innerhalb von 30 Tagen niemand ab, wird der Wächter entfernt.</string>
+    <string name="unpair_hint">Warum soll dieser Wächter gehen? Mindestens 10 Zeichen.</string>
+
+    <!-- Phones I guard (§15.6) -->
+    <string name="guard_requests">Anfragen</string>
+    <string name="guard_requests_none">Nichts wartet auf dich.</string>
+    <string name="guard_phones">Handys</string>
+    <string name="guard_new">Ein neues Handy bewachen</string>
+    <string name="guard_leave">Nicht mehr bewachen</string>
+    <string name="guard_leave_title">Nicht mehr bewachen?</string>
+    <string name="guard_leave_body">%1$s wird benachrichtigt. Bist du der letzte Wächter, ist das Handy danach ungeschützt.</string>
+    <string name="guard_battery_title">Killit im Hintergrund laufen lassen</string>
+    <string name="guard_battery_body">Das Energiesparen kann Anfragen der Handys, die du bewachst, zurückhalten.</string>
+    <string name="history">Verlauf</string>
+    <string name="guardian_notice_title">Dein Schlüssel ist jetzt dein Wächterschlüssel</string>
+    <string name="guardian_notice_body">Du brauchst ihn jedes Mal, wenn du für die Handys, die du bewachst, etwas genehmigst, ablehnst oder blockierst. Wer ihn kennt, kann in deinem Namen Anfragen genehmigen, also behalte ihn für dich. Richte auch eine Displaysperre auf deinem Handy ein. Wenn du ihn vergisst, musst du Killit neu installieren und neu koppeln.</string>
+    <string name="guardian_notice_ok">Verstanden</string>
+
+    <!-- A request, as a guardian sees it (§15.6) -->
+    <string name="request_unblock">%1$s möchte %2$s freigeben</string>
+    <string name="request_unlock">%1$s möchte Killit entsperren</string>
+    <string name="request_unpair_you">%1$s möchte dich als Wächter entfernen</string>
+    <string name="request_unpair_named">%1$s möchte %2$s als Wächter entfernen</string>
+    <string name="request_unpair_other">%1$s möchte einen Wächter entfernen</string>
+    <string name="request_waiting_now">Wartet jetzt</string>
+    <string name="request_unlock_meaning">Wenn du zustimmst, hat %1$s die volle Kontrolle über Killit, bis die App verlassen wird.</string>
+    <string name="request_unpair_target_unknown">Es geht um einen Wächter, den du nicht kennst.</string>
+    <string name="request_unpair_timer">Wenn niemand ablehnt, wird der Wächter am %1$s entfernt.</string>
+    <plurals name="request_chances">
+        <item quantity="one">Noch %1$d von 3 Anfragen, diese mitgezählt</item>
+        <item quantity="other">Noch %1$d von 3 Anfragen, diese mitgezählt</item>
+    </plurals>
+    <string name="request_installer_play">Aus Google Play installiert</string>
+    <string name="request_installer_unknown">Aus einer unbekannten Quelle installiert</string>
+    <string name="request_installer_other">Installiert von %1$s</string>
+    <string name="request_package_note">Name und Symbol stammen von der App selbst. Prüfe den Paketnamen.</string>
+    <string name="request_view_play">In Google Play ansehen</string>
+    <string name="request_guardians">Wächter</string>
+    <string name="request_add_note">Notiz hinzufügen (optional)</string>
+    <string name="request_note_hint">Eine Notiz, die mit deiner Antwort angezeigt wird</string>
+    <string name="request_deny">Ablehnen</string>
+    <string name="request_approve">Zustimmen</string>
+    <string name="request_you_approved">Du hast zugestimmt.</string>
+    <string name="request_you_denied">Du hast abgelehnt.</string>
+    <string name="request_closed_approved">Alle Wächter haben zugestimmt.</string>
+    <string name="request_closed_denied">Abgelehnt.</string>
+    <string name="request_closed_withdrawn">Zurückgezogen.</string>
+    <string name="request_closed_uninstalled">Die App wurde deinstalliert.</string>
+    <string name="request_closed_resolved">Direkt auf dem Handy erledigt, während es entsperrt war.</string>
+    <string name="request_closed_guardian_removed">Nicht mehr nötig: Ein Wächter wurde entfernt.</string>
+    <string name="request_gone">Diese Anfrage gibt es nicht mehr.</string>
+
+    <!-- History lines (I10), written on this phone in its own language (E-F3) -->
+    <string name="event_paired">Gekoppelt</string>
+    <string name="event_left">Bewachen beendet</string>
+    <string name="event_guardian_removed">Ein Wächter wurde entfernt</string>
+    <string name="event_removed_you">Du wurdest als Wächter entfernt</string>
+    <string name="event_other_left">%1$s bewacht nicht mehr</string>
+    <string name="event_other_removed">%1$s wurde als Wächter entfernt</string>
+    <string name="event_guardian_added">%1$s ist Wächter geworden</string>
+    <string name="event_app_installed_blocked">%1$s wurde installiert und blockiert</string>
+    <string name="event_app_installed">%1$s wurde installiert</string>
+    <string name="event_release_started">Entfernen von Killit gestartet; abgeschlossen am %1$s</string>
+    <string name="event_release_cancelled">Entfernen von Killit abgebrochen</string>
+    <string name="event_protection_on">Eingeschaltet: %1$s</string>
+    <string name="event_protection_off">Ausgeschaltet: %1$s</string>
+    <string name="event_management_on">App-Verwaltung eingeschaltet</string>
+    <string name="event_management_off">App-Verwaltung ausgeschaltet</string>
+    <string name="event_request_approved">Zugestimmt: %1$s</string>
+    <string name="event_request_denied">Abgelehnt: %1$s</string>
+    <string name="event_request_cancelled">Zurückgezogen: %1$s</string>
+
+    <!-- Time -->
+    <string name="when_just_now">Gerade eben</string>
+    <plurals name="when_minutes_ago">
+        <item quantity="one">Vor %1$d Minute</item>
+        <item quantity="other">Vor %1$d Minuten</item>
+    </plurals>
+    <plurals name="when_hours_ago">
+        <item quantity="one">Vor %1$d Stunde</item>
+        <item quantity="other">Vor %1$d Stunden</item>
+    </plurals>
+    <string name="last_seen_today">Heute gesehen</string>
+    <string name="last_seen_yesterday">Gestern gesehen</string>
+    <plurals name="last_seen_days">
+        <item quantity="one">Vor %1$d Tag gesehen</item>
+        <item quantity="other">Vor %1$d Tagen gesehen</item>
+    </plurals>
+
+    <!-- The pairing wizard (§15.7) -->
+    <string name="wizard_intro_guardian">Du wirst ein anderes Handy bewachen. Seine Besitzerin oder sein Besitzer braucht deine Zustimmung, um Apps freizugeben, Killit zu entsperren oder dich als Wächter zu entfernen.</string>
+    <string name="wizard_intro_protected">Dein Wächter genehmigt oder lehnt deine Anfragen ab. Mit einem Wächter öffnet dein Schlüssel die Einstellungen von Killit nicht mehr: Zum Entsperren braucht es die Zustimmung jedes Wächters.</string>
+    <string name="wizard_needs_owner">Auf diesem Handy ist der Schutz noch nicht eingerichtet. Richte ihn zuerst ein und füge dann einen Wächter hinzu.</string>
+    <string name="wizard_set_up">Schutz einrichten</string>
+    <string name="wizard_warning">Kopple dich nur mit Menschen, die du gut kennst und persönlich getroffen hast. Weigert sich ein Wächter, die Kopplung zu lösen, kommst du nur durch Zurücksetzen des Handys heraus.</string>
+    <string name="wizard_your_name">Dein Name</string>
+    <string name="wizard_your_name_hint">So sieht dich das andere Handy</string>
+    <string name="wizard_show_code">Einen Code anzeigen</string>
+    <string name="wizard_have_code">Ich habe einen Code</string>
+    <string name="wizard_enter_code">Gib den Code vom anderen Handy ein</string>
+    <string name="wizard_join">Beitreten</string>
+    <string name="wizard_show_code_instead">Stattdessen einen Code anzeigen</string>
+    <string name="wizard_give_code">Gib diesen Code der anderen Person. Sie tippt ihn auf ihrem Handy ein.</string>
+    <string name="wizard_code_expires">Noch %1$s gültig</string>
+    <string name="wizard_share">Code teilen</string>
+    <string name="wizard_share_text">Mein Killit-Kopplungscode: %1$s (15 Minuten gültig)</string>
+    <string name="wizard_waiting_joiner">Warten auf das andere Handy…</string>
+    <string name="wizard_connecting">Die beiden Handys werden verbunden…</string>
+    <string name="wizard_call_title">Ruft euch jetzt an</string>
+    <string name="wizard_call_body">Lest euch eure 6 Ziffern gegenseitig vor. Sie müssen auf beiden Handys gleich sein.</string>
+    <string name="wizard_no_match">Stimmen nicht überein</string>
+    <string name="wizard_match">Stimmen überein</string>
+    <string name="wizard_waiting_confirm">Warten auf die Bestätigung des anderen Handys…</string>
+    <string name="wizard_finishing">Wird abgeschlossen…</string>
+    <string name="wizard_paired_title">Gekoppelt</string>
+    <string name="wizard_paired_guardian">Du bewachst jetzt %1$s.</string>
+    <string name="wizard_paired_protected">%1$s bewacht jetzt dieses Handy.</string>
+    <string name="wizard_nickname_note">Dieser Name wird nur auf deinem Handy angezeigt.</string>
+    <string name="wizard_done">Fertig</string>
+    <string name="wizard_again">Erneut versuchen</string>
+    <string name="wizard_failed_mismatch">Die Codes stimmten nicht überein, daher wurde nichts gekoppelt. Vielleicht mischt sich jemand ein. Fangt neu an und vergleicht die Codes in einem Anruf.</string>
+    <string name="wizard_failed_expired">Der Code ist abgelaufen. Fang neu an.</string>
+    <string name="wizard_failed_code">Dieser Code ist falsch, schon benutzt oder abgelaufen.</string>
+    <string name="wizard_failed_invalid">Etwas am anderen Handy ließ sich nicht prüfen, daher wurde nichts gekoppelt.</string>
+    <string name="wizard_failed_roles">Ihr habt beide dieselbe Rolle gewählt. Eine Person beginnt bei Mein Handy, die andere bei Handys, die ich bewache.</string>
+    <string name="wizard_failed_declined">Das andere Handy hat abgelehnt.</string>
+    <string name="wizard_failed_limit">Eines der Handys ist schon mit zu vielen Handys gekoppelt.</string>
+    <string name="wizard_failed_cancelled">Die Kopplung wurde abgebrochen.</string>
+
+    <!-- Messages -->
+    <string name="msg_offline">Der Killit-Server war nicht erreichbar. Killit versucht es erneut.</string>
+    <string name="msg_cant_pair">Dieses Handy kann nicht koppeln: Es kann nicht nachweisen, dass seine Schlüssel sicher in Hardware liegen.</string>
+    <string name="msg_identity_lost">Der Server kennt dieses Handy nicht mehr. Kopple es neu.</string>
+    <string name="msg_rate_limited">Zu viele Versuche. Versuch es später noch einmal.</string>
+    <string name="msg_sent">An deine Wächter gesendet.</string>
+    <string name="msg_no_guardians">Niemand bewacht dieses Handy.</string>
+    <string name="msg_bad_explanation">Schreib zwischen 10 und 500 Zeichen.</string>
 </resources>

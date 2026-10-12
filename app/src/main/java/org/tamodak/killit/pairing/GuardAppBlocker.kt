@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
+import androidx.core.graphics.createBitmap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -76,7 +77,7 @@ class GuardAppBlocker(
      * the guardian's phone builds a bitmap without any image decoder parsing network input.
      */
     private fun iconOf(pm: PackageManager, application: ApplicationInfo): ByteArray? = runCatching {
-        val bitmap = Bitmap.createBitmap(ICON_SIDE, ICON_SIDE, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(ICON_SIDE, ICON_SIDE, Bitmap.Config.ARGB_8888)
         pm.getApplicationIcon(application).apply { setBounds(0, 0, ICON_SIDE, ICON_SIDE) }.draw(Canvas(bitmap))
         val pixels = IntArray(ICON_SIDE * ICON_SIDE)
         // getPixels returns non-premultiplied sRGB ARGB, the form the protocol sends.

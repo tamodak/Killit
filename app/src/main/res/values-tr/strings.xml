@@ -52,7 +52,6 @@
     <string name="setup_saved">Şifre belirlendi.</string>
 
     <!-- Home -->
-    <string name="home_status_owner_yes">Cihaz Sahibi etkin</string>
     <string name="home_status_owner_no">Cihaz Sahibi değil</string>
     <string name="home_status_owner_yes_desc">Killit uygulamaları engelleyip engelini kaldırabilir.</string>
     <string name="home_status_owner_no_desc">Killit, Cihaz Sahibi olarak kurulmadan hiçbir şeyi engelleyemez. Aşağıdaki üç yoldan birini seç.</string>
@@ -181,4 +180,248 @@
     <string name="home_notifications_title">Bildirimlere izin ver</string>
     <string name="home_notifications_body">Killit yeni yüklenen bir uygulamayı engellediğinde sana haber verir.</string>
     <string name="home_notifications_allow">İzin ver</string>
+
+    <!-- ============================== Pairing (PLAN.md §15) ============================== -->
+
+    <!-- Hub (PLAN.md §15.3). Counts only, never names, before the passkey (I5). -->
+    <string name="hub_my_phone">Telefonum</string>
+    <string name="hub_my_phone_setup">Henüz korunmuyor · Kur</string>
+    <string name="hub_my_phone_protected">Şifrenle korunuyor</string>
+    <plurals name="hub_my_phone_guardians">
+        <item quantity="one">Korunuyor · %1$d koruyucu</item>
+        <item quantity="other">Korunuyor · %1$d koruyucu</item>
+    </plurals>
+    <plurals name="hub_my_requests_open">
+        <item quantity="one">Koruyucularına %1$d istek gönderildi</item>
+        <item quantity="other">Koruyucularına %1$d istek gönderildi</item>
+    </plurals>
+    <string name="hub_guard">Koruduğum telefonlar</string>
+    <string name="hub_guard_none">Henüz hiçbir telefonu korumuyorsun</string>
+    <plurals name="hub_guard_phones">
+        <item quantity="one">%1$d telefon</item>
+        <item quantity="other">%1$d telefon</item>
+    </plurals>
+    <plurals name="hub_guard_waiting">
+        <item quantity="one">%1$d istek bekliyor</item>
+        <item quantity="other">%1$d istek bekliyor</item>
+    </plurals>
+    <string name="update_needed">Bunu görmek için Killit\'i güncelle</string>
+    <string name="update_needed_long">Bazı mesajlar daha yeni bir Killit gerektiriyor. Görmek için Killit\'i güncelle.</string>
+
+    <!-- My phone (§15.4, §15.5) -->
+    <string name="my_phone_guardians">Koruyucular</string>
+    <string name="my_phone_guardians_none">Bu telefonu kimse korumuyor</string>
+    <string name="my_phone_settings">Ayarlar</string>
+    <string name="my_phone_settings_desc">Koruma seçenekleri, dil, şifre</string>
+    <string name="my_phone_unlocked_title">Koruyucuların kilidi açtı</string>
+    <string name="my_phone_unlocked_body">Killit\'ten çıkana kadar tüm kontrol sende. Çıkınca yeniden kilitlenir.</string>
+    <string name="my_phone_locked_body">Koruyucuların bu telefonu koruyor. Ayarları değiştirmek için önce onlarla konuş, sonra kilit açma isteği gönder.</string>
+    <string name="my_phone_unlock">Killit\'in kilidini aç</string>
+    <string name="my_phone_ask_unblock">Bir uygulamanın engelini kaldırmayı iste</string>
+    <string name="my_phone_ask_unblock_desc">Koruyucuların karar verir</string>
+    <string name="my_phone_block_more">Daha fazla uygulama engelle</string>
+    <string name="my_phone_block_more_desc">Kimseye sormadan</string>
+    <string name="my_phone_my_guardians">Koruyucularım</string>
+    <string name="harden_date_time_guarded">Koruyucuların varken zorunlu.</string>
+    <string name="release_guardians_note">Koruyucularına haber verilir; işlem tamamlanınca kaldırılırlar.</string>
+
+    <!-- The live unlock (§3.4) -->
+    <string name="unlock_title">Killit\'in kilidini aç</string>
+    <string name="unlock_intro">Önce koruyucularınla konuş. Sonra isteği gönder ve bu ekranda kal: hepsi onaylayınca Killit açılır.</string>
+    <string name="unlock_explanation_hint">Koruyucuların için bir not (isteğe bağlı)</string>
+    <string name="unlock_send">Kilit açma isteğini gönder</string>
+    <string name="unlock_waiting_title">Koruyucuların bekleniyor</string>
+    <string name="unlock_waiting_body">Bu ekranda kal. Çıkarsan istek iptal olur.</string>
+    <string name="unlock_denied_title">İstek reddedildi</string>
+    <string name="unlock_cooldown">%1$s sonra yeniden isteyebilirsin.</string>
+    <string name="unlock_daily_limit">Bugünün kilit açma isteklerini kullandın. Yarın yeniden dene.</string>
+    <string name="unlock_approved">Onaylandı. Açılıyor…</string>
+    <string name="vote_waiting">Bekliyor</string>
+    <string name="vote_approved">Onayladı</string>
+    <string name="vote_denied">Reddetti</string>
+
+    <!-- Asking to unblock an app (§3.6) -->
+    <string name="ask_unblock_intro">Bu uygulamalar engelli. Birine izin vermelerini koruyucularından iste ve nedenini söyle.</string>
+    <string name="ask_unblock_none">Engelli uygulama yok.</string>
+    <string name="ask_unblock_not_blocked">Bu uygulama artık engelli değil.</string>
+    <plurals name="ask_chances_left">
+        <item quantity="one">3 istekten %1$d tane kaldı</item>
+        <item quantity="other">3 istekten %1$d tane kaldı</item>
+    </plurals>
+    <plurals name="ask_state_denied">
+        <item quantity="one">Reddedildi · 3 istekten %1$d tane kaldı</item>
+        <item quantity="other">Reddedildi · 3 istekten %1$d tane kaldı</item>
+    </plurals>
+    <string name="ask_state_waiting">Koruyucuların bekleniyor</string>
+    <string name="ask_state_no_chances">İstek hakkı kalmadı</string>
+    <string name="ask_state_no_chances_long">Bu uygulama için 3 isteğin de reddedildi. Artık yalnızca kilidi açılmış bir Killit izin verebilir.</string>
+    <string name="ask_unblock_hint">Bu uygulamaya neden ihtiyacın var? En az 10 karakter.</string>
+    <string name="ask_unblock_what_they_see">Koruyucuların uygulamanın adını, paket adını, yükleyicisini ve yazdıklarını görür.</string>
+    <string name="ask_send">Koruyucularına gönder</string>
+    <string name="ask_withdraw">İsteği geri çek</string>
+    <string name="ask_last_denied">Son isteğin reddedildi</string>
+    <string name="text_counter">%1$d / %2$d</string>
+
+    <!-- Blocking more apps (D7) -->
+    <string name="block_more_intro">Kimseye sormadan uygulama engelle. Sonradan engeli kaldırmak koruyucularının onayını gerektirir.</string>
+    <plurals name="block_more_button">
+        <item quantity="one">%1$d uygulamayı engelle</item>
+        <item quantity="other">%1$d uygulamayı engelle</item>
+    </plurals>
+    <plurals name="block_more_confirm_title">
+        <item quantity="one">%1$d uygulama engellensin mi?</item>
+        <item quantity="other">%1$d uygulama engellensin mi?</item>
+    </plurals>
+    <string name="block_more_confirm_body">Bunların engelini kendin kaldıramayacaksın. Engeli kaldırmak koruyucularının onayını gerektirecek.</string>
+    <string name="block_more_confirm">Engelle</string>
+
+    <!-- Guardians (§15.4) -->
+    <string name="guardians_none">Bu telefonu henüz kimse korumuyor.</string>
+    <string name="guardians_add">Koruyucu ekle</string>
+    <string name="guardians_add_needs_owner">Önce Telefonum\'da korumayı kur</string>
+    <string name="guardians_ask_remove">Kaldırılmasını iste</string>
+    <string name="guardians_removal_pending">Kaldırma istendi. Biri reddetmezse %1$s tarihinde gerçekleşir.</string>
+    <string name="guardians_no_chances">3 kaldırma isteğinin üçü de reddedildi.</string>
+    <string name="guardians_hint_second">İkinci bir koruyucu eklemek seni daha iyi korur.</string>
+    <string name="guardians_hint_many">4\'ten fazla koruyucu nadiren gerekir ve her isteğin onaylanmasını zorlaştırır.</string>
+    <string name="guardians_gone">Bu eşleşme artık yok.</string>
+    <string name="rename">Yeniden adlandır</string>
+    <string name="rename_hint">Ad</string>
+    <string name="unpair_rules">Bu kişi dahil her koruyucuya sorulur. Hepsi onaylarsa koruyucu hemen kaldırılır. Biri reddederse istek biter ve 3 isteğinden biri harcanır. 30 gün içinde kimse reddetmezse koruyucu kaldırılır.</string>
+    <string name="unpair_hint">Bu koruyucu neden ayrılmalı? En az 10 karakter.</string>
+
+    <!-- Phones I guard (§15.6) -->
+    <string name="guard_requests">İstekler</string>
+    <string name="guard_requests_none">Seni bekleyen bir şey yok.</string>
+    <string name="guard_phones">Telefonlar</string>
+    <string name="guard_new">Yeni bir telefonu koru</string>
+    <string name="guard_leave">Korumayı bırak</string>
+    <string name="guard_leave_title">Korumayı bırakmak istiyor musun?</string>
+    <string name="guard_leave_body">%1$s bilgilendirilecek. Son koruyucusu sensen telefonu korumasız kalır.</string>
+    <string name="guard_battery_title">Killit\'in arka planda çalışmasına izin ver</string>
+    <string name="guard_battery_body">Pil tasarrufu, koruduğun telefonlardan gelen istekleri geciktirebilir.</string>
+    <string name="history">Geçmiş</string>
+    <string name="guardian_notice_title">Şifren artık koruyucu anahtarın</string>
+    <string name="guardian_notice_body">Koruduğun telefonlar için bir şeyi onayladığında, reddettiğinde ya da engellediğinde her seferinde ona ihtiyacın olacak. Onu bilen herkes senin adına istekleri onaylayabilir, bu yüzden kendine sakla. Telefonuna bir ekran kilidi de koy. Unutursan Killit\'i yeniden yükleyip yeniden eşleşmen gerekir.</string>
+    <string name="guardian_notice_ok">Anladım</string>
+
+    <!-- A request, as a guardian sees it (§15.6) -->
+    <string name="request_unblock">%1$s, %2$s uygulamasının engelini kaldırmak istiyor</string>
+    <string name="request_unlock">%1$s, Killit\'in kilidini açmak istiyor</string>
+    <string name="request_unpair_you">%1$s seni koruyuculuktan kaldırmak istiyor</string>
+    <string name="request_unpair_named">%1$s, %2$s kişisini koruyuculuktan kaldırmak istiyor</string>
+    <string name="request_unpair_other">%1$s bir koruyucuyu kaldırmak istiyor</string>
+    <string name="request_waiting_now">Şu an bekliyor</string>
+    <string name="request_unlock_meaning">Onaylarsan %1$s, uygulamadan çıkana kadar Killit\'in tüm kontrolünü alır.</string>
+    <string name="request_unpair_target_unknown">Tanımadığın bir koruyucuyla ilgili.</string>
+    <string name="request_unpair_timer">Biri reddetmezse koruyucu %1$s tarihinde kaldırılır.</string>
+    <plurals name="request_chances">
+        <item quantity="one">Bununla birlikte 3 istekten %1$d tane kaldı</item>
+        <item quantity="other">Bununla birlikte 3 istekten %1$d tane kaldı</item>
+    </plurals>
+    <string name="request_installer_play">Google Play\'den yüklendi</string>
+    <string name="request_installer_unknown">Bilinmeyen bir kaynaktan yüklendi</string>
+    <string name="request_installer_other">Yükleyen: %1$s</string>
+    <string name="request_package_note">Ad ve simge uygulamanın kendisinden gelir. Paket adını kontrol et.</string>
+    <string name="request_view_play">Google Play\'de gör</string>
+    <string name="request_guardians">Koruyucular</string>
+    <string name="request_add_note">Not ekle (isteğe bağlı)</string>
+    <string name="request_note_hint">Cevabınla birlikte görecekleri bir not</string>
+    <string name="request_deny">Reddet</string>
+    <string name="request_approve">Onayla</string>
+    <string name="request_you_approved">Bunu onayladın.</string>
+    <string name="request_you_denied">Bunu reddettin.</string>
+    <string name="request_closed_approved">Tüm koruyucular onayladı.</string>
+    <string name="request_closed_denied">Reddedildi.</string>
+    <string name="request_closed_withdrawn">Geri çekildi.</string>
+    <string name="request_closed_uninstalled">Uygulama kaldırıldı.</string>
+    <string name="request_closed_resolved">Kilidi açıkken telefonun kendisinde halledildi.</string>
+    <string name="request_closed_guardian_removed">Artık gerekmiyor: bir koruyucu kaldırıldı.</string>
+    <string name="request_gone">Bu istek artık yok.</string>
+
+    <!-- History lines (I10), written on this phone in its own language (E-F3) -->
+    <string name="event_paired">Eşleşildi</string>
+    <string name="event_left">Koruma bırakıldı</string>
+    <string name="event_guardian_removed">Bir koruyucu kaldırıldı</string>
+    <string name="event_removed_you">Koruyuculuktan kaldırıldın</string>
+    <string name="event_other_left">%1$s korumayı bıraktı</string>
+    <string name="event_other_removed">%1$s koruyuculuktan kaldırıldı</string>
+    <string name="event_guardian_added">%1$s koruyucu oldu</string>
+    <string name="event_app_installed_blocked">%1$s yüklendi ve engellendi</string>
+    <string name="event_app_installed">%1$s yüklendi</string>
+    <string name="event_release_started">Killit\'in kaldırılması başlatıldı; %1$s tarihinde tamamlanır</string>
+    <string name="event_release_cancelled">Killit\'in kaldırılması durduruldu</string>
+    <string name="event_protection_on">Açıldı: %1$s</string>
+    <string name="event_protection_off">Kapatıldı: %1$s</string>
+    <string name="event_management_on">Uygulama yönetimi açıldı</string>
+    <string name="event_management_off">Uygulama yönetimi kapatıldı</string>
+    <string name="event_request_approved">Onaylandı: %1$s</string>
+    <string name="event_request_denied">Reddedildi: %1$s</string>
+    <string name="event_request_cancelled">Geri çekildi: %1$s</string>
+
+    <!-- Time -->
+    <string name="when_just_now">Az önce</string>
+    <plurals name="when_minutes_ago">
+        <item quantity="one">%1$d dakika önce</item>
+        <item quantity="other">%1$d dakika önce</item>
+    </plurals>
+    <plurals name="when_hours_ago">
+        <item quantity="one">%1$d saat önce</item>
+        <item quantity="other">%1$d saat önce</item>
+    </plurals>
+    <string name="last_seen_today">Bugün görüldü</string>
+    <string name="last_seen_yesterday">Dün görüldü</string>
+    <plurals name="last_seen_days">
+        <item quantity="one">%1$d gün önce görüldü</item>
+        <item quantity="other">%1$d gün önce görüldü</item>
+    </plurals>
+
+    <!-- The pairing wizard (§15.7) -->
+    <string name="wizard_intro_guardian">Başka bir telefonu koruyacaksın. Sahibinin uygulamaların engelini kaldırmak, Killit\'in kilidini açmak ya da seni koruyuculuktan kaldırmak için senin onayına ihtiyacı olacak.</string>
+    <string name="wizard_intro_protected">Koruyucun isteklerini onaylar ya da reddeder. Bir koruyucun olduğunda şifren artık Killit\'in ayarlarını açmaz: kilidi açmak için her koruyucunun onayı gerekir.</string>
+    <string name="wizard_needs_owner">Bu telefonda koruma henüz kurulmadı. Önce kur, sonra koruyucu ekle.</string>
+    <string name="wizard_set_up">Korumayı kur</string>
+    <string name="wizard_warning">Yalnızca iyi tanıdığın ve gerçek hayatta tanıştığın kişilerle eşleş. Bir koruyucu eşleşmeyi bitirmeyi reddederse, ayrılmanın tek yolu telefonu sıfırlamaktır.</string>
+    <string name="wizard_your_name">Adın</string>
+    <string name="wizard_your_name_hint">Diğer telefonun seni göreceği ad</string>
+    <string name="wizard_show_code">Bir kod göster</string>
+    <string name="wizard_have_code">Kodum var</string>
+    <string name="wizard_enter_code">Diğer telefondaki kodu yaz</string>
+    <string name="wizard_join">Katıl</string>
+    <string name="wizard_show_code_instead">Bunun yerine bir kod göster</string>
+    <string name="wizard_give_code">Bu kodu diğer kişiye ver. O da kendi telefonuna yazsın.</string>
+    <string name="wizard_code_expires">Kalan süre: %1$s</string>
+    <string name="wizard_share">Kodu paylaş</string>
+    <string name="wizard_share_text">Killit eşleşme kodum: %1$s (15 dakika geçerli)</string>
+    <string name="wizard_waiting_joiner">Diğer telefon bekleniyor…</string>
+    <string name="wizard_connecting">İki telefon bağlanıyor…</string>
+    <string name="wizard_call_title">Şimdi birbirinizi arayın</string>
+    <string name="wizard_call_body">6 haneli kodlarınızı birbirinize okuyun. İki telefonda da aynı olmalı.</string>
+    <string name="wizard_no_match">Eşleşmiyor</string>
+    <string name="wizard_match">Eşleşiyor</string>
+    <string name="wizard_waiting_confirm">Diğer telefonun onayı bekleniyor…</string>
+    <string name="wizard_finishing">Tamamlanıyor…</string>
+    <string name="wizard_paired_title">Eşleşildi</string>
+    <string name="wizard_paired_guardian">Artık %1$s telefonunu koruyorsun.</string>
+    <string name="wizard_paired_protected">Artık %1$s bu telefonu koruyor.</string>
+    <string name="wizard_nickname_note">Bu ad yalnızca senin telefonunda görünür.</string>
+    <string name="wizard_done">Bitti</string>
+    <string name="wizard_again">Yeniden dene</string>
+    <string name="wizard_failed_mismatch">Kodlar eşleşmedi, bu yüzden eşleşme yapılmadı. Biri araya girmeye çalışıyor olabilir. Yeniden başlayın ve kodları bir aramada karşılaştırın.</string>
+    <string name="wizard_failed_expired">Kodun süresi doldu. Yeniden başla.</string>
+    <string name="wizard_failed_code">Bu kod yanlış, kullanılmış ya da süresi dolmuş.</string>
+    <string name="wizard_failed_invalid">Diğer telefonla ilgili bir şey doğrulanamadı, bu yüzden eşleşme yapılmadı.</string>
+    <string name="wizard_failed_roles">İkiniz de aynı rolü seçtiniz. Biriniz Telefonum\'dan, diğeriniz Koruduğum telefonlar\'dan başlamalı.</string>
+    <string name="wizard_failed_declined">Diğer telefon reddetti.</string>
+    <string name="wizard_failed_limit">Telefonlardan biri zaten çok fazla telefonla eşleşmiş.</string>
+    <string name="wizard_failed_cancelled">Eşleşme iptal edildi.</string>
+
+    <!-- Messages -->
+    <string name="msg_offline">Killit sunucusuna ulaşılamadı. Killit yeniden deneyecek.</string>
+    <string name="msg_cant_pair">Bu telefon eşleşemez: anahtarlarının donanımda güvenle tutulduğunu kanıtlayamıyor.</string>
+    <string name="msg_identity_lost">Sunucu bu telefonu artık tanımıyor. Yeniden eşleş.</string>
+    <string name="msg_rate_limited">Çok fazla deneme. Daha sonra yeniden dene.</string>
+    <string name="msg_sent">Koruyucularına gönderildi.</string>
+    <string name="msg_no_guardians">Bu telefonu kimse korumuyor.</string>
+    <string name="msg_bad_explanation">10 ile 500 karakter arasında yaz.</string>
 </resources>

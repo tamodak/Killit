@@ -60,7 +60,6 @@
     <string name="setup_saved">Passkey set.</string>
 
     <!-- Home -->
-    <string name="home_status_owner_yes">Device Owner active</string>
     <string name="home_status_owner_no">Not a Device Owner</string>
     <string name="home_status_owner_yes_desc">Killit can block and unblock apps.</string>
     <string name="home_status_owner_no_desc">Killit cannot block anything until it is provisioned as Device Owner. Pick one of the three ways below.</string>
@@ -192,4 +191,248 @@
     <string name="home_notifications_title">Allow notifications</string>
     <string name="home_notifications_body">Killit tells you when it blocks a newly installed app.</string>
     <string name="home_notifications_allow">Allow</string>
+
+    <!-- ============================== Pairing (PLAN.md §15) ============================== -->
+
+    <!-- Hub (PLAN.md §15.3). Counts only, never names, before the passkey (I5). -->
+    <string name="hub_my_phone">My phone</string>
+    <string name="hub_my_phone_setup">Not protected yet · Set up</string>
+    <string name="hub_my_phone_protected">Protected by your passkey</string>
+    <plurals name="hub_my_phone_guardians">
+        <item quantity="one">Protected · %1$d guardian</item>
+        <item quantity="other">Protected · %1$d guardians</item>
+    </plurals>
+    <plurals name="hub_my_requests_open">
+        <item quantity="one">%1$d request sent to your guardians</item>
+        <item quantity="other">%1$d requests sent to your guardians</item>
+    </plurals>
+    <string name="hub_guard">Phones I guard</string>
+    <string name="hub_guard_none">You don\'t guard any phones yet</string>
+    <plurals name="hub_guard_phones">
+        <item quantity="one">%1$d phone</item>
+        <item quantity="other">%1$d phones</item>
+    </plurals>
+    <plurals name="hub_guard_waiting">
+        <item quantity="one">%1$d request waiting</item>
+        <item quantity="other">%1$d requests waiting</item>
+    </plurals>
+    <string name="update_needed">Update Killit to see this</string>
+    <string name="update_needed_long">Some messages need a newer Killit. Update Killit to see them.</string>
+
+    <!-- My phone (§15.4, §15.5) -->
+    <string name="my_phone_guardians">Guardians</string>
+    <string name="my_phone_guardians_none">Nobody guards this phone</string>
+    <string name="my_phone_settings">Settings</string>
+    <string name="my_phone_settings_desc">Protection options, language, passkey</string>
+    <string name="my_phone_unlocked_title">Unlocked by your guardians</string>
+    <string name="my_phone_unlocked_body">You have full control until you leave Killit. Leaving locks it again.</string>
+    <string name="my_phone_locked_body">Your guardians keep this phone protected. To change settings, talk to them first, then send an unlock request.</string>
+    <string name="my_phone_unlock">Unlock Killit</string>
+    <string name="my_phone_ask_unblock">Ask to unblock an app</string>
+    <string name="my_phone_ask_unblock_desc">Your guardians decide</string>
+    <string name="my_phone_block_more">Block more apps</string>
+    <string name="my_phone_block_more_desc">Without asking anyone</string>
+    <string name="my_phone_my_guardians">My guardians</string>
+    <string name="harden_date_time_guarded">Required while you have guardians.</string>
+    <string name="release_guardians_note">Your guardians are told, and removed when it completes.</string>
+
+    <!-- The live unlock (§3.4) -->
+    <string name="unlock_title">Unlock Killit</string>
+    <string name="unlock_intro">Talk to your guardians first. Then send the request and stay on this screen: Killit opens when all of them approve.</string>
+    <string name="unlock_explanation_hint">A note for your guardians (optional)</string>
+    <string name="unlock_send">Send the unlock request</string>
+    <string name="unlock_waiting_title">Waiting for your guardians</string>
+    <string name="unlock_waiting_body">Stay on this screen. Leaving cancels the request.</string>
+    <string name="unlock_denied_title">The request was denied</string>
+    <string name="unlock_cooldown">You can ask again in %1$s.</string>
+    <string name="unlock_daily_limit">You have sent today\'s unlock requests. Try again tomorrow.</string>
+    <string name="unlock_approved">Approved. Opening…</string>
+    <string name="vote_waiting">Waiting</string>
+    <string name="vote_approved">Approved</string>
+    <string name="vote_denied">Denied</string>
+
+    <!-- Asking to unblock an app (§3.6) -->
+    <string name="ask_unblock_intro">These apps are blocked. Ask your guardians to allow one, and say why.</string>
+    <string name="ask_unblock_none">No apps are blocked.</string>
+    <string name="ask_unblock_not_blocked">This app isn\'t blocked any more.</string>
+    <plurals name="ask_chances_left">
+        <item quantity="one">%1$d of 3 requests left</item>
+        <item quantity="other">%1$d of 3 requests left</item>
+    </plurals>
+    <plurals name="ask_state_denied">
+        <item quantity="one">Denied · %1$d of 3 requests left</item>
+        <item quantity="other">Denied · %1$d of 3 requests left</item>
+    </plurals>
+    <string name="ask_state_waiting">Waiting for your guardians</string>
+    <string name="ask_state_no_chances">No requests left</string>
+    <string name="ask_state_no_chances_long">All 3 requests for this app were denied. Only an unlocked Killit can allow it now.</string>
+    <string name="ask_unblock_hint">Why do you need this app? At least 10 characters.</string>
+    <string name="ask_unblock_what_they_see">Your guardians see the app\'s name, package and installer, and what you write.</string>
+    <string name="ask_send">Send to your guardians</string>
+    <string name="ask_withdraw">Withdraw the request</string>
+    <string name="ask_last_denied">Your last request was denied</string>
+    <string name="text_counter">%1$d / %2$d</string>
+
+    <!-- Blocking more apps (D7) -->
+    <string name="block_more_intro">Block apps without asking anyone. Unblocking them later needs your guardians.</string>
+    <plurals name="block_more_button">
+        <item quantity="one">Block %1$d app</item>
+        <item quantity="other">Block %1$d apps</item>
+    </plurals>
+    <plurals name="block_more_confirm_title">
+        <item quantity="one">Block %1$d app?</item>
+        <item quantity="other">Block %1$d apps?</item>
+    </plurals>
+    <string name="block_more_confirm_body">You won\'t be able to unblock these yourself. Unblocking will need your guardians\' approval.</string>
+    <string name="block_more_confirm">Block</string>
+
+    <!-- Guardians (§15.4) -->
+    <string name="guardians_none">Nobody guards this phone yet.</string>
+    <string name="guardians_add">Add a guardian</string>
+    <string name="guardians_add_needs_owner">Set up protection on My phone first</string>
+    <string name="guardians_ask_remove">Ask to remove</string>
+    <string name="guardians_removal_pending">Removal requested. Unless someone denies it, it happens on %1$s.</string>
+    <string name="guardians_no_chances">All 3 removal requests were denied.</string>
+    <string name="guardians_hint_second">Adding a second guardian gives you more protection.</string>
+    <string name="guardians_hint_many">More than 4 guardians is rarely needed and makes every request harder to get approved.</string>
+    <string name="guardians_gone">This pairing no longer exists.</string>
+    <string name="rename">Rename</string>
+    <string name="rename_hint">Name</string>
+    <string name="unpair_rules">Every guardian is asked, this one included. If all of them approve, the guardian is removed at once. If one denies, the request ends and uses one of your 3 requests. If nobody denies within 30 days, the guardian is removed.</string>
+    <string name="unpair_hint">Why should this guardian go? At least 10 characters.</string>
+
+    <!-- Phones I guard (§15.6) -->
+    <string name="guard_requests">Requests</string>
+    <string name="guard_requests_none">Nothing is waiting for you.</string>
+    <string name="guard_phones">Phones</string>
+    <string name="guard_new">Guard a new phone</string>
+    <string name="guard_leave">Stop guarding</string>
+    <string name="guard_leave_title">Stop guarding?</string>
+    <string name="guard_leave_body">%1$s will be told. If you are their last guardian, their phone becomes unprotected.</string>
+    <string name="guard_battery_title">Let Killit run in the background</string>
+    <string name="guard_battery_body">Battery saving can hold back requests from the phones you guard.</string>
+    <string name="history">History</string>
+    <string name="guardian_notice_title">Your passkey is now your guardian key</string>
+    <string name="guardian_notice_body">You\'ll need it every time you approve, deny or block something for the phones you guard. Anyone who knows it can approve requests in your name, so keep it to yourself. Also set a screen lock on your phone. If you forget it, you\'ll have to reinstall Killit and pair again.</string>
+    <string name="guardian_notice_ok">I understand</string>
+
+    <!-- A request, as a guardian sees it (§15.6) -->
+    <string name="request_unblock">%1$s wants to unblock %2$s</string>
+    <string name="request_unlock">%1$s wants to unlock Killit</string>
+    <string name="request_unpair_you">%1$s wants to remove you as a guardian</string>
+    <string name="request_unpair_named">%1$s wants to remove %2$s as a guardian</string>
+    <string name="request_unpair_other">%1$s wants to remove a guardian</string>
+    <string name="request_waiting_now">Waiting now</string>
+    <string name="request_unlock_meaning">Approving gives %1$s full control of Killit until they leave the app.</string>
+    <string name="request_unpair_target_unknown">It is about a guardian you don\'t know.</string>
+    <string name="request_unpair_timer">Unless someone denies it, the guardian is removed on %1$s.</string>
+    <plurals name="request_chances">
+        <item quantity="one">%1$d of 3 requests left, counting this one</item>
+        <item quantity="other">%1$d of 3 requests left, counting this one</item>
+    </plurals>
+    <string name="request_installer_play">Installed from Google Play</string>
+    <string name="request_installer_unknown">Installed from an unknown source</string>
+    <string name="request_installer_other">Installed by %1$s</string>
+    <string name="request_package_note">The name and icon come from the app itself. Check the package name.</string>
+    <string name="request_view_play">View on Google Play</string>
+    <string name="request_guardians">Guardians</string>
+    <string name="request_add_note">Add a note (optional)</string>
+    <string name="request_note_hint">A note they\'ll see with your answer</string>
+    <string name="request_deny">Deny</string>
+    <string name="request_approve">Approve</string>
+    <string name="request_you_approved">You approved this.</string>
+    <string name="request_you_denied">You denied this.</string>
+    <string name="request_closed_approved">Approved by every guardian.</string>
+    <string name="request_closed_denied">Denied.</string>
+    <string name="request_closed_withdrawn">Withdrawn.</string>
+    <string name="request_closed_uninstalled">The app was uninstalled.</string>
+    <string name="request_closed_resolved">Settled on the phone itself while it was unlocked.</string>
+    <string name="request_closed_guardian_removed">No longer needed: a guardian was removed.</string>
+    <string name="request_gone">This request no longer exists.</string>
+
+    <!-- History lines (I10), written on this phone in its own language (E-F3) -->
+    <string name="event_paired">Paired</string>
+    <string name="event_left">Guarding stopped</string>
+    <string name="event_guardian_removed">A guardian was removed</string>
+    <string name="event_removed_you">You were removed as a guardian</string>
+    <string name="event_other_left">%1$s stopped guarding</string>
+    <string name="event_other_removed">%1$s was removed as a guardian</string>
+    <string name="event_guardian_added">%1$s became a guardian</string>
+    <string name="event_app_installed_blocked">%1$s was installed and blocked</string>
+    <string name="event_app_installed">%1$s was installed</string>
+    <string name="event_release_started">Started removing Killit; it completes on %1$s</string>
+    <string name="event_release_cancelled">Stopped removing Killit</string>
+    <string name="event_protection_on">Turned on: %1$s</string>
+    <string name="event_protection_off">Turned off: %1$s</string>
+    <string name="event_management_on">App management turned on</string>
+    <string name="event_management_off">App management turned off</string>
+    <string name="event_request_approved">Approved: %1$s</string>
+    <string name="event_request_denied">Denied: %1$s</string>
+    <string name="event_request_cancelled">Withdrawn: %1$s</string>
+
+    <!-- Time -->
+    <string name="when_just_now">Just now</string>
+    <plurals name="when_minutes_ago">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="when_hours_ago">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+    <string name="last_seen_today">Seen today</string>
+    <string name="last_seen_yesterday">Seen yesterday</string>
+    <plurals name="last_seen_days">
+        <item quantity="one">Seen %1$d day ago</item>
+        <item quantity="other">Seen %1$d days ago</item>
+    </plurals>
+
+    <!-- The pairing wizard (§15.7) -->
+    <string name="wizard_intro_guardian">You\'ll guard another phone. Its owner will need your approval to unblock apps, to unlock Killit, or to remove you as a guardian.</string>
+    <string name="wizard_intro_protected">Your guardian will approve or deny your requests. With a guardian, your passkey no longer opens Killit\'s settings: unlocking needs every guardian\'s approval.</string>
+    <string name="wizard_needs_owner">Protection isn\'t set up on this phone yet. Set it up first, then add a guardian.</string>
+    <string name="wizard_set_up">Set up protection</string>
+    <string name="wizard_warning">Only pair with people you know well and have met in real life. If a guardian refuses to unpair, you can only leave by wiping the phone.</string>
+    <string name="wizard_your_name">Your name</string>
+    <string name="wizard_your_name_hint">How the other phone will see you</string>
+    <string name="wizard_show_code">Show a code</string>
+    <string name="wizard_have_code">I have a code</string>
+    <string name="wizard_enter_code">Type the code from the other phone</string>
+    <string name="wizard_join">Join</string>
+    <string name="wizard_show_code_instead">Show a code instead</string>
+    <string name="wizard_give_code">Give this code to the other person. They type it on their phone.</string>
+    <string name="wizard_code_expires">Valid for %1$s</string>
+    <string name="wizard_share">Share the code</string>
+    <string name="wizard_share_text">My Killit pairing code: %1$s (valid for 15 minutes)</string>
+    <string name="wizard_waiting_joiner">Waiting for the other phone…</string>
+    <string name="wizard_connecting">Connecting the two phones…</string>
+    <string name="wizard_call_title">Call each other now</string>
+    <string name="wizard_call_body">Read your 6 digits to each other. They must be the same on both phones.</string>
+    <string name="wizard_no_match">They don\'t match</string>
+    <string name="wizard_match">They match</string>
+    <string name="wizard_waiting_confirm">Waiting for the other phone to confirm…</string>
+    <string name="wizard_finishing">Finishing…</string>
+    <string name="wizard_paired_title">Paired</string>
+    <string name="wizard_paired_guardian">You now guard %1$s.</string>
+    <string name="wizard_paired_protected">%1$s now guards this phone.</string>
+    <string name="wizard_nickname_note">This name is shown only on your phone.</string>
+    <string name="wizard_done">Done</string>
+    <string name="wizard_again">Try again</string>
+    <string name="wizard_failed_mismatch">The codes didn\'t match, so nothing was paired. Someone may be interfering. Start again, and compare the codes on a call.</string>
+    <string name="wizard_failed_expired">The code expired. Start again.</string>
+    <string name="wizard_failed_code">That code is wrong, used or expired.</string>
+    <string name="wizard_failed_invalid">Something about the other phone didn\'t check out, so nothing was paired.</string>
+    <string name="wizard_failed_roles">You both chose the same role. One of you starts from My phone, the other from Phones I guard.</string>
+    <string name="wizard_failed_declined">The other phone declined.</string>
+    <string name="wizard_failed_limit">One of the phones is already paired with too many phones.</string>
+    <string name="wizard_failed_cancelled">Pairing was cancelled.</string>
+
+    <!-- Messages -->
+    <string name="msg_offline">Couldn\'t reach the Killit server. Killit will try again.</string>
+    <string name="msg_cant_pair">This phone can\'t pair: it can\'t prove that its keys are kept safe in hardware.</string>
+    <string name="msg_identity_lost">The server no longer knows this phone. Pair again.</string>
+    <string name="msg_rate_limited">Too many attempts. Try again later.</string>
+    <string name="msg_sent">Sent to your guardians.</string>
+    <string name="msg_no_guardians">Nobody guards this phone.</string>
+    <string name="msg_bad_explanation">Write between 10 and 500 characters.</string>
 </resources>

@@ -311,6 +311,95 @@ object KillitIcons {
         }
     }
 
+    /** An open padlock: the live unlock, and My phone once its guardians opened it. */
+    val Unlock: ImageVector = icon("Unlock") {
+        stroke {
+            rect(5f, 11f, 14f, 10f)
+            moveTo(8f, 11f)
+            verticalLineTo(5f)
+            arcTo(4f, 4f, 0f, false, true, 16f, 5f)
+            verticalLineTo(6f)
+        }
+    }
+
+    /** Guardians: the people who guard this phone. */
+    val People: ImageVector = icon("People") {
+        stroke {
+            circle(9f, 8f, 3.5f)
+            moveTo(3f, 20f)
+            curveTo(3f, 15.5f, 15f, 15.5f, 15f, 20f)
+        }
+        stroke(1.5f) {
+            circle(17f, 9f, 2.5f)
+            moveTo(17.5f, 14f)
+            curveTo(19.5f, 14.3f, 21f, 15.8f, 21f, 18f)
+        }
+    }
+
+    /** Requests waiting for an answer. */
+    val Inbox: ImageVector = icon("Inbox") {
+        stroke {
+            rect(3f, 4f, 18f, 16f)
+            moveTo(3f, 13f)
+            lineTo(8f, 13f)
+            lineTo(9.5f, 16f)
+            lineTo(14.5f, 16f)
+            lineTo(16f, 13f)
+            lineTo(21f, 13f)
+        }
+    }
+
+    /** Time: a countdown, "last seen", and the history. */
+    val Clock: ImageVector = icon("Clock") {
+        stroke {
+            circle(12f, 12f, 9f)
+            moveTo(12f, 7f)
+            lineTo(12f, 12f)
+            lineTo(16f, 14f)
+        }
+    }
+
+    /** Adding something: a guardian, a guarded phone. */
+    val Plus: ImageVector = icon("Plus") {
+        stroke {
+            segment(12f, 5f, 12f, 19f)
+            segment(5f, 12f, 19f, 12f)
+        }
+    }
+
+    /** Ending something: a request withdrawn, a guardian removed. */
+    val Close: ImageVector = icon("Close") {
+        stroke {
+            segment(6f, 6f, 18f, 18f)
+            segment(18f, 6f, 6f, 18f)
+        }
+    }
+
+    /** Settings: three sliders, square like everything else. */
+    val Settings: ImageVector = icon("Settings") {
+        stroke {
+            segment(3f, 6f, 21f, 6f)
+            segment(3f, 12f, 21f, 12f)
+            segment(3f, 18f, 21f, 18f)
+        }
+        solid {
+            rect(6f, 4f, 4f, 4f)
+            rect(14f, 10f, 4f, 4f)
+            rect(8f, 16f, 4f, 4f)
+        }
+    }
+
+    /** Sharing an invite code. */
+    val Share: ImageVector = icon("Share") {
+        stroke(1.5f) {
+            circle(18f, 5f, 2.5f)
+            circle(6f, 12f, 2.5f)
+            circle(18f, 19f, 2.5f)
+            segment(8.2f, 10.8f, 15.8f, 6.2f)
+            segment(8.2f, 13.2f, 15.8f, 17.8f)
+        }
+    }
+
     /** The tampered state, and nothing else — it should stay rare enough to mean something. */
     val Warning: ImageVector = icon("Warning") {
         stroke {

@@ -39,19 +39,21 @@ import org.tamodak.killit.ui.theme.KillitIcons
  * again: re-confirming against a first entry the user may have fat-fingered would just persist the
  * mistake.
  *
- * Doubles as the change-passkey screen; [onCancel] is non-null only in that mode.
+ * Doubles as the change-passkey screen; [changing] says which of the two it is.
  *
  * @param enabled false while a save is in flight.
  * @param onConfirmed called once both entries match, with the method and the passkey.
  * @param modifier applied to the screen.
- * @param onCancel leaves without setting anything. Null in first-time setup, where there is no
- *   passkey to go back to.
+ * @param changing true when replacing a passkey rather than setting the first one.
+ * @param onCancel leaves without setting anything: back to the Hub the first time, back to the
+ *   settings when changing.
  */
 @Composable
 fun CredentialSetupScreen(
     enabled: Boolean,
     onConfirmed: (LockType, String) -> Unit,
     modifier: Modifier = Modifier,
+    changing: Boolean = false,
     onCancel: (() -> Unit)? = null,
 ) {
     var selectedType by remember { mutableStateOf<LockType?>(null) }
@@ -75,8 +77,8 @@ fun CredentialSetupScreen(
     KillitScreen(
         title = when {
             type != null -> stringResource(type.labelRes())
-            onCancel == null -> stringResource(R.string.setup_title)
-            else -> stringResource(R.string.setup_change_title)
+            changing -> stringResource(R.string.setup_change_title)
+            else -> stringResource(R.string.setup_title)
         },
         modifier = modifier,
         onBack = if (type != null) ::reset else onCancel,

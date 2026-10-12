@@ -21,6 +21,11 @@ import org.tamodak.killit.data.LockType
 import org.tamodak.killit.data.PackageStatus
 import org.tamodak.killit.data.ReleaseRequest
 import org.tamodak.killit.data.VerifyResult
+import org.tamodak.killit.pairing.LiveUnlock
+import org.tamodak.killit.pairing.PairingEngine
+import org.tamodak.killit.pairing.store.PairRole
+import org.tamodak.killit.protocol.NoticeBody
+import org.tamodak.killit.protocol.ProtectionOption
 import org.tamodak.killit.protection.PackageGuard
 import org.tamodak.killit.protection.Protection
 import org.tamodak.killit.protection.ProtectionControl
@@ -34,40 +39,151 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /**
+ * What a screen asks of the session before it may be shown.
+ *
+ * The order matters: each level includes the ones before it.
+ */
+enum class Access {
+    /** Anyone holding the phone may see it: the Hub, setting the first passkey, the tampered screen. */
+    NONE,
+
+    /** The passkey was proved on this visit (PLAN.md J1): both sections, and My phone locked. */
+    PASSKEY,
+
+    /**
+     * Full control of this phone (PLAN.md §3.5): the passkey on a phone nobody guards, or every
+     * guardian's approval of a live unlock, until the user leaves the app.
+     */
+    FULL_CONTROL,
+}
+
+/**
  * Which screen the single-activity UI is showing.
  *
- * @property requiresAuthentication whether the screen may only be shown to a session that has
- *   proved the passkey. [KillitViewModel.navigateTo] refuses such a screen otherwise.
+ * @property access what the session must have proved for the screen to be shown;
+ *   [KillitViewModel.navigateTo] refuses it otherwise.
+ * @property parent where back goes. There is no back stack: every screen knows its parent.
  */
 sealed interface Screen {
-    val requiresAuthentication: Boolean get() = false
+    val access: Access get() = Access.NONE
+    val parent: Screen? get() = Hub
 
     /** Bootstrapping: reading the stores and the current suspension state. */
-    data object Loading : Screen
+    data object Loading : Screen {
+        override val parent: Screen? get() = null
+    }
 
-    /** No passkey yet — choose a method and set one. */
+    /** The first screen: My phone and Phones I guard, with counts and never names (I5). */
+    data object Hub : Screen {
+        override val parent: Screen? get() = null
+    }
+
+    /** No passkey yet: choose a method and set one. Reached from a Hub card. */
     data object Setup : Screen
 
-    /** A passkey exists; prove it. */
+    /** A passkey exists; prove it. Shown on the way into either section. */
     data object Gate : Screen
 
-    /** Unlocked. Status, hardening toggles, and the way into everything else. */
-    data object Home : Screen {
-        override val requiresAuthentication get() = true
+    /** Killit's data was cleared: apps are blocked but the passkey can no longer be verified. */
+    data object Tampered : Screen {
+        override val parent: Screen? get() = null
+    }
+
+    /**
+     * This phone: setup when Killit isn't device owner, the locked screen when it has guardians,
+     * and everything else when the session has full control.
+     */
+    data object MyPhone : Screen {
+        override val access get() = Access.PASSKEY
     }
 
     /** Choosing which packages to block. */
     data object Apps : Screen {
-        override val requiresAuthentication get() = true
+        override val access get() = Access.FULL_CONTROL
+        override val parent: Screen get() = MyPhone
     }
 
-    /** Replacing an existing passkey. The same screen as [Setup], but cancellable. */
-    data object ChangePasskey : Screen {
-        override val requiresAuthentication get() = true
+    /** Protection options, language, and giving up device owner. */
+    data object Settings : Screen {
+        override val access get() = Access.FULL_CONTROL
+        override val parent: Screen get() = MyPhone
     }
 
-    /** Killit's data was cleared: apps are blocked but the passkey can no longer be verified. */
-    data object Tampered : Screen
+    /** Replacing the passkey; reached from either section's settings. */
+    data class ChangePasskey(override val parent: Screen) : Screen {
+        override val access get() = Access.PASSKEY
+    }
+
+    /** This phone's guardians: adding one, asking to remove one. */
+    data object Guardians : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = MyPhone
+    }
+
+    /** Asking every guardian to remove one of them (UNPAIR). */
+    data class AskRemove(val pairId: String) : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = Guardians
+    }
+
+    /** The live unlock: waiting, on screen, for every guardian. */
+    data object UnlockWaiting : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = MyPhone
+    }
+
+    /** Blocked apps this phone can ask its guardians about. */
+    data object AskUnblock : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = MyPhone
+    }
+
+    /** Writing the explanation for one app (UNBLOCK_APP). */
+    data class AskUnblockApp(val packageName: String) : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = AskUnblock
+    }
+
+    /** Blocking more apps without the guardians (D7). */
+    data object BlockMore : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = MyPhone
+    }
+
+    /** Phones I guard: their requests and the phones themselves. */
+    data object Guard : Screen {
+        override val access get() = Access.PASSKEY
+    }
+
+    /**
+     * One request from a guarded phone, with Deny and Approve.
+     *
+     * @property parent the inbox, or the phone whose list it was opened from.
+     */
+    data class Request(val pairId: String, val requestId: String, override val parent: Screen = Guard) : Screen {
+        override val access get() = Access.PASSKEY
+    }
+
+    /** One guarded phone: its name, its history, and Stop guarding. */
+    data class Phone(val pairId: String) : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = Guard
+    }
+
+    /** The guardian side's settings: the passkey explanation, language, passkey. */
+    data object GuardSettings : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = Guard
+    }
+
+    /**
+     * The pairing wizard. The role follows from where it was started (PLAN.md §15.1): "Guard a new
+     * phone" makes this phone the guardian, "Add a guardian" the protected one.
+     */
+    data class Wizard(val role: PairRole) : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = if (role == PairRole.GUARDIAN) Guard else Guardians
+    }
 }
 
 /** What the gate shows after a rejected attempt. */
@@ -140,6 +256,12 @@ sealed interface ShizukuOutcome {
  * @param language which language the UI is shown in.
  * @param waitingApps packages blocked automatically that nobody has decided about yet: the app
  *   list's "New" section.
+ * @param guardianCount how many guardians this phone has; null until it is known. My phone shows
+ *   nothing until then, so a guarded phone never flashes its unlocked face.
+ * @param fullControl whether My phone is unlocked: no guardians, or a live unlock they all
+ *   approved. A display hint only; every action checks again against storage.
+ * @param unlockedByGuardians whether the full control came from a live unlock, for the banner
+ *   that says it ends on leaving.
  */
 data class KillitUiState(
     val screen: Screen = Screen.Loading,
@@ -158,6 +280,9 @@ data class KillitUiState(
     val releaseRequest: ReleaseRequest? = null,
     val language: AppLanguage = AppLanguage.DEFAULT,
     val waitingApps: Set<String> = emptySet(),
+    val guardianCount: Int? = null,
+    val fullControl: Boolean = false,
+    val unlockedByGuardians: Boolean = false,
 ) {
     /** How many checkboxes differ from what is applied: newly ticked plus newly cleared. */
     val pendingChanges: Int
@@ -192,6 +317,11 @@ data class KillitUiState(
  * saved state bundle. It dies with the ViewModel, which means process death re-locks — the
  * conservative direction.
  *
+ * The passkey opens both sections (PLAN.md J1), but on a phone with guardians it no longer opens
+ * the phone itself. Full control then needs [unlockedByGuardians]: every guardian's approval of a
+ * live unlock that is still on screen (§3.4). Whether a phone has guardians is read from storage
+ * at every point that grants something, never from a cached count that may not have arrived yet.
+ *
  * A session is only ever unlocked while the activity is started (see [unlockIfInForeground]), and
  * leaving the activity always locks it (see [lockOnBackground]). Work that is in flight when the
  * user leaves — verifying a passkey, saving the blocklist, releasing device owner — keeps running
@@ -204,6 +334,8 @@ data class KillitUiState(
  * @param guard default-blocking: records what the user decides in the app list.
  * @param protection starts protection whenever it may have become possible, and stops it before
  *   device owner is given up.
+ * @param pairing the guardians: how many there are decides whether the passkey alone opens this
+ *   phone, and only an approved live unlock opens it otherwise.
  */
 class KillitViewModel(
     private val repository: LockRepository,
@@ -212,6 +344,7 @@ class KillitViewModel(
     private val shizuku: ShizukuProvisioner,
     private val guard: PackageGuard,
     private val protection: ProtectionControl,
+    private val pairing: PairingEngine,
 ) : ViewModel() {
 
     /** The single source of UI state. Mutated only through [update] calls in this class. */
@@ -247,15 +380,23 @@ class KillitViewModel(
     private var awaitingExternalScreen = false
 
     /**
-     * Where to go once the passkey has been proved, when the session was opened for a purpose —
-     * tapping the blocked-apps notification, say. Null means Home.
+     * Where to go once the passkey has been proved: the section whose card was tapped, or what a
+     * notification asked for. Null means My phone.
      */
     private var destinationAfterUnlock: Screen? = null
+
+    /**
+     * Whether every guardian approved the live unlock on screen during this visit (§3.4). Like
+     * [authenticated], it ends when the user leaves.
+     */
+    private var unlockedByGuardians = false
 
     init {
         KillitLog.d(KillitLog.VM) { "ViewModel created; bootstrapping" }
         viewModelScope.launch { bootstrap() }
         viewModelScope.launch { followWaitingApps() }
+        viewModelScope.launch { followGuardians() }
+        viewModelScope.launch { followGateOpenings() }
     }
 
     // ---------------------------------------------------------------- startup
@@ -295,9 +436,9 @@ class KillitViewModel(
         _state.update { it.copy(language = language) }
 
         if (cached != null) {
-            KillitLog.i(KillitLog.VM, "Bootstrap: cached ${cached.lockType} record -> Gate")
+            KillitLog.i(KillitLog.VM, "Bootstrap: cached ${cached.lockType} record -> Hub")
             _state.update {
-                it.copy(lockType = cached.lockType, screen = Screen.Gate, appsLoading = true)
+                it.copy(lockType = cached.lockType, screen = Screen.Hub, appsLoading = true)
             }
             startBackgroundLoad(reconcile = true)
             return@timed
@@ -314,7 +455,8 @@ class KillitViewModel(
 
         if (record != null || !isOwner) {
             // A record here came back from durable storage — the restore after a "Clear data".
-            val screen = if (record != null) Screen.Gate else Screen.Setup
+            // Without one, the Hub's cards lead to setting the first passkey.
+            val screen = Screen.Hub
             KillitLog.i(KillitLog.VM, "Bootstrap: owner=$isOwner lock=${record?.lockType} -> $screen")
             _state.update { it.copy(screen = screen) }
             startBackgroundLoad(reconcile = false)
@@ -326,7 +468,7 @@ class KillitViewModel(
         viewModelScope.launch { loadHardening() }
         loadApps()
         val blocked = _state.value.blocked
-        val screen = if (blocked.isNotEmpty()) Screen.Tampered else Screen.Setup
+        val screen = if (blocked.isNotEmpty()) Screen.Tampered else Screen.Hub
         KillitLog.i(KillitLog.VM, "Bootstrap: blocked=${blocked.size} -> $screen")
         _state.update { it.copy(screen = screen) }
     }
@@ -346,6 +488,8 @@ class KillitViewModel(
             // Promotes a pre-provisioning passkey to durable storage, and refreshes the local
             // cache from durable if the two ever drifted.
             if (reconcile) repository.reconcile()
+            // Brings guardians back after a "Clear data", before anything reads how many there are.
+            pairing.store.reconcile()
             // Opening Killit is one of the moments protection checks every package.
             protection.ensureRunning()
         }
@@ -369,6 +513,54 @@ class KillitViewModel(
                 if (!first && arrived.isNotEmpty() && !_state.value.appsLoading) refreshApps()
                 first = false
             }
+    }
+
+    /**
+     * Keeps [KillitUiState.guardianCount] and [KillitUiState.fullControl] current. Gaining a
+     * guardian ends the full control a phone without guardians had (the safe direction); losing
+     * the last one frees it.
+     */
+    private suspend fun followGuardians() {
+        pairing.store.pairings
+            .map { all -> all.count { it.myRole == PairRole.PROTECTED } }
+            .distinctUntilChanged()
+            .collect { count ->
+                _state.update { it.copy(guardianCount = count, fullControl = authenticated && (count == 0 || unlockedByGuardians)) }
+                val screen = _state.value.screen
+                if (screen.access == Access.FULL_CONTROL && !_state.value.fullControl) {
+                    KillitLog.i(KillitLog.VM, "Guardians changed; leaving $screen")
+                    _state.update { it.copy(screen = Screen.MyPhone) }
+                }
+            }
+    }
+
+    /**
+     * Opens My phone when every guardian approved the live unlock (PLAN.md §6.2 (b)), but only if
+     * the waiting screen for that very session is still in the foreground (H10, E-B3).
+     */
+    private suspend fun followGateOpenings() {
+        pairing.effects.gateOpenings.collect { effect ->
+            val approved = pairing.unlock.state.value as? LiveUnlock.State.Approved
+            val onScreen = inForeground && authenticated && _state.value.screen == Screen.UnlockWaiting
+            if (approved?.sessionId != effect.sessionId || !onScreen) {
+                KillitLog.w(KillitLog.VM, "An approved unlock arrived for a session no longer on screen; ignored")
+                return@collect
+            }
+            KillitLog.i(KillitLog.VM, "Every guardian approved the unlock; full control until leaving")
+            unlockedByGuardians = true
+            _state.update { it.copy(screen = Screen.MyPhone, fullControl = true, unlockedByGuardians = true) }
+        }
+    }
+
+    /**
+     * Whether the session has full control, read from storage rather than the cached count: a
+     * guarded phone restored after Clear data must never count as unguarded for a moment.
+     */
+    private suspend fun hasFullControl(): Boolean {
+        if (!authenticated) return false
+        if (unlockedByGuardians) return true
+        pairing.store.reconcile()
+        return pairing.store.guardians().isEmpty()
     }
 
     /**
@@ -491,7 +683,7 @@ class KillitViewModel(
     }
 
     /**
-     * Sets or replaces the passkey, then opens Home.
+     * Sets or replaces the passkey, then goes where the user was heading.
      *
      * Setting one authenticates the session, since the setup screen has the user enter it twice —
      * but, as for [submitGate], only if the user is still here when the record has been written.
@@ -504,9 +696,15 @@ class KillitViewModel(
         viewModelScope.launch {
             KillitLog.i(KillitLog.VM, "Setting passkey ($lockType)")
             _state.update { it.copy(busy = true) }
+            val changing = authenticated && _state.value.screen is Screen.ChangePasskey
             repository.setCredential(lockType, credential)
             _state.update { it.copy(busy = false, lockType = lockType, message = UiMessage.PasskeySet) }
-            if (!unlockIfInForeground()) _state.update { it.copy(screen = Screen.Gate) }
+            val screen = _state.value.screen
+            when {
+                // A change returns to the settings it was opened from.
+                changing && screen is Screen.ChangePasskey -> _state.update { it.copy(screen = screen.parent) }
+                !unlockIfInForeground() -> _state.update { it.copy(screen = Screen.Hub) }
+            }
             // Setting the first passkey is the other moment protection can start.
             protection.ensureRunning()
         }
@@ -520,17 +718,26 @@ class KillitViewModel(
      * for whoever opens it next. Such a result is dropped: the user simply proves the passkey again
      * on return.
      *
-     * @return true when the session was unlocked and Home is showing.
+     * The destination is checked like any navigation: a screen that needs full control, asked for
+     * by a notification, becomes My phone when the guardians keep this phone locked.
+     *
+     * @return true when the session was unlocked.
      */
-    private fun unlockIfInForeground(): Boolean {
+    private suspend fun unlockIfInForeground(): Boolean {
         if (!inForeground) {
             KillitLog.i(KillitLog.VM, "Passkey proved after Killit left the foreground; staying locked")
             return false
         }
         authenticated = true
-        val destination = destinationAfterUnlock ?: Screen.Home
+        val wanted = destinationAfterUnlock ?: Screen.MyPhone
         destinationAfterUnlock = null
-        _state.update { it.copy(screen = destination) }
+        val full = hasFullControl()
+        val destination = when {
+            wanted.access != Access.FULL_CONTROL || full -> wanted
+            wanted == Screen.Apps -> Screen.AskUnblock
+            else -> Screen.MyPhone
+        }
+        _state.update { it.copy(screen = destination, fullControl = full) }
         return true
     }
 
@@ -543,7 +750,36 @@ class KillitViewModel(
      * @param screen where to go.
      */
     fun openAfterUnlock(screen: Screen) {
-        if (authenticated) navigateTo(screen) else destinationAfterUnlock = screen
+        when {
+            authenticated -> navigateTo(screen)
+            // Straight to the passkey (§15.3): a notification opens the relevant place, through
+            // the one prompt on the way in.
+            _state.value.lockType != null && _state.value.screen != Screen.Loading -> {
+                destinationAfterUnlock = screen
+                _state.update { it.copy(screen = Screen.Gate, gateFeedback = null) }
+            }
+            else -> destinationAfterUnlock = screen
+        }
+    }
+
+    /**
+     * Opens a section from the Hub: straight in when the passkey was proved on this visit, through
+     * the gate otherwise, and through setting a passkey when there is none yet (§15.9).
+     *
+     * @param screen [Screen.MyPhone] or [Screen.Guard].
+     */
+    fun openSection(screen: Screen) {
+        when {
+            authenticated -> navigateTo(screen)
+            _state.value.lockType == null -> {
+                destinationAfterUnlock = screen
+                _state.update { it.copy(screen = Screen.Setup) }
+            }
+            else -> {
+                destinationAfterUnlock = screen
+                _state.update { it.copy(screen = Screen.Gate, gateFeedback = null) }
+            }
+        }
     }
 
     // ---------------------------------------------------------------- app blocking
@@ -589,13 +825,22 @@ class KillitViewModel(
             KillitLog.d(KillitLog.VM) { "save ignored: already busy" }
             return
         }
+        // Busy from the tap on, so a second tap can't start another save while this one checks.
+        _state.update { it.copy(busy = true, saveFailures = emptyList()) }
         viewModelScope.launch {
+            if (!hasFullControl()) {
+                KillitLog.w(KillitLog.VM, "save refused: the session has no full control")
+                _state.update { it.copy(busy = false) }
+                return@launch
+            }
             KillitLog.i(KillitLog.VM, "Saving ${snapshot.pendingChanges} blocklist changes")
-            _state.update { it.copy(busy = true, saveFailures = emptyList()) }
 
             // Through the guard, so the decisions are remembered: an unblocked app stays allowed
             // after an update, a blocked one stays blocked even if it is reinstalled.
             val result = guard.applySelection(desired = snapshot.selection, current = snapshot.blocked)
+            // G11: an app unblocked here no longer needs the request its guardians were asked.
+            val unblocked = (snapshot.blocked - snapshot.selection) - result.failedToUnblock.toSet()
+            if (unblocked.isNotEmpty()) pairing.onUnblockedLocally(unblocked)
 
             // Re-read from the OS rather than assuming the write landed: any package Android
             // refused is still unblocked, and its checkbox has to go back.
@@ -637,12 +882,36 @@ class KillitViewModel(
      */
     fun setHardening(config: HardeningConfig) {
         viewModelScope.launch {
-            KillitLog.i(KillitLog.VM, "Hardening changed: $config")
-            repository.setHardening(config)
-            dpc.applyHardening(config)
-            _state.update { it.copy(hardening = config) }
+            if (!hasFullControl()) {
+                KillitLog.w(KillitLog.VM, "setHardening refused: the session has no full control")
+                return@launch
+            }
+            // I1: while anyone guards this phone the clock stays locked, or the UNPAIR timer and
+            // the release delay could be skipped by moving it.
+            val guarded = pairing.store.guardians().isNotEmpty()
+            val applied = if (guarded) config.copy(blockDateTime = true) else config
+            val before = _state.value.hardening
+            KillitLog.i(KillitLog.VM, "Hardening changed: $applied")
+            repository.setHardening(applied)
+            dpc.applyHardening(applied)
+            _state.update { it.copy(hardening = applied) }
+            // H6: guardians hear about every protection that changes.
+            for ((option, enabled) in protectionChanges(before, applied)) {
+                pairing.notifyGuardians(NoticeBody.ProtectionChanged(option, enabled))
+            }
         }
     }
+
+    /** The options that differ between two configs, as NOTICE PROTECTION_CHANGED names them. */
+    private fun protectionChanges(before: HardeningConfig, after: HardeningConfig): List<Pair<ProtectionOption, Boolean>> =
+        listOf(
+            Triple(ProtectionOption.UNINSTALL, before.blockUninstall, after.blockUninstall),
+            Triple(ProtectionOption.FORCE_STOP, before.blockForceStop, after.blockForceStop),
+            Triple(ProtectionOption.SAFE_BOOT, before.blockSafeBoot, after.blockSafeBoot),
+            Triple(ProtectionOption.FACTORY_RESET, before.blockFactoryReset, after.blockFactoryReset),
+            Triple(ProtectionOption.APPS_CONTROL, before.blockAppsControl, after.blockAppsControl),
+            Triple(ProtectionOption.DATE_TIME, before.blockDateTime, after.blockDateTime),
+        ).filter { (_, old, new) -> old != new }.map { (option, _, new) -> option to new }
 
     // ---------------------------------------------------------------- provisioning
 
@@ -729,8 +998,11 @@ class KillitViewModel(
      */
     fun requestRelease() {
         viewModelScope.launch {
+            if (!hasFullControl()) return@launch
             val request = repository.requestRelease(BuildConfig.RELEASE_DELAY_MILLIS)
             _state.update { it.copy(releaseRequest = request) }
+            // C8: guardians hear when it would complete.
+            if (request != null) pairing.notifyGuardians(NoticeBody.ReleaseStarted(request.availableAtMillis))
         }
     }
 
@@ -739,6 +1011,7 @@ class KillitViewModel(
         viewModelScope.launch {
             repository.cancelRelease()
             _state.update { it.copy(releaseRequest = null) }
+            pairing.notifyGuardians(NoticeBody.ReleaseCancelled)
         }
     }
 
@@ -752,6 +1025,7 @@ class KillitViewModel(
     fun releaseDeviceOwner() {
         if (_state.value.busy) return
         viewModelScope.launch {
+            if (!hasFullControl()) return@launch
             if (!repository.isReleaseAllowed()) {
                 KillitLog.w(KillitLog.VM, "Release refused: the waiting period has not elapsed")
                 // Re-sync so the UI shows the real remaining time rather than an enabled button.
@@ -774,6 +1048,8 @@ class KillitViewModel(
             // protecting the phone again later should start from a fresh snapshot.
             guard.forget()
             protection.stop()
+            // H7: every guardian is removed and told, while this phone can still say so.
+            pairing.releaseAll()
 
             val packages = _state.value.apps.map { it.packageName }
             dpc.releaseDeviceOwner(packages)
@@ -789,32 +1065,42 @@ class KillitViewModel(
     /**
      * Moves to another screen, clearing any stale gate feedback on the way.
      *
-     * A screen that needs a session is refused while locked. The UI only offers those screens from
-     * an unlocked one, but a tap that lands just as Killit locks would otherwise open one without
-     * the passkey.
+     * A screen the session hasn't earned is refused. The UI only offers those screens to a session
+     * that has, but a tap that lands just as Killit locks would otherwise open one without the
+     * passkey. Full control is checked against the cached guardian count, which fails closed while
+     * it is still unknown; every action behind such a screen checks storage again.
+     *
+     * Leaving the live unlock's screen withdraws the request (§3.4).
      *
      * @param screen where to go.
      */
     fun navigateTo(screen: Screen) {
-        if (screen.requiresAuthentication && !authenticated) {
-            KillitLog.w(KillitLog.VM, "navigateTo($screen) refused: session is not authenticated")
+        val allowed = when (screen.access) {
+            Access.NONE -> true
+            Access.PASSKEY -> authenticated
+            Access.FULL_CONTROL -> authenticated && (unlockedByGuardians || _state.value.guardianCount == 0)
+        }
+        if (!allowed) {
+            KillitLog.w(KillitLog.VM, "navigateTo($screen) refused: the session hasn't earned it")
             return
         }
-        KillitLog.d(KillitLog.VM) { "navigate ${_state.value.screen} -> $screen" }
+        val from = _state.value.screen
+        if (from == Screen.UnlockWaiting && screen != Screen.UnlockWaiting) {
+            viewModelScope.launch { pairing.cancelUnlock() }
+        }
+        KillitLog.d(KillitLog.VM) { "navigate $from -> $screen" }
         _state.update { it.copy(screen = screen, gateFeedback = null) }
     }
 
-    /**
-     * Returns to Home, if this session has earned it.
-     *
-     * Guarded: without the check, a back press from an unauthenticated screen would reach Home.
-     */
-    fun goHome() {
-        if (!authenticated) {
-            KillitLog.w(KillitLog.VM, "goHome refused: session is not authenticated")
-            return
+    /** Goes back to the current screen's parent; the Hub has none. */
+    fun back() {
+        val parent = _state.value.screen.parent ?: return
+        if (parent == Screen.Hub) {
+            if (_state.value.screen == Screen.UnlockWaiting) viewModelScope.launch { pairing.cancelUnlock() }
+            _state.update { it.copy(screen = Screen.Hub, gateFeedback = null) }
+        } else {
+            navigateTo(parent)
         }
-        _state.update { it.copy(screen = Screen.Home) }
     }
 
     /**
@@ -849,12 +1135,18 @@ class KillitViewModel(
 
         KillitLog.i(KillitLog.VM, "App backgrounded; re-locking")
         authenticated = false
+        unlockedByGuardians = false
+        destinationAfterUnlock = null
+        // A live unlock never survives leaving: the request is withdrawn and its nonce forgotten.
+        viewModelScope.launch { pairing.cancelUnlock() }
         _state.update {
             it.copy(
-                screen = Screen.Gate,
+                screen = Screen.Hub,
                 gateFeedback = null,
                 // Drop unsaved checkbox changes rather than carrying them past a lock.
                 selection = it.blocked,
+                fullControl = false,
+                unlockedByGuardians = false,
             )
         }
     }
@@ -904,6 +1196,7 @@ class KillitViewModel(
 
                         override fun stop() = Protection.stop(application)
                     },
+                    pairing = ServiceLocator.pairing,
                 )
             }
         }

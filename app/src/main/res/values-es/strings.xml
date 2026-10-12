@@ -53,7 +53,6 @@
     <string name="setup_saved">Clave establecida.</string>
 
     <!-- Home -->
-    <string name="home_status_owner_yes">Propietario del dispositivo activo</string>
     <string name="home_status_owner_no">No es propietario del dispositivo</string>
     <string name="home_status_owner_yes_desc">Killit puede bloquear y desbloquear apps.</string>
     <string name="home_status_owner_no_desc">Killit no puede bloquear nada hasta que se configure como propietario del dispositivo. Elige una de las tres formas de abajo.</string>
@@ -186,4 +185,260 @@
     <string name="home_notifications_title">Permitir notificaciones</string>
     <string name="home_notifications_body">Killit te avisa cuando bloquea una app recién instalada.</string>
     <string name="home_notifications_allow">Permitir</string>
+
+    <!-- ============================== Pairing (PLAN.md §15) ============================== -->
+
+    <!-- Hub (PLAN.md §15.3). Counts only, never names, before the passkey (I5). -->
+    <string name="hub_my_phone">Mi teléfono</string>
+    <string name="hub_my_phone_setup">Aún sin protección · Configurar</string>
+    <string name="hub_my_phone_protected">Protegido por tu clave</string>
+    <plurals name="hub_my_phone_guardians">
+        <item quantity="one">Protegido · %1$d guardián</item>
+        <item quantity="many">Protegido · %1$d guardianes</item>
+        <item quantity="other">Protegido · %1$d guardianes</item>
+    </plurals>
+    <plurals name="hub_my_requests_open">
+        <item quantity="one">%1$d solicitud enviada a tus guardianes</item>
+        <item quantity="many">%1$d solicitudes enviadas a tus guardianes</item>
+        <item quantity="other">%1$d solicitudes enviadas a tus guardianes</item>
+    </plurals>
+    <string name="hub_guard">Teléfonos que protejo</string>
+    <string name="hub_guard_none">Aún no proteges ningún teléfono</string>
+    <plurals name="hub_guard_phones">
+        <item quantity="one">%1$d teléfono</item>
+        <item quantity="many">%1$d teléfonos</item>
+        <item quantity="other">%1$d teléfonos</item>
+    </plurals>
+    <plurals name="hub_guard_waiting">
+        <item quantity="one">%1$d solicitud en espera</item>
+        <item quantity="many">%1$d solicitudes en espera</item>
+        <item quantity="other">%1$d solicitudes en espera</item>
+    </plurals>
+    <string name="update_needed">Actualiza Killit para ver esto</string>
+    <string name="update_needed_long">Algunos mensajes necesitan un Killit más reciente. Actualiza Killit para verlos.</string>
+
+    <!-- My phone (§15.4, §15.5) -->
+    <string name="my_phone_guardians">Guardianes</string>
+    <string name="my_phone_guardians_none">Nadie protege este teléfono</string>
+    <string name="my_phone_settings">Ajustes</string>
+    <string name="my_phone_settings_desc">Opciones de protección, idioma, clave</string>
+    <string name="my_phone_unlocked_title">Desbloqueado por tus guardianes</string>
+    <string name="my_phone_unlocked_body">Tienes el control total hasta que salgas de Killit. Al salir se vuelve a bloquear.</string>
+    <string name="my_phone_locked_body">Tus guardianes protegen este teléfono. Para cambiar los ajustes, habla primero con ellos y luego envía una solicitud de desbloqueo.</string>
+    <string name="my_phone_unlock">Desbloquear Killit</string>
+    <string name="my_phone_ask_unblock">Pedir que desbloqueen una app</string>
+    <string name="my_phone_ask_unblock_desc">Deciden tus guardianes</string>
+    <string name="my_phone_block_more">Bloquear más apps</string>
+    <string name="my_phone_block_more_desc">Sin preguntar a nadie</string>
+    <string name="my_phone_my_guardians">Mis guardianes</string>
+    <string name="harden_date_time_guarded">Obligatorio mientras tengas guardianes.</string>
+    <string name="release_guardians_note">Se avisa a tus guardianes y se quitan cuando termine.</string>
+
+    <!-- The live unlock (§3.4) -->
+    <string name="unlock_title">Desbloquear Killit</string>
+    <string name="unlock_intro">Habla primero con tus guardianes. Luego envía la solicitud y quédate en esta pantalla: Killit se abre cuando todos la aprueben.</string>
+    <string name="unlock_explanation_hint">Una nota para tus guardianes (opcional)</string>
+    <string name="unlock_send">Enviar la solicitud de desbloqueo</string>
+    <string name="unlock_waiting_title">Esperando a tus guardianes</string>
+    <string name="unlock_waiting_body">Quédate en esta pantalla. Si sales, la solicitud se cancela.</string>
+    <string name="unlock_denied_title">La solicitud fue rechazada</string>
+    <string name="unlock_cooldown">Podrás volver a pedirlo en %1$s.</string>
+    <string name="unlock_daily_limit">Ya enviaste las solicitudes de desbloqueo de hoy. Vuelve a intentarlo mañana.</string>
+    <string name="unlock_approved">Aprobado. Abriendo…</string>
+    <string name="vote_waiting">Esperando</string>
+    <string name="vote_approved">Aprobado</string>
+    <string name="vote_denied">Rechazado</string>
+
+    <!-- Asking to unblock an app (§3.6) -->
+    <string name="ask_unblock_intro">Estas apps están bloqueadas. Pide a tus guardianes que permitan una y explica por qué.</string>
+    <string name="ask_unblock_none">No hay apps bloqueadas.</string>
+    <string name="ask_unblock_not_blocked">Esta app ya no está bloqueada.</string>
+    <plurals name="ask_chances_left">
+        <item quantity="one">Te queda %1$d de 3 solicitudes</item>
+        <item quantity="many">Te quedan %1$d de 3 solicitudes</item>
+        <item quantity="other">Te quedan %1$d de 3 solicitudes</item>
+    </plurals>
+    <plurals name="ask_state_denied">
+        <item quantity="one">Rechazada · te queda %1$d de 3 solicitudes</item>
+        <item quantity="many">Rechazada · te quedan %1$d de 3 solicitudes</item>
+        <item quantity="other">Rechazada · te quedan %1$d de 3 solicitudes</item>
+    </plurals>
+    <string name="ask_state_waiting">Esperando a tus guardianes</string>
+    <string name="ask_state_no_chances">No te quedan solicitudes</string>
+    <string name="ask_state_no_chances_long">Las 3 solicitudes para esta app fueron rechazadas. Ahora solo un Killit desbloqueado puede permitirla.</string>
+    <string name="ask_unblock_hint">¿Por qué necesitas esta app? Al menos 10 caracteres.</string>
+    <string name="ask_unblock_what_they_see">Tus guardianes ven el nombre, el paquete y el instalador de la app, y lo que escribas.</string>
+    <string name="ask_send">Enviar a tus guardianes</string>
+    <string name="ask_withdraw">Retirar la solicitud</string>
+    <string name="ask_last_denied">Tu última solicitud fue rechazada</string>
+    <string name="text_counter">%1$d / %2$d</string>
+
+    <!-- Blocking more apps (D7) -->
+    <string name="block_more_intro">Bloquea apps sin preguntar a nadie. Desbloquearlas después necesitará a tus guardianes.</string>
+    <plurals name="block_more_button">
+        <item quantity="one">Bloquear %1$d app</item>
+        <item quantity="many">Bloquear %1$d apps</item>
+        <item quantity="other">Bloquear %1$d apps</item>
+    </plurals>
+    <plurals name="block_more_confirm_title">
+        <item quantity="one">¿Bloquear %1$d app?</item>
+        <item quantity="many">¿Bloquear %1$d apps?</item>
+        <item quantity="other">¿Bloquear %1$d apps?</item>
+    </plurals>
+    <string name="block_more_confirm_body">No podrás desbloquearlas tú. Desbloquearlas necesitará la aprobación de tus guardianes.</string>
+    <string name="block_more_confirm">Bloquear</string>
+
+    <!-- Guardians (§15.4) -->
+    <string name="guardians_none">Aún nadie protege este teléfono.</string>
+    <string name="guardians_add">Añadir un guardián</string>
+    <string name="guardians_add_needs_owner">Configura primero la protección en Mi teléfono</string>
+    <string name="guardians_ask_remove">Pedir que lo quiten</string>
+    <string name="guardians_removal_pending">Se pidió quitarlo. Si nadie lo rechaza, ocurrirá el %1$s.</string>
+    <string name="guardians_no_chances">Las 3 solicitudes para quitarlo fueron rechazadas.</string>
+    <string name="guardians_hint_second">Añadir un segundo guardián te protege más.</string>
+    <string name="guardians_hint_many">Rara vez hacen falta más de 4 guardianes, y cada solicitud se vuelve más difícil de aprobar.</string>
+    <string name="guardians_gone">Este emparejamiento ya no existe.</string>
+    <string name="rename">Cambiar el nombre</string>
+    <string name="rename_hint">Nombre</string>
+    <string name="unpair_rules">Se pregunta a todos los guardianes, también a este. Si todos lo aprueban, el guardián se quita al momento. Si uno lo rechaza, la solicitud termina y gasta una de tus 3 solicitudes. Si nadie lo rechaza en 30 días, el guardián se quita.</string>
+    <string name="unpair_hint">¿Por qué debería irse este guardián? Al menos 10 caracteres.</string>
+
+    <!-- Phones I guard (§15.6) -->
+    <string name="guard_requests">Solicitudes</string>
+    <string name="guard_requests_none">No hay nada esperándote.</string>
+    <string name="guard_phones">Teléfonos</string>
+    <string name="guard_new">Proteger un teléfono nuevo</string>
+    <string name="guard_leave">Dejar de proteger</string>
+    <string name="guard_leave_title">¿Dejar de proteger?</string>
+    <string name="guard_leave_body">Se avisará a %1$s. Si eres su último guardián, su teléfono queda sin protección.</string>
+    <string name="guard_battery_title">Deja que Killit funcione en segundo plano</string>
+    <string name="guard_battery_body">El ahorro de batería puede retrasar las solicitudes de los teléfonos que proteges.</string>
+    <string name="history">Historial</string>
+    <string name="guardian_notice_title">Tu clave es ahora tu llave de guardián</string>
+    <string name="guardian_notice_body">La necesitarás cada vez que apruebes, rechaces o bloquees algo para los teléfonos que proteges. Cualquiera que la conozca puede aprobar solicitudes en tu nombre, así que guárdala para ti. Pon también un bloqueo de pantalla en tu teléfono. Si la olvidas, tendrás que reinstalar Killit y volver a emparejar.</string>
+    <string name="guardian_notice_ok">Entendido</string>
+
+    <!-- A request, as a guardian sees it (§15.6) -->
+    <string name="request_unblock">%1$s quiere desbloquear %2$s</string>
+    <string name="request_unlock">%1$s quiere desbloquear Killit</string>
+    <string name="request_unpair_you">%1$s quiere quitarte como guardián</string>
+    <string name="request_unpair_named">%1$s quiere quitar a %2$s como guardián</string>
+    <string name="request_unpair_other">%1$s quiere quitar a un guardián</string>
+    <string name="request_waiting_now">Esperando ahora</string>
+    <string name="request_unlock_meaning">Si lo apruebas, %1$s tendrá el control total de Killit hasta que salga de la app.</string>
+    <string name="request_unpair_target_unknown">Se trata de un guardián que no conoces.</string>
+    <string name="request_unpair_timer">Si nadie lo rechaza, el guardián se quitará el %1$s.</string>
+    <plurals name="request_chances">
+        <item quantity="one">Le queda %1$d de 3 solicitudes, contando esta</item>
+        <item quantity="many">Le quedan %1$d de 3 solicitudes, contando esta</item>
+        <item quantity="other">Le quedan %1$d de 3 solicitudes, contando esta</item>
+    </plurals>
+    <string name="request_installer_play">Instalada desde Google Play</string>
+    <string name="request_installer_unknown">Instalada desde un origen desconocido</string>
+    <string name="request_installer_other">Instalada por %1$s</string>
+    <string name="request_package_note">El nombre y el icono los pone la propia app. Comprueba el nombre del paquete.</string>
+    <string name="request_view_play">Ver en Google Play</string>
+    <string name="request_guardians">Guardianes</string>
+    <string name="request_add_note">Añadir una nota (opcional)</string>
+    <string name="request_note_hint">Una nota que verá junto a tu respuesta</string>
+    <string name="request_deny">Rechazar</string>
+    <string name="request_approve">Aprobar</string>
+    <string name="request_you_approved">Lo aprobaste.</string>
+    <string name="request_you_denied">Lo rechazaste.</string>
+    <string name="request_closed_approved">Aprobado por todos los guardianes.</string>
+    <string name="request_closed_denied">Rechazado.</string>
+    <string name="request_closed_withdrawn">Retirado.</string>
+    <string name="request_closed_uninstalled">La app se desinstaló.</string>
+    <string name="request_closed_resolved">Resuelto en el propio teléfono mientras estaba desbloqueado.</string>
+    <string name="request_closed_guardian_removed">Ya no hace falta: se quitó un guardián.</string>
+    <string name="request_gone">Esta solicitud ya no existe.</string>
+
+    <!-- History lines (I10), written on this phone in its own language (E-F3) -->
+    <string name="event_paired">Emparejado</string>
+    <string name="event_left">Se dejó de proteger</string>
+    <string name="event_guardian_removed">Se quitó un guardián</string>
+    <string name="event_removed_you">Te quitaron como guardián</string>
+    <string name="event_other_left">%1$s dejó de proteger</string>
+    <string name="event_other_removed">Se quitó a %1$s como guardián</string>
+    <string name="event_guardian_added">%1$s pasó a ser guardián</string>
+    <string name="event_app_installed_blocked">Se instaló y se bloqueó %1$s</string>
+    <string name="event_app_installed">Se instaló %1$s</string>
+    <string name="event_release_started">Se empezó a quitar Killit; termina el %1$s</string>
+    <string name="event_release_cancelled">Se dejó de quitar Killit</string>
+    <string name="event_protection_on">Activado: %1$s</string>
+    <string name="event_protection_off">Desactivado: %1$s</string>
+    <string name="event_management_on">Gestión de apps activada</string>
+    <string name="event_management_off">Gestión de apps desactivada</string>
+    <string name="event_request_approved">Aprobado: %1$s</string>
+    <string name="event_request_denied">Rechazado: %1$s</string>
+    <string name="event_request_cancelled">Retirado: %1$s</string>
+
+    <!-- Time -->
+    <string name="when_just_now">Ahora mismo</string>
+    <plurals name="when_minutes_ago">
+        <item quantity="one">Hace %1$d minuto</item>
+        <item quantity="many">Hace %1$d minutos</item>
+        <item quantity="other">Hace %1$d minutos</item>
+    </plurals>
+    <plurals name="when_hours_ago">
+        <item quantity="one">Hace %1$d hora</item>
+        <item quantity="many">Hace %1$d horas</item>
+        <item quantity="other">Hace %1$d horas</item>
+    </plurals>
+    <string name="last_seen_today">Visto hoy</string>
+    <string name="last_seen_yesterday">Visto ayer</string>
+    <plurals name="last_seen_days">
+        <item quantity="one">Visto hace %1$d día</item>
+        <item quantity="many">Visto hace %1$d días</item>
+        <item quantity="other">Visto hace %1$d días</item>
+    </plurals>
+
+    <!-- The pairing wizard (§15.7) -->
+    <string name="wizard_intro_guardian">Vas a proteger otro teléfono. Su dueño necesitará tu aprobación para desbloquear apps, para desbloquear Killit o para quitarte como guardián.</string>
+    <string name="wizard_intro_protected">Tu guardián aprobará o rechazará tus solicitudes. Con un guardián, tu clave ya no abre los ajustes de Killit: desbloquearlo necesita la aprobación de cada guardián.</string>
+    <string name="wizard_needs_owner">La protección aún no está configurada en este teléfono. Configúrala primero y luego añade un guardián.</string>
+    <string name="wizard_set_up">Configurar la protección</string>
+    <string name="wizard_warning">Empareja solo con personas que conozcas bien y hayas visto en persona. Si un guardián se niega a desemparejar, solo podrás salir borrando el teléfono.</string>
+    <string name="wizard_your_name">Tu nombre</string>
+    <string name="wizard_your_name_hint">Cómo te verá el otro teléfono</string>
+    <string name="wizard_show_code">Mostrar un código</string>
+    <string name="wizard_have_code">Tengo un código</string>
+    <string name="wizard_enter_code">Escribe el código del otro teléfono</string>
+    <string name="wizard_join">Unirse</string>
+    <string name="wizard_show_code_instead">Mostrar un código en su lugar</string>
+    <string name="wizard_give_code">Dale este código a la otra persona. Lo escribe en su teléfono.</string>
+    <string name="wizard_code_expires">Válido durante %1$s</string>
+    <string name="wizard_share">Compartir el código</string>
+    <string name="wizard_share_text">Mi código de emparejamiento de Killit: %1$s (válido 15 minutos)</string>
+    <string name="wizard_waiting_joiner">Esperando al otro teléfono…</string>
+    <string name="wizard_connecting">Conectando los dos teléfonos…</string>
+    <string name="wizard_call_title">Llamaos ahora</string>
+    <string name="wizard_call_body">Leeos los 6 dígitos el uno al otro. Deben ser iguales en los dos teléfonos.</string>
+    <string name="wizard_no_match">No coinciden</string>
+    <string name="wizard_match">Coinciden</string>
+    <string name="wizard_waiting_confirm">Esperando a que el otro teléfono confirme…</string>
+    <string name="wizard_finishing">Terminando…</string>
+    <string name="wizard_paired_title">Emparejados</string>
+    <string name="wizard_paired_guardian">Ahora proteges a %1$s.</string>
+    <string name="wizard_paired_protected">Ahora %1$s protege este teléfono.</string>
+    <string name="wizard_nickname_note">Este nombre solo se muestra en tu teléfono.</string>
+    <string name="wizard_done">Listo</string>
+    <string name="wizard_again">Volver a intentarlo</string>
+    <string name="wizard_failed_mismatch">Los códigos no coincidían, así que no se emparejó nada. Puede que alguien esté interfiriendo. Empezad de nuevo y comparad los códigos en una llamada.</string>
+    <string name="wizard_failed_expired">El código caducó. Empieza de nuevo.</string>
+    <string name="wizard_failed_code">Ese código es incorrecto, ya se usó o caducó.</string>
+    <string name="wizard_failed_invalid">Algo del otro teléfono no se pudo verificar, así que no se emparejó nada.</string>
+    <string name="wizard_failed_roles">Los dos elegisteis el mismo papel. Uno empieza desde Mi teléfono y el otro desde Teléfonos que protejo.</string>
+    <string name="wizard_failed_declined">El otro teléfono lo rechazó.</string>
+    <string name="wizard_failed_limit">Uno de los teléfonos ya está emparejado con demasiados teléfonos.</string>
+    <string name="wizard_failed_cancelled">Se canceló el emparejamiento.</string>
+
+    <!-- Messages -->
+    <string name="msg_offline">No se pudo conectar con el servidor de Killit. Killit lo volverá a intentar.</string>
+    <string name="msg_cant_pair">Este teléfono no puede emparejarse: no puede demostrar que sus claves se guardan seguras en el hardware.</string>
+    <string name="msg_identity_lost">El servidor ya no reconoce este teléfono. Vuelve a emparejarlo.</string>
+    <string name="msg_rate_limited">Demasiados intentos. Vuelve a intentarlo más tarde.</string>
+    <string name="msg_sent">Enviado a tus guardianes.</string>
+    <string name="msg_no_guardians">Nadie protege este teléfono.</string>
+    <string name="msg_bad_explanation">Escribe entre 10 y 500 caracteres.</string>
 </resources>
