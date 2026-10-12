@@ -9,7 +9,9 @@ import kotlinx.coroutines.sync.withLock
 
 /**
  * The clear-data-proof copies of Killit's state, kept in the device owner's own application
- * restrictions: the passkey record, the pending release request and the known-package list.
+ * restrictions: the passkey record, the pending release request, the known-package list, and what
+ * pairing must not lose — this phone's guardians, the chances left to ask them, and the limits on
+ * unlock requests.
  *
  * ### Why application restrictions, of all places
  *
@@ -46,7 +48,7 @@ import kotlinx.coroutines.sync.withLock
  *
  * @param dpc the gateway to `DevicePolicyManager`, which owns the dispatcher these calls run on.
  */
-class DurableStore(private val dpc: DevicePolicyController) {
+class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStore {
 
     /** Serialises every read-merge-write of the bundle; see the class documentation. */
     private val writeLock = Mutex()
@@ -57,7 +59,7 @@ class DurableStore(private val dpc: DevicePolicyController) {
      * @return true once Killit is device owner; false while callers must fall back to their local
      *   stores.
      */
-    suspend fun isAvailable(): Boolean = dpc.isDeviceOwner()
+    override suspend fun isAvailable(): Boolean = dpc.isDeviceOwner()
 
     /**
      * Reads the credential record back.
@@ -230,6 +232,107 @@ class DurableStore(private val dpc: DevicePolicyController) {
      */
     suspend fun clearKnownPackages(): Boolean = update { remove(KEY_KNOWN_PACKAGES) }
 
+    // ---------------------------------------------------------------- pairing
+
+    /**
+     * Reads this phone's guardians.
+     *
+     * Without this copy, Clear data would erase the guardians while every app stayed blocked, and
+     * the passkey alone would then open everything: the one outcome pairing exists to prevent. An
+     * entry with a missing or unreadable field is left out, and logged loudly.
+     *
+     * @return every readable guardian; empty when none were ever written; null when Killit is not
+     *   device owner.
+     */
+    override suspend fun readGuardians(): List<DurableGuardian>? {
+        val bundle = dpc.readSelfRestrictions() ?: return null
+        val list = bundle.getBundle(KEY_GUARDIANS) ?: return emptyList()
+        return list.keySet().mapNotNull { key ->
+            list.getBundle(key)?.toGuardian().also {
+                if (it == null) KillitLog.e(KillitLog.DURABLE, "readGuardians: entry $key is corrupt; skipped")
+            }
+        }
+    }
+
+    /**
+     * Replaces the guardian list with [guardians].
+     *
+     * @return true when the device policy service accepted the write.
+     */
+    override suspend fun writeGuardians(guardians: Collection<DurableGuardian>): Boolean {
+        val written = update {
+            putBundle(KEY_GUARDIANS, Bundle().apply { guardians.forEach { putBundle(it.pairId.encodeBase64(), it.toBundle()) } })
+        }
+        if (!written) KillitLog.e(KillitLog.DURABLE, "Guardians NOT written durably (${guardians.size} entries)")
+        return written
+    }
+
+    /**
+     * Reads the UNBLOCK_APP chances left per app and certificate (D4).
+     *
+     * @return every readable entry; empty when none; null when Killit is not device owner.
+     */
+    override suspend fun readAppChances(): List<DurableAppChances>? {
+        val bundle = dpc.readSelfRestrictions() ?: return null
+        val list = bundle.getBundle(KEY_APP_CHANCES) ?: return emptyList()
+        return list.keySet().mapNotNull { key ->
+            val packageName = key.substringBefore(CHANCES_SEPARATOR)
+            val digest = key.substringAfter(CHANCES_SEPARATOR, "").decodeBase64()
+            if (digest == null || !list.containsKey(key)) null else DurableAppChances(packageName, digest, list.getInt(key))
+        }
+    }
+
+    /**
+     * Replaces the chance counters with [chances].
+     *
+     * @return true when the device policy service accepted the write.
+     */
+    override suspend fun writeAppChances(chances: Collection<DurableAppChances>): Boolean {
+        val written = update {
+            putBundle(
+                KEY_APP_CHANCES,
+                Bundle().apply {
+                    chances.forEach { putInt(it.packageName + CHANCES_SEPARATOR + it.certDigest.encodeBase64(), it.chancesLeft) }
+                },
+            )
+        }
+        if (!written) KillitLog.e(KillitLog.DURABLE, "App chances NOT written durably")
+        return written
+    }
+
+    /**
+     * Reads the limits on live unlock requests (C4).
+     *
+     * @return the limits; zeros when none were written; null when Killit is not device owner.
+     */
+    override suspend fun readUnlockLimits(): UnlockLimits? {
+        val bundle = dpc.readSelfRestrictions() ?: return null
+        return UnlockLimits(
+            cooldownUntil = bundle.getMillis(KEY_UNLOCK_COOLDOWN_UNTIL) ?: 0L,
+            day = bundle.getInt(KEY_UNLOCK_DAY, 0),
+            count = bundle.getInt(KEY_UNLOCK_COUNT, 0),
+        )
+    }
+
+    /** Writes the limits on live unlock requests. */
+    override suspend fun writeUnlockLimits(limits: UnlockLimits): Boolean = update {
+        putMillis(KEY_UNLOCK_COOLDOWN_UNTIL, limits.cooldownUntil)
+        putInt(KEY_UNLOCK_DAY, limits.day)
+        putInt(KEY_UNLOCK_COUNT, limits.count)
+    }
+
+    /**
+     * Forgets everything pairing kept here. Called once this phone has no guardians and device
+     * owner is being released.
+     */
+    override suspend fun clearPairing(): Boolean = update {
+        remove(KEY_GUARDIANS)
+        remove(KEY_APP_CHANCES)
+        remove(KEY_UNLOCK_COOLDOWN_UNTIL)
+        remove(KEY_UNLOCK_DAY)
+        remove(KEY_UNLOCK_COUNT)
+    }
+
     /**
      * Wipes every durable entry.
      *
@@ -282,6 +385,35 @@ class DurableStore(private val dpc: DevicePolicyController) {
         return KnownPackage(packageName, cert, status, since)
     }
 
+    private fun DurableGuardian.toBundle() = Bundle().apply {
+        putString(KEY_G_PAIR_ID, pairId.encodeBase64())
+        putString(KEY_G_PEER_FP, peerFp.encodeBase64())
+        putString(KEY_G_SIGN_PK, peerSignPk.encodeBase64())
+        putString(KEY_G_ENC_PK, peerEncPk.encodeBase64())
+        putString(KEY_G_NAME, peerName)
+        putString(KEY_G_NICKNAME, nickname)
+        putString(KEY_G_MODEL, peerModel)
+        putBoolean(KEY_G_MANAGEMENT, appManagement)
+        putMillis(KEY_G_CREATED, createdAt)
+        putInt(KEY_G_UNPAIR_CHANCES, unpairChances)
+    }
+
+    private fun Bundle.toGuardian(): DurableGuardian? {
+        if (!containsKey(KEY_G_UNPAIR_CHANCES)) return null
+        return DurableGuardian(
+            pairId = getString(KEY_G_PAIR_ID)?.decodeBase64() ?: return null,
+            peerFp = getString(KEY_G_PEER_FP)?.decodeBase64() ?: return null,
+            peerSignPk = getString(KEY_G_SIGN_PK)?.decodeBase64() ?: return null,
+            peerEncPk = getString(KEY_G_ENC_PK)?.decodeBase64() ?: return null,
+            peerName = getString(KEY_G_NAME) ?: return null,
+            nickname = getString(KEY_G_NICKNAME) ?: return null,
+            peerModel = getString(KEY_G_MODEL) ?: return null,
+            appManagement = getBoolean(KEY_G_MANAGEMENT, false),
+            createdAt = getMillis(KEY_G_CREATED) ?: return null,
+            unpairChances = getInt(KEY_G_UNPAIR_CHANCES),
+        )
+    }
+
     private companion object {
         const val KEY_LOCK_TYPE = "killit_lock_type"
         const val KEY_SALT = "killit_passkey_salt"
@@ -297,8 +429,79 @@ class DurableStore(private val dpc: DevicePolicyController) {
         const val KEY_ENTRY_CERT = "cert_sha256"
         const val KEY_ENTRY_STATUS = "status"
         const val KEY_ENTRY_SINCE = "since"
+
+        // Pairing: the guardians (one nested bundle per pairing, keyed by pair id), the chance
+        // counters (one int per app and certificate) and the unlock limits.
+        const val KEY_GUARDIANS = "killit_guardians"
+        const val KEY_G_PAIR_ID = "pair_id"
+        const val KEY_G_PEER_FP = "peer_fp"
+        const val KEY_G_SIGN_PK = "sign_pk"
+        const val KEY_G_ENC_PK = "enc_pk"
+        const val KEY_G_NAME = "name"
+        const val KEY_G_NICKNAME = "nickname"
+        const val KEY_G_MODEL = "model"
+        const val KEY_G_MANAGEMENT = "app_management"
+        const val KEY_G_CREATED = "created"
+        const val KEY_G_UNPAIR_CHANCES = "unpair_chances"
+        const val KEY_APP_CHANCES = "killit_app_chances"
+        const val CHANCES_SEPARATOR = "/"
+        const val KEY_UNLOCK_COOLDOWN_UNTIL = "killit_unlock_cooldown_until"
+        const val KEY_UNLOCK_DAY = "killit_unlock_day"
+        const val KEY_UNLOCK_COUNT = "killit_unlock_count"
     }
 }
+
+/**
+ * The part of [DurableStore] pairing uses. An interface so the pairing engine can be tested with
+ * several phones in one process, none of which may write the real device owner's restrictions.
+ */
+interface DurablePairingStore {
+    /** @return true once Killit is device owner, so the copy can be read and written. */
+    suspend fun isAvailable(): Boolean
+
+    suspend fun readGuardians(): List<DurableGuardian>?
+
+    suspend fun writeGuardians(guardians: Collection<DurableGuardian>): Boolean
+
+    suspend fun readAppChances(): List<DurableAppChances>?
+
+    suspend fun writeAppChances(chances: Collection<DurableAppChances>): Boolean
+
+    suspend fun readUnlockLimits(): UnlockLimits?
+
+    suspend fun writeUnlockLimits(limits: UnlockLimits): Boolean
+
+    suspend fun clearPairing(): Boolean
+}
+
+/**
+ * One of this phone's guardians, as [DurableStore] keeps it: everything needed to go on verifying
+ * the guardian's decisions and to keep counting it.
+ */
+class DurableGuardian(
+    val pairId: ByteArray,
+    val peerFp: ByteArray,
+    val peerSignPk: ByteArray,
+    val peerEncPk: ByteArray,
+    val peerName: String,
+    val nickname: String,
+    val peerModel: String,
+    val appManagement: Boolean,
+    val createdAt: Long,
+    val unpairChances: Int,
+)
+
+/** The UNBLOCK_APP chances left for one app and certificate, as [DurableStore] keeps them. */
+class DurableAppChances(val packageName: String, val certDigest: ByteArray, val chancesLeft: Int)
+
+/**
+ * The limits on live unlock requests (C4).
+ *
+ * @param cooldownUntil no new request before this time.
+ * @param day the local day [count] belongs to, as days since the epoch.
+ * @param count requests sent on [day].
+ */
+class UnlockLimits(val cooldownUntil: Long, val day: Int, val count: Int)
 
 /**
  * Encodes bytes for storage in a restriction bundle or preference.

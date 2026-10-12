@@ -41,7 +41,10 @@ class ProtectionService : Service() {
     /** Lives as long as the service; cancelled in [onDestroy]. */
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    /** Hears package installs, updates and enable-state changes, and checks the package. */
+    /**
+     * Hears package installs, updates and enable-state changes, and checks the package; and
+     * removals, which close a pending unblock request without costing a chance (H11).
+     */
     private val packageReceiver = object : BroadcastReceiver() {
         /**
          * Checks the package the broadcast names.
@@ -52,7 +55,11 @@ class ProtectionService : Service() {
         override fun onReceive(context: Context, intent: Intent) {
             val packageName = intent.data?.schemeSpecificPart ?: return
             KillitLog.d(KillitLog.GUARD) { "${intent.action} for $packageName" }
-            scope.launch { ServiceLocator.packageGuard.checkPackage(packageName) }
+            if (intent.action == Intent.ACTION_PACKAGE_FULLY_REMOVED) {
+                scope.launch { ServiceLocator.pairing.onPackageRemoved(packageName) }
+            } else {
+                scope.launch { ServiceLocator.packageGuard.checkPackage(packageName) }
+            }
         }
     }
 
@@ -65,6 +72,8 @@ class ProtectionService : Service() {
             addAction(Intent.ACTION_PACKAGE_REPLACED)
             // A disabled app being switched back on arrives as a change.
             addAction(Intent.ACTION_PACKAGE_CHANGED)
+            // Sent once an app and its data are gone, never for an update.
+            addAction(Intent.ACTION_PACKAGE_FULLY_REMOVED)
             addDataScheme("package")
         }
         // Exported, because these broadcasts come from the system; see the class documentation for

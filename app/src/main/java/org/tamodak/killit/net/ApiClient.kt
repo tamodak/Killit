@@ -21,6 +21,7 @@ import okhttp3.Response
 import okhttp3.ResponseBody
 import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.pairing.DeviceKeys
+import org.tamodak.killit.pairing.PairingServer
 import org.tamodak.killit.protocol.ApiAuth
 import org.tamodak.killit.protocol.ApiRequest
 import org.tamodak.killit.protocol.deviceId
@@ -56,7 +57,7 @@ class ApiClient(
     private val http: OkHttpClient = defaultHttpClient(),
     private val now: () -> Long = System::currentTimeMillis,
     private val io: CoroutineDispatcher = Dispatchers.IO,
-) {
+) : PairingServer {
     /**
      * How far this phone's clock is behind the server's, learned from a `stale_timestamp` refusal.
      * Kept only for the process's lifetime: the clock may be corrected in the meantime.
@@ -100,11 +101,11 @@ class ApiClient(
     // ---------------------------------------------------------------- invites (SPEC.md §6)
 
     /** `POST /v1/invites`: a new code, retiring this phone's earlier unfinished invites. */
-    suspend fun createInvite(): InviteCreated =
+    override suspend fun createInvite(): InviteCreated =
         call("POST", "/v1/invites", null, InviteCreated.serializer()).also { requireId(it.id) }
 
     /** `POST /v1/invites/join` with the joiner's commitment. A wrong, used or expired code is a 404. */
-    suspend fun joinInvite(code: String, commit: ByteArray): InviteJoined =
+    override suspend fun joinInvite(code: String, commit: ByteArray): InviteJoined =
         call(
             "POST",
             "/v1/invites/join",
@@ -116,14 +117,14 @@ class ApiClient(
      * `GET /v1/invites/{id}`. With [known], the server holds the request until the invite changes
      * from that version or [waitSeconds] pass.
      */
-    suspend fun invite(id: String, waitSeconds: Int = 0, known: String? = null): InviteView {
+    override suspend fun invite(id: String, waitSeconds: Int, known: String?): InviteView {
         requireId(id)
         val query = if (known == null) "" else "?wait=$waitSeconds&known=${known.urlSafe()}"
         return call("GET", "/v1/invites/$id$query", null, InviteView.serializer())
     }
 
     /** `POST /v1/invites/{id}/reveal`. */
-    suspend fun reveal(id: String, reveal: ByteArray): InviteView {
+    override suspend fun reveal(id: String, reveal: ByteArray): InviteView {
         requireId(id)
         return call(
             "POST",
@@ -134,7 +135,7 @@ class ApiClient(
     }
 
     /** `DELETE /v1/invites/{id}`: "They don't match", back, or giving up. */
-    suspend fun cancelInvite(id: String) {
+    override suspend fun cancelInvite(id: String) {
         requireId(id)
         call<Unit>("DELETE", "/v1/invites/$id", null, null)
     }
@@ -142,7 +143,7 @@ class ApiClient(
     // ---------------------------------------------------------------- links (SPEC.md §7)
 
     /** `POST /v1/links`: confirms the safety code; the link exists once both phones have. */
-    suspend fun confirmLink(inviteId: String): LinkConfirmed {
+    override suspend fun confirmLink(inviteId: String): LinkConfirmed {
         requireId(inviteId)
         return call(
             "POST",
@@ -153,10 +154,10 @@ class ApiClient(
     }
 
     /** `GET /v1/links`: every linked phone, with whole days since it was last seen. */
-    suspend fun links(): List<LinkInfo> = call("GET", "/v1/links", null, LinksResponse.serializer()).links
+    override suspend fun links(): List<LinkInfo> = call("GET", "/v1/links", null, LinksResponse.serializer()).links
 
     /** `DELETE /v1/links/{peer}`. Idempotent. */
-    suspend fun deleteLink(peerFp: ByteArray) {
+    override suspend fun deleteLink(peerFp: ByteArray) {
         call<Unit>("DELETE", "/v1/links/${deviceId(peerFp)}", null, null)
     }
 
@@ -169,20 +170,20 @@ class ApiClient(
      * @param messages recipient fingerprint and envelope, at most 50.
      * @return how many the server accepted.
      */
-    suspend fun send(messages: List<Pair<ByteArray, ByteArray>>): Int {
+    override suspend fun send(messages: List<Pair<ByteArray, ByteArray>>): Int {
         val body = SendRequest(messages.map { (to, envelope) -> OutgoingMessage(deviceId(to), envelope.toBase64Url()) })
         return call("POST", "/v1/messages", json.encodeToString(SendRequest.serializer(), body), SendResponse.serializer()).accepted
     }
 
     /** `GET /v1/messages`, held by the server for up to [waitSeconds] when the mailbox is empty. */
-    suspend fun fetch(waitSeconds: Int = 0): List<InboxMessage> {
+    override suspend fun fetch(waitSeconds: Int): List<InboxMessage> {
         val query = if (waitSeconds > 0) "?wait=$waitSeconds" else ""
         return call("GET", "/v1/messages$query", null, InboxResponse.serializer()).messages
             .onEach { requireId(it.id) }
     }
 
     /** `POST /v1/messages/ack`: the server deletes these messages. */
-    suspend fun ack(ids: List<String>) {
+    override suspend fun ack(ids: List<String>) {
         ids.forEach(::requireId)
         call<Unit>("POST", "/v1/messages/ack", json.encodeToString(AckRequest.serializer(), AckRequest(ids)), null)
     }

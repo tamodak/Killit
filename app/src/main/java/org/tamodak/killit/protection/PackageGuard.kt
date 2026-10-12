@@ -37,11 +37,16 @@ import kotlinx.coroutines.withContext
  * user. It never unblocks anything; only the user's choices in the app list do (see
  * [applySelection]).
  *
+ * Two narrow exceptions come from pairing, and only from it: [approveRemotely] unblocks one app
+ * every guardian approved, and [blockMore] lets a guarded phone block more apps without its
+ * guardians (D7), which can only make it stricter.
+ *
  * ### Concurrency
  *
  * The protection service's receiver, the periodic check and the app list can all act at once, so
  * every operation holds [lock]. Each reads the list, decides and writes back as one step, which
- * keeps two of them from undoing each other.
+ * keeps two of them from undoing each other. [listener] is called only after the lock is released:
+ * pairing takes its own lock and may come back here to approve an app.
  *
  * @param context any context; only its application context is retained, for app labels.
  * @param dpc blocks packages.
@@ -75,6 +80,15 @@ class PackageGuard(
     /** Every decision made so far, re-emitted on every change. Backs the app list. */
     val packages: Flow<Map<String, KnownPackage>> = store.packages
 
+    /** Told about newly blocked apps, so a guarded phone's guardians hear about them (D1). */
+    fun interface Listener {
+        suspend fun onNewAppsBlocked(packageNames: List<String>)
+    }
+
+    /** Set once, when the dependency graph is built. */
+    @Volatile
+    var listener: Listener? = null
+
     /**
      * Reports whether default-blocking should be running.
      *
@@ -88,15 +102,18 @@ class PackageGuard(
      *
      * @param reason names the trigger in the log.
      */
-    suspend fun checkAll(reason: String) = lock.withLock {
-        if (!isActive()) {
-            KillitLog.d(KillitLog.GUARD) { "checkAll($reason) skipped: not active" }
-            return@withLock
+    suspend fun checkAll(reason: String) {
+        val blocked = lock.withLock {
+            if (!isActive()) {
+                KillitLog.d(KillitLog.GUARD) { "checkAll($reason) skipped: not active" }
+                return@withLock emptyList()
+            }
+            KillitLog.i(KillitLog.GUARD, "Checking every package ($reason)")
+            val installed = scanner.scanAll()
+            val known = store.readAll()
+            if (known.isEmpty()) takeSnapshot(installed).let { emptyList() } else carryOut(installed, known)
         }
-        KillitLog.i(KillitLog.GUARD, "Checking every package ($reason)")
-        val installed = scanner.scanAll()
-        val known = store.readAll()
-        if (known.isEmpty()) takeSnapshot(installed) else carryOut(installed, known)
+        announce(blocked)
     }
 
     /**
@@ -104,16 +121,72 @@ class PackageGuard(
      *
      * @param packageName the package that was added, replaced or changed.
      */
-    suspend fun checkPackage(packageName: String) = lock.withLock {
-        if (!isActive()) return@withLock
-        val known = store.readAll()
-        if (known.isEmpty()) {
-            takeSnapshot(scanner.scanAll())
-            return@withLock
+    suspend fun checkPackage(packageName: String) {
+        val blocked = lock.withLock {
+            if (!isActive()) return@withLock emptyList()
+            val known = store.readAll()
+            if (known.isEmpty()) {
+                takeSnapshot(scanner.scanAll())
+                return@withLock emptyList()
+            }
+            // Null when it was removed again before the check ran; entries outlive the app anyway.
+            val pkg = scanner.scan(packageName) ?: return@withLock emptyList()
+            carryOut(listOf(pkg), known)
         }
-        // Null when it was removed again before the check ran; entries outlive the app anyway.
-        val pkg = scanner.scan(packageName) ?: return@withLock
-        carryOut(listOf(pkg), known)
+        announce(blocked)
+    }
+
+    /**
+     * Reports whether Killit blocks a package now.
+     *
+     * @param packageName the package to probe.
+     */
+    suspend fun isBlocked(packageName: String): Boolean = packageName in dpc.blockedPackages(listOf(packageName))
+
+    /**
+     * Unblocks one app because every guardian approved it (PLAN.md §6.2 (a)), and records it as
+     * approved — but only while the installed app is the one they approved, signed by
+     * [certDigest]. A different app that took the name in the meantime stays blocked.
+     *
+     * @return true when the app is allowed now.
+     */
+    suspend fun approveRemotely(packageName: String, certDigest: ByteArray): Boolean = lock.withLock {
+        if (!isActive()) return@withLock false
+        val pkg = scanner.scan(packageName) ?: return@withLock false
+        if (!pkg.certDigest.contentEquals(certDigest)) {
+            KillitLog.w(KillitLog.GUARD, "Approval for $packageName names another certificate; it stays blocked")
+            return@withLock false
+        }
+        if (!dpc.applyBlocklist(desired = emptySet(), current = setOf(packageName)).isSuccess) return@withLock false
+        store.put(listOf(KnownPackage(packageName, pkg.certDigest, PackageStatus.APPROVED, clock())))
+        refreshWaitingNotification(store.readAll(), alert = false)
+        true
+    }
+
+    /**
+     * Blocks more apps (D7). It only ever adds blocks, so a guarded phone may do it without its
+     * guardians; unblocking them afterwards needs the guardians like any other app.
+     *
+     * @param packageNames the apps to block.
+     * @return the ones Android refused to suspend.
+     */
+    suspend fun blockMore(packageNames: Collection<String>): List<String> = lock.withLock {
+        val refused = dpc.blockPackages(packageNames)
+        if (!isActive()) return@withLock refused
+        val now = clock()
+        store.put(
+            (packageNames - refused.toSet()).mapNotNull { name ->
+                scanner.scan(name)?.let { KnownPackage(name, it.certDigest, PackageStatus.USER_BLOCKED, now) }
+            },
+        )
+        refused
+    }
+
+    /** Tells [listener] about newly blocked apps, outside [lock]. */
+    private suspend fun announce(packageNames: List<String>) {
+        if (packageNames.isEmpty()) return
+        runCatching { listener?.onNewAppsBlocked(packageNames) }
+            .onFailure { KillitLog.w(KillitLog.GUARD, "Announcing blocked apps failed", it) }
     }
 
     /**
@@ -199,8 +272,9 @@ class PackageGuard(
      *
      * @param installed the packages to decide about.
      * @param known every decision made so far.
+     * @return the packages that were new and are now blocked.
      */
-    private suspend fun carryOut(installed: List<InstalledPackage>, known: Map<String, KnownPackage>) {
+    private suspend fun carryOut(installed: List<InstalledPackage>, known: Map<String, KnownPackage>): List<String> {
         val now = clock()
         val updates = mutableListOf<KnownPackage>()
         val mustBeBlocked = mutableSetOf<String>()
@@ -233,9 +307,9 @@ class PackageGuard(
         }
         store.put(updates)
 
-        if (newlyBlocked.any { it.packageName !in refused }) {
-            refreshWaitingNotification(store.readAll(), alert = true)
-        }
+        val blocked = newlyBlocked.map { it.packageName }.filter { it !in refused }
+        if (blocked.isNotEmpty()) refreshWaitingNotification(store.readAll(), alert = true)
+        return blocked
     }
 
     /**

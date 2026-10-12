@@ -94,6 +94,22 @@ class EncodingVectorsTest {
         assertEquals(trimmed, checkText(encodeText(trimmed, TextRule.SELF_NAME), TextRule.SELF_NAME))
     }
 
+    /** Text from the platform is made to fit its rule, and the result always passes the rule's checks. */
+    @Test
+    fun fitTextAlwaysFits() {
+        val label = "  My\u0000App\n\u2028Pro\ud800  "
+        val fitted = fitText(label, TextRule.APP_LABEL)
+        assertEquals("My App  Pro", fitted)
+        assertEquals(fitted, checkText(encodeText(fitted, TextRule.APP_LABEL), TextRule.APP_LABEL))
+        val long = "\ud83d\ude00".repeat(60)
+        val cut = fitText(long, TextRule.SELF_NAME)
+        assertEquals(40, codePointCount(cut))
+        assertEquals("a b", fitText("a\nb", TextRule.DEVICE_MODEL))
+        assertEquals("a\nb", fitText("a\nb", TextRule.NOTE))
+        val bytesBound = fitText("\u00e7".repeat(300), TextRule.SELF_NAME)
+        assertTrue(encodeText(bytesBound, TextRule.SELF_NAME).size <= TextRule.SELF_NAME.maxBytes)
+    }
+
     /** A Kotlin string can hold half a surrogate pair; it is refused rather than silently replaced. */
     @Test
     fun loneSurrogateIsRefused() {

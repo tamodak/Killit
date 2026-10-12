@@ -10,6 +10,15 @@ import org.tamodak.killit.data.KnownPackagesStore
 import org.tamodak.killit.data.LockPreferences
 import org.tamodak.killit.data.LockRepository
 import org.tamodak.killit.data.db.KillitDatabase
+import org.tamodak.killit.net.ApiClient
+import org.tamodak.killit.pairing.DeviceKeys
+import org.tamodak.killit.pairing.GuardAppBlocker
+import org.tamodak.killit.pairing.PairingEngine
+import org.tamodak.killit.pairing.PairingNotifier
+import org.tamodak.killit.pairing.PairingPreferences
+import org.tamodak.killit.pairing.PairingStore
+import org.tamodak.killit.pairing.PairingSync
+import org.tamodak.killit.pairing.Registration
 import org.tamodak.killit.protection.PackageGuard
 import org.tamodak.killit.protection.PackageScanner
 import org.tamodak.killit.protection.ProtectionNotifications
@@ -28,6 +37,13 @@ import org.tamodak.killit.protection.ProtectionNotifications
  * call.
  */
 object ServiceLocator {
+
+    /** `Build.MANUFACTURER` and `Build.MODEL`, fitted to the protocol's rule for them. */
+    private fun deviceModel(): String =
+        org.tamodak.killit.protocol.fitText(
+            "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}",
+            org.tamodak.killit.protocol.TextRule.DEVICE_MODEL,
+        )
 
     /**
      * Guards [init] against rebuilding the graph. `@Volatile` because the flag is written under the
@@ -54,6 +70,22 @@ object ServiceLocator {
 
     /** The protection service's notification and the blocked-apps one. */
     lateinit var protectionNotifications: ProtectionNotifications
+        private set
+
+    /** This phone's identity keys. */
+    lateinit var deviceKeys: DeviceKeys
+        private set
+
+    /** Registers the identity with the server the first time pairing needs it. */
+    lateinit var registration: Registration
+        private set
+
+    /** Small local facts about pairing: the registered key, the last name used. */
+    lateinit var pairingPreferences: PairingPreferences
+        private set
+
+    /** Guardians, guarded phones, and the requests between them. */
+    lateinit var pairing: PairingEngine
         private set
 
     /**
@@ -96,6 +128,35 @@ object ServiceLocator {
             lockRepository = lockRepository,
             notifications = protectionNotifications,
         )
+
+        // Pairing. Nothing here touches the disk or the network until it is first used.
+        deviceKeys = DeviceKeys(appContext)
+        pairingPreferences = PairingPreferences(appContext)
+        val api = ApiClient(
+            baseUrl = BuildConfig.API_BASE_URL,
+            audience = BuildConfig.API_AUDIENCE,
+            identity = { deviceKeys.current() },
+        )
+        val pairingStore = PairingStore(database.pairing(), durable)
+        registration = Registration(deviceKeys, api, pairingPreferences, hasPairings = { database.pairing().pairings().isNotEmpty() })
+        pairing = PairingEngine(
+            store = pairingStore,
+            server = api,
+            identity = { registration.ensureRegistered() },
+            apps = GuardAppBlocker(appContext, packageGuard, PackageScanner(appContext)),
+            durable = durable,
+            notifier = object : PairingNotifier {},
+            config = PairingEngine.Config(
+                deviceModel = deviceModel(),
+                unpairTimerMillis = BuildConfig.UNPAIR_TIMER_MILLIS,
+                unlockCooldownMillis = BuildConfig.UNLOCK_COOLDOWN_MILLIS,
+                unlocksPerDay = BuildConfig.UNLOCKS_PER_DAY,
+                silenceAlertMillis = BuildConfig.SILENCE_ALERT_MILLIS,
+            ),
+            canBeProtected = { devicePolicyController.isDeviceOwner() },
+            onQueued = { PairingSync.soon(appContext) },
+        )
+        packageGuard.listener = PackageGuard.Listener { pairing.onAppsBlocked(it) }
 
         initialised = true
         KillitLog.i(KillitLog.APP, "Dependency graph ready")

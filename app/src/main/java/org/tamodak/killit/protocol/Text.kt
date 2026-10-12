@@ -142,6 +142,43 @@ fun trimText(text: String): String {
 }
 
 /**
+ * Makes text from the platform fit a rule: an app's label or the device model can hold anything.
+ * Forbidden characters and lone surrogates become spaces, the edges are trimmed, and the text is
+ * cut at a code point boundary to both of the rule's limits. The minimum isn't enforced; a caller
+ * whose rule has one checks the result.
+ */
+fun fitText(text: String, rule: TextRule): String {
+    val cleaned = StringBuilder(text.length)
+    var index = 0
+    while (index < text.length) {
+        val codePoint = text.codePointAt(index)
+        index += Character.charCount(codePoint)
+        val forbidden = isForbiddenControl(codePoint) || (codePoint == 0x0a && !rule.paragraph) || codePoint in 0xd800..0xdfff
+        cleaned.appendCodePoint(if (forbidden) 0x20 else codePoint)
+    }
+    val trimmed = trimText(cleaned.toString())
+    val fitted = StringBuilder(trimmed.length)
+    var count = 0
+    var bytes = 0
+    index = 0
+    while (index < trimmed.length && count < rule.maxCodePoints) {
+        val codePoint = trimmed.codePointAt(index)
+        val size = when {
+            codePoint < 0x80 -> 1
+            codePoint < 0x800 -> 2
+            codePoint < 0x10000 -> 3
+            else -> 4
+        }
+        if (bytes + size > rule.maxBytes) break
+        fitted.appendCodePoint(codePoint)
+        bytes += size
+        count++
+        index += Character.charCount(codePoint)
+    }
+    return trimText(fitted.toString())
+}
+
+/**
  * Counts code points the way the text rules do, for the UI's length counters.
  *
  * @return the number of Unicode scalar values in [text].
