@@ -86,6 +86,18 @@ class ApiClientTest {
         assertTrue(verifies(request))
     }
 
+    /** The push target is the Firebase Installation ID, under the name SPEC.md §4 gives it. */
+    @Test
+    fun pushTargetIsTheFid() = runBlocking<Unit> {
+        answer(204, "")
+        api.setPushTarget("cKx3Q9mXRjS1-AbCdEfGhI")
+        val request = server.takeRequest()
+        assertEquals("PUT", request.method)
+        assertEquals("/v1/devices/me/push", request.target)
+        assertEquals("""{"fid":"cKx3Q9mXRjS1-AbCdEfGhI"}""", request.body!!.utf8())
+        assertTrue(verifies(request))
+    }
+
     /** A body is signed byte for byte, and a query string is part of the signed target. */
     @Test
     fun bodiesAndQueriesAreSigned() = runBlocking<Unit> {

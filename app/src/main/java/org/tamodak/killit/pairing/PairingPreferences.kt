@@ -32,9 +32,15 @@ class PairingPreferences(context: Context) {
     /** The fingerprint the server registered, or null before registration succeeds. */
     suspend fun registeredFp(): ByteArray? = store.data.first()[KEY_REGISTERED_FP]?.let { runCatching { it.fromHex() }.getOrNull() }
 
-    /** Records that the server knows [fp]. */
+    /**
+     * Records that the server knows [fp]. Whether it has the push id is forgotten with the old
+     * registration, so the id is sent again to whatever record the server now has.
+     */
     suspend fun setRegistered(fp: ByteArray?) {
-        store.edit { if (fp == null) it.remove(KEY_REGISTERED_FP) else it[KEY_REGISTERED_FP] = fp.toHex() }
+        store.edit {
+            if (fp == null) it.remove(KEY_REGISTERED_FP) else it[KEY_REGISTERED_FP] = fp.toHex()
+            it.remove(KEY_SENT_FID)
+        }
     }
 
     /** The name this phone last called itself in a pairing, offered as the default next time. */
@@ -44,11 +50,18 @@ class PairingPreferences(context: Context) {
         store.edit { it[KEY_SELF_NAME] = name }
     }
 
-    /** The push token last sent to the server, so an unchanged token isn't sent again. */
-    suspend fun pushToken(): String? = store.data.first()[KEY_PUSH_TOKEN]
+    /** The Firebase Installation ID FCM last registered this phone under, or null before. */
+    suspend fun fid(): String? = store.data.first()[KEY_FID]
 
-    suspend fun setPushToken(token: String?) {
-        store.edit { if (token == null) it.remove(KEY_PUSH_TOKEN) else it[KEY_PUSH_TOKEN] = token }
+    suspend fun setFid(fid: String?) {
+        store.edit { if (fid == null) it.remove(KEY_FID) else it[KEY_FID] = fid }
+    }
+
+    /** The id the server last received, so an unchanged one isn't sent again. */
+    suspend fun sentFid(): String? = store.data.first()[KEY_SENT_FID]
+
+    suspend fun setSentFid(fid: String) {
+        store.edit { it[KEY_SENT_FID] = fid }
     }
 
     /** True once the user tapped "I understand" on the guardian password explanation. */
@@ -61,7 +74,8 @@ class PairingPreferences(context: Context) {
     private companion object {
         val KEY_REGISTERED_FP = stringPreferencesKey("registered_fp")
         val KEY_SELF_NAME = stringPreferencesKey("self_name")
-        val KEY_PUSH_TOKEN = stringPreferencesKey("push_token")
+        val KEY_FID = stringPreferencesKey("fcm_fid")
+        val KEY_SENT_FID = stringPreferencesKey("fcm_fid_sent")
         val KEY_GUARDIAN_NOTICE = booleanPreferencesKey("guardian_notice_acknowledged")
     }
 }

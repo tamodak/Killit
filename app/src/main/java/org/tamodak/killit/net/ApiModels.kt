@@ -22,7 +22,7 @@ class RegisterRequest(val challenge: String, val chain: List<String>)
 class DeviceResponse(val device: String, val securityLevel: String)
 
 @Serializable
-class PushTokenRequest(val fcmToken: String)
+class PushTargetRequest(val fid: String)
 
 @Serializable
 class InviteCreated(val id: String, val code: String, val expiresAt: Long)

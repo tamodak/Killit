@@ -18,6 +18,28 @@ val releaseApiBaseUrl = "https://api.tamodak.org"
 val debugApiBaseUrl = (findProperty("killit.apiBaseUrl") as String?) ?: "https://api.test.tamodak.org"
 fun audienceOf(baseUrl: String): String = URI(baseUrl).authority
 
+// Push (protocol/SPEC.md §9). The Firebase project comes from app/google-services.json, the file
+// the Firebase console hands out; its values name the project and aren't secrets. They become the
+// string resources Firebase reads when the app starts. A build without the file has no push and
+// relies on the background sync (PLAN.md §7).
+val firebaseResources: Map<String, String> = file("google-services.json").takeIf { it.exists() }?.let { file ->
+    @Suppress("UNCHECKED_CAST")
+    fun Any?.obj() = this as Map<String, Any?>
+    @Suppress("UNCHECKED_CAST")
+    fun Any?.list() = this as List<Any?>
+    val json = groovy.json.JsonSlurper().parse(file).obj()
+    val project = json["project_info"].obj()
+    val client = json["client"].list().map { it.obj() }.first {
+        it["client_info"].obj()["android_client_info"].obj()["package_name"] == "org.tamodak.killit"
+    }
+    mapOf(
+        "google_app_id" to client["client_info"].obj()["mobilesdk_app_id"] as String,
+        "google_api_key" to client["api_key"].list().first().obj()["current_key"] as String,
+        "project_id" to project["project_id"] as String,
+        "gcm_defaultSenderId" to project["project_number"] as String,
+    )
+}.orEmpty()
+
 android {
     namespace = "org.tamodak.killit"
     compileSdk {
@@ -70,6 +92,8 @@ android {
 
         buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
         buildConfigField("String", "API_AUDIENCE", "\"${audienceOf(debugApiBaseUrl)}\"")
+
+        firebaseResources.forEach { (name, value) -> resValue("string", name, value) }
     }
 
     buildTypes {
@@ -122,6 +146,8 @@ android {
         // KillitPrivilegedService rebuilds the admin component from BuildConfig.APPLICATION_ID
         // rather than trusting one passed over binder.
         buildConfig = true
+        // The Firebase project's string resources, from app/google-services.json (see above).
+        resValues = true
     }
 }
 
@@ -160,6 +186,8 @@ dependencies {
     implementation(libs.tink.android)
     implementation(libs.okhttp)
     implementation(libs.kotlinx.serialization.json)
+    // Push: a data message that only wakes Killit to read its mailbox.
+    implementation(libs.firebase.messaging)
     // Hashes the passkey with Argon2id. Its POM also lists appcompat as a runtime dependency that
     // none of its classes use, so that is left out rather than shipped in a device-owner app.
     implementation(libs.argon2kt) {

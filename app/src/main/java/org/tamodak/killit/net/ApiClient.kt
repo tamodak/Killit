@@ -83,13 +83,13 @@ class ApiClient(
     /** `GET /v1/devices/me`: answers only if the server knows this phone's key. */
     suspend fun me(): DeviceResponse = call("GET", "/v1/devices/me", null, DeviceResponse.serializer())
 
-    /** `PUT /v1/devices/me/push`. */
-    suspend fun setPushToken(token: String) {
-        call<Unit>("PUT", "/v1/devices/me/push", json.encodeToString(PushTokenRequest.serializer(), PushTokenRequest(token)), null)
+    /** `PUT /v1/devices/me/push`: the Firebase Installation ID FCM reaches this phone by. */
+    suspend fun setPushTarget(fid: String) {
+        call<Unit>("PUT", "/v1/devices/me/push", json.encodeToString(PushTargetRequest.serializer(), PushTargetRequest(fid)), null)
     }
 
     /** `DELETE /v1/devices/me/push`. */
-    suspend fun clearPushToken() {
+    suspend fun clearPushTarget() {
         call<Unit>("DELETE", "/v1/devices/me/push", null, null)
     }
 

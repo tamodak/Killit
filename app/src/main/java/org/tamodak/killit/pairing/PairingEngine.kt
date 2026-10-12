@@ -34,6 +34,7 @@ import org.tamodak.killit.protocol.NoticeBody
  * @param scheduler the background work pairing needs.
  * @param onGuarded applies the device policies that follow from having guardians, or not
  *   (H2, I1); called whenever that changes, and when [enforceGuarded] is asked to.
+ * @param registerPush makes sure the server can wake this phone with a push, once it has pairings.
  */
 class PairingEngine(
     val store: PairingStore,
@@ -46,6 +47,7 @@ class PairingEngine(
     canBeProtected: suspend () -> Boolean,
     private val scheduler: Scheduler = object : Scheduler {},
     private val onGuarded: suspend (Boolean) -> Unit = {},
+    private val registerPush: suspend () -> Unit = {},
     private val now: () -> Long = System::currentTimeMillis,
 ) {
     /**
@@ -189,13 +191,20 @@ class PairingEngine(
     }
 
     /**
-     * Keeps the background work in step with what there is: the periodic sync while anything is
-     * paired, and a sync for the next UNPAIR timer. The worker cancels itself once nothing is.
+     * Keeps the background work in step with what there is while anything is paired: the periodic
+     * sync, the push registration, and a sync for the next UNPAIR timer. The worker cancels itself
+     * once nothing is paired.
      */
     private suspend fun keepScheduled() {
-        if (!periodicScheduled && dao.pairings().isNotEmpty()) {
+        if (dao.pairings().isEmpty()) return
+        if (!periodicScheduled) {
             scheduler.periodic()
             periodicScheduled = true
+        }
+        try {
+            registerPush()
+        } catch (e: IOException) {
+            KillitLog.d(KillitLog.SYNC) { "Push registration deferred: ${e.message}" }
         }
         val timer = requests.nextTimer()
         if (timer != null && timer != scheduledTimer) {

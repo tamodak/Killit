@@ -24,6 +24,7 @@ tink = "1.23.0"
 okhttp = "5.4.0"
 # 1.9 is the newest release built for Kotlin 2.2; 1.10 and later need Kotlin 2.3.
 kotlinxSerialization = "1.9.0"
+firebaseMessaging = "26.0.0"
 
 [libraries]
 
@@ -49,6 +50,8 @@ argon2kt = { group = "com.lambdapioneer.argon2kt", name = "argon2kt", version.re
 tink-android = { group = "com.google.crypto.tink", name = "tink-android", version.ref = "tink" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+# Push: an FCM data message only ever wakes Killit to read its mailbox (SPEC.md §9).
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
 # Testing.
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver3", version.ref = "okhttp" }

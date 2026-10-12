@@ -168,6 +168,24 @@
         </receiver>
 
         <!--
+            Push (protocol/SPEC.md §9): a data message from the pairing server that only ever means
+            "read the mailbox now". Not exported: Firebase's own receiver, which only Google Play
+            services can send to, passes messages on to it.
+        -->
+        <service
+            android:name=".pairing.PushService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- No FCM token until the first pairing asks for one (Push.register). -->
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+
+        <!--
             Shizuku's own provider, which brokers the connection to its server. Declared verbatim as
             the library requires; multiprocess is false because Killit runs in one process — the
             privileged user service lives in Shizuku's process, not Killit's.

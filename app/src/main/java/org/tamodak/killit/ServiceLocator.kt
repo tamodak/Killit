@@ -19,6 +19,7 @@ import org.tamodak.killit.pairing.PairingNotifications
 import org.tamodak.killit.pairing.PairingPreferences
 import org.tamodak.killit.pairing.PairingStore
 import org.tamodak.killit.pairing.PairingSync
+import org.tamodak.killit.pairing.Push
 import org.tamodak.killit.pairing.Registration
 import org.tamodak.killit.pairing.Reminders
 import org.tamodak.killit.protection.PackageGuard
@@ -94,6 +95,10 @@ object ServiceLocator {
     lateinit var pairingNotifications: PairingNotifications
         private set
 
+    /** FCM registration, for the push that wakes a sync (SPEC.md §9). */
+    lateinit var push: Push
+        private set
+
     /**
      * Builds the graph.
      *
@@ -148,6 +153,7 @@ object ServiceLocator {
             identity = { deviceKeys.current() },
         )
         val pairingStore = PairingStore(database.pairing(), durable)
+        push = Push(appContext, pairingPreferences, upload = api::setPushTarget)
         registration = Registration(deviceKeys, api, pairingPreferences, hasPairings = { database.pairing().pairings().isNotEmpty() })
         pairingNotifications = PairingNotifications(
             appContext,
@@ -178,6 +184,7 @@ object ServiceLocator {
                 override fun at(atMillis: Long) = PairingSync.at(appContext, atMillis)
             },
             onGuarded = GuardedPolicies(devicePolicyController, lockRepository)::apply,
+            registerPush = push::register,
         )
         packageGuard.listener = PackageGuard.Listener { pairing.onAppsBlocked(it) }
 
