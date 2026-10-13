@@ -521,4 +521,49 @@
     <string name="move_failed_limit">Ponsel baru sudah terhubung dengan terlalu banyak ponsel.</string>
     <string name="move_failed_cancelled">Pindahan dibatalkan. Tidak ada yang dipindahkan.</string>
     <string name="move_failed_mismatch">Kodenya tidak cocok, jadi tidak ada yang dipindahkan. Mungkin ada yang mengganggu. Mulai lagi.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">Pindah dari ponsel lain?</string>
+    <string name="hub_my_phone_frozen">Dibekukan sejak pindah ke ponsel baru</string>
+    <string name="settings_move">Pindah ke ponsel baru</string>
+    <string name="settings_move_desc">Serahkan semua pasangan ke ponsel barumu</string>
+    <string name="guard_settings_move_guarded">Ponsel ini punya penjaga, jadi pindahnya dari Ponselku › Setelan, saat kunci Killit terbuka.</string>
+    <string name="move_in_title">Pindah dari ponsel lain</string>
+    <string name="move_in_intro">Ponsel ini mengambil alih semua yang dipasangkan dengan ponsel lamamu: penjaganya dan ponsel yang dijaganya. Tidak ada yang perlu memasangkan ulang.</string>
+    <string name="move_in_needs_owner">Untuk mengambil alih penjaga, Killit harus melindungi ponsel ini dulu. Memindahkan ponsel yang kamu jaga saja bisa tanpa itu.</string>
+    <string name="move_in_start">Tampilkan kode</string>
+    <string name="move_in_give_code">Di ponsel lama, buka Killit, pilih Setelan › Pindah ke ponsel baru, lalu ketik kode ini.</string>
+    <string name="move_compare_title">Letakkan kedua ponsel berdampingan</string>
+    <string name="move_compare_body">Keduanya harus menampilkan 6 angka yang sama. Kalau tidak, mungkin ada yang mengganggu.</string>
+    <string name="move_in_receiving">Menerima dari ponsel lama…</string>
+    <string name="move_in_ready_title">Konfirmasi di ponsel lama</string>
+    <string name="move_in_ready_body">Ini pindah ke sini begitu ponsel lama mengonfirmasi:</string>
+    <string name="move_in_give_up_in">Kalau ponsel lama tidak mengonfirmasi, kamu bisa membatalkan dalam %1$s.</string>
+    <string name="move_in_give_up">Batalkan</string>
+    <string name="move_in_done_title">Sudah pindah ke sini</string>
+    <string name="move_in_done_body">Ponsel ini sekarang punya semua pasangan ponsel lama, dan pasangannya sudah diberi tahu.</string>
+    <string name="move_out_title">Pindah ke ponsel baru</string>
+    <string name="move_out_intro">Di ponsel baru, pasang Killit dan pilih Pindah dari ponsel lain? di layar pertamanya. Ponsel itu menampilkan kode: ketik di sini.</string>
+    <string name="move_out_moves">Ini pindah ke ponsel baru:</string>
+    <string name="move_out_frozen_warning">Ponsel ini punya penjaga. Setelah pindah, ponsel ini tetap seperti sekarang: aplikasi yang diblokir tetap diblokir, dan tidak ada yang bisa dibuka blokirnya. Hanya menghapus Killit, setelah masa tunggunya, yang mengakhiri itu.</string>
+    <string name="move_out_connect">Hubungkan</string>
+    <string name="move_out_sending">Mengirim semuanya ke ponsel baru…</string>
+    <string name="move_out_ready_title">Pindah ke %1$s?</string>
+    <string name="move_out_ready_title_bare">Pindah ke ponsel baru?</string>
+    <string name="move_out_ready_window">Konfirmasi dalam %1$s.</string>
+    <string name="move_out_confirm">Pindah</string>
+    <string name="move_out_moving">Sedang pindah. Biarkan ponsel ini tetap online sampai selesai.</string>
+    <string name="move_out_done_title">Sudah pindah</string>
+    <string name="move_out_done_body">Semuanya sudah pindah ke ponsel baru. Ponsel ini tidak punya pasangan lagi.</string>
+    <string name="move_out_done_frozen">Aplikasinya tetap seperti sekarang. Hanya menghapus Killit yang mengakhiri itu.</string>
+    <string name="move_under_way">Ada pindahan ke atau dari ponsel ini yang sedang berjalan. Itu selesai dulu.</string>
+    <string name="frozen_title">Perlindungan pindah ke ponsel baru</string>
+    <string name="frozen_body">Penjaganya pindah ke %1$s pada %2$s. Aplikasi yang diblokir tetap diblokir, dan tidak ada yang bisa dibuka blokirnya di sini. Menghapus Killit, setelah masa tunggunya, mengakhiri itu.</string>
+    <string name="frozen_body_bare">Penjaganya pindah ke ponsel baru pada %1$s. Aplikasi yang diblokir tetap diblokir, dan tidak ada yang bisa dibuka blokirnya di sini. Menghapus Killit, setelah masa tunggunya, mengakhiri itu.</string>
+    <plurals name="move_guardians">
+        <item quantity="other">%1$d penjaga</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="other">%1$d ponsel yang kamu jaga</item>
+    </plurals>
 </resources>

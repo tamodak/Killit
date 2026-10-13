@@ -43,14 +43,15 @@ import org.tamodak.killit.ui.theme.KillitRowDivider
 
 /**
  * My phone's settings (PLAN.md §15.5): the protection options, letting guardians manage the apps
- * (D5), the language, the passkey, and, last and in red, giving up device owner. Only a session
- * with full control gets here.
+ * (D5), the language, the passkey, moving to a new phone (§3.10), and, last and in red, giving up
+ * device owner. Only a session with full control gets here.
  *
  * @param onHardeningChange called with the full config whenever one toggle moves.
  * @param onRequestRelease starts the wait before device owner can be given up.
  * @param onCancelRelease abandons that wait.
  * @param onReleaseDeviceOwner carries out the release, once the wait has elapsed.
  * @param onAppManagementChange lets the guardians manage this phone's apps, or stops them.
+ * @param onMove opens the move to a new phone; null when this phone has no pairings to move.
  */
 @Composable
 fun SettingsScreen(
@@ -63,11 +64,8 @@ fun SettingsScreen(
     onReleaseDeviceOwner: () -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     onAppManagementChange: (Boolean) -> Unit,
+    onMove: (() -> Unit)?,
 ) {
-    // Two separate confirmations: one to start the wait, another to actually release once it is
-    // over. The second is the irreversible one.
-    var confirmRelease by remember { mutableStateOf(false) }
-    var confirmReleaseNow by remember { mutableStateOf(false) }
     var pickingLanguage by remember { mutableStateOf(false) }
     // The management switch asks first either way: on shows the guardians the apps, off is told.
     var confirmManagement by remember { mutableStateOf<Boolean?>(null) }
@@ -104,17 +102,19 @@ fun SettingsScreen(
                     icon = KillitIcons.Key,
                     onClick = onChangePasskey,
                 )
+                if (onMove != null) {
+                    KillitRow(
+                        title = stringResource(R.string.settings_move),
+                        subtitle = stringResource(R.string.settings_move_desc),
+                        icon = KillitIcons.People,
+                        onClick = onMove,
+                    )
+                }
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 KillitRule()
-                ReleaseSection(
-                    state = state,
-                    guarded = guarded,
-                    onRequestRelease = { confirmRelease = true },
-                    onCancelRelease = onCancelRelease,
-                    onReleaseNow = { confirmReleaseNow = true },
-                )
+                ReleaseControls(state, guarded, onRequestRelease, onCancelRelease, onReleaseDeviceOwner)
             }
         }
     }
@@ -144,6 +144,34 @@ fun SettingsScreen(
             onDismiss = { pickingLanguage = false },
         )
     }
+
+}
+
+/**
+ * Giving up device owner, with its two confirmations: one to start the wait, another to actually
+ * release once it is over. The second is the irreversible one. Shown in Settings, and on a frozen
+ * phone's My phone, where it is the only way out (PLAN.md §3.10).
+ *
+ * @param guarded whether guardians will be removed and told when the release completes (H7).
+ */
+@Composable
+internal fun ReleaseControls(
+    state: KillitUiState,
+    guarded: Boolean,
+    onRequestRelease: () -> Unit,
+    onCancelRelease: () -> Unit,
+    onReleaseDeviceOwner: () -> Unit,
+) {
+    var confirmRelease by remember { mutableStateOf(false) }
+    var confirmReleaseNow by remember { mutableStateOf(false) }
+
+    ReleaseSection(
+        state = state,
+        guarded = guarded,
+        onRequestRelease = { confirmRelease = true },
+        onCancelRelease = onCancelRelease,
+        onReleaseNow = { confirmReleaseNow = true },
+    )
 
     if (confirmRelease) {
         KillitDialog(

@@ -39,6 +39,8 @@ import org.tamodak.killit.ui.myphone.SettingsScreen
 import org.tamodak.killit.ui.myphone.UnlockWaitingScreen
 import org.tamodak.killit.ui.myphone.requestStatusByApp
 import org.tamodak.killit.ui.onboarding.OnboardingScreen
+import org.tamodak.killit.ui.pairing.MoveInScreen
+import org.tamodak.killit.ui.pairing.MoveOutScreen
 import org.tamodak.killit.ui.pairing.WizardScreen
 import org.tamodak.killit.ui.setup.CredentialSetupScreen
 import org.tamodak.killit.ui.tamper.TamperedScreen
@@ -171,6 +173,7 @@ private fun Screens(
             pairing = pairing,
             onMyPhone = { viewModel.openSection(Screen.MyPhone) },
             onGuard = { viewModel.openSection(Screen.Guard) },
+            onMoveIn = { viewModel.openSection(Screen.MoveIn) },
             onLanguageChange = viewModel::setLanguage,
         )
 
@@ -227,6 +230,9 @@ private fun Screens(
             onProvisionViaShizuku = viewModel::provisionViaShizuku,
             onDismissShizukuOutcome = viewModel::dismissShizukuOutcome,
             onRefreshStatus = viewModel::refreshOwnerStatus,
+            onRequestRelease = viewModel::requestRelease,
+            onCancelRelease = viewModel::cancelRelease,
+            onReleaseDeviceOwner = viewModel::releaseDeviceOwner,
         )
 
         Screen.Settings -> SettingsScreen(
@@ -239,6 +245,7 @@ private fun Screens(
             onReleaseDeviceOwner = viewModel::releaseDeviceOwner,
             onLanguageChange = viewModel::setLanguage,
             onAppManagementChange = viewModel::setAppManagement,
+            onMove = if (pairing.pairings.isEmpty()) null else { { viewModel.navigateTo(Screen.MoveOut(Screen.Settings)) } },
         )
 
         Screen.Apps -> AppListScreen(
@@ -255,7 +262,8 @@ private fun Screens(
 
         Screen.Guardians -> GuardiansScreen(
             pairing = pairing,
-            canAddGuardian = state.isDeviceOwner,
+            // A phone a move froze can't take guardians again: it would be a way out of the freeze.
+            canAddGuardian = state.isDeviceOwner && state.movedAway == null,
             onBack = viewModel::back,
             onAdd = { viewModel.navigateTo(Screen.Wizard(PairRole.PROTECTED)) },
             onAskRemove = { viewModel.navigateTo(Screen.AskRemove(it)) },
@@ -352,6 +360,9 @@ private fun Screens(
             onBack = viewModel::back,
             onLanguageChange = viewModel::setLanguage,
             onChangePasskey = { viewModel.navigateTo(Screen.ChangePasskey(Screen.GuardSettings)) },
+            canMove = pairing.pairings.isNotEmpty(),
+            guarded = pairing.guardians.isNotEmpty(),
+            onMove = { viewModel.navigateTo(Screen.MoveOut(Screen.GuardSettings)) },
         )
 
         is Screen.Wizard -> WizardScreen(
@@ -369,13 +380,40 @@ private fun Screens(
             onOpenSetup = { viewModel.navigateTo(Screen.MyPhone) },
             follow = pairingViewModel::followCeremony,
         )
+
+        Screen.MoveIn -> MoveInScreen(
+            canTakeGuardians = state.isDeviceOwner && state.lockType != null && state.movedAway == null,
+            pairing = pairing,
+            onBack = viewModel::back,
+            onStart = pairingViewModel::startMoveIn,
+            onConfirm = pairingViewModel::confirmCode,
+            onReject = pairingViewModel::rejectCode,
+            onCancel = pairingViewModel::cancelCeremony,
+            onDismiss = pairingViewModel::dismissCeremony,
+            onOpenSetup = { viewModel.navigateTo(Screen.MyPhone) },
+            follow = pairingViewModel::followCeremony,
+        )
+
+        is Screen.MoveOut -> MoveOutScreen(
+            guarded = pairing.guardians.isNotEmpty(),
+            pairing = pairing,
+            onBack = viewModel::back,
+            onJoin = { code -> pairingViewModel.startMoveOut(code, viewModel::mayMoveOut) },
+            onConfirm = pairingViewModel::confirmCode,
+            onReject = pairingViewModel::rejectCode,
+            onCommit = { pairingViewModel.commitMove(viewModel::mayMoveOut) },
+            onCancel = pairingViewModel::cancelCeremony,
+            onDismiss = pairingViewModel::dismissCeremony,
+            onDone = { viewModel.navigateTo(Screen.Hub) },
+            follow = pairingViewModel::followCeremony,
+        )
     }
 }
 
 /** True for the screens whose content comes from pairing, which sync when they open. */
 private fun Screen.showsPairing(): Boolean = when (this) {
     Screen.Hub, Screen.MyPhone, Screen.Guardians, Screen.AskUnblock, is Screen.AskUnblockApp,
-    Screen.Guard, is Screen.Request, is Screen.Phone, is Screen.ManageApps -> true
+    Screen.Guard, is Screen.Request, is Screen.Phone, is Screen.ManageApps, Screen.MoveIn, is Screen.MoveOut -> true
     else -> false
 }
 
@@ -389,6 +427,7 @@ private fun pairingMessageText(message: PairingMessage): String = when (message)
     PairingMessage.RateLimited -> stringResource(R.string.msg_rate_limited)
     PairingMessage.Sent -> stringResource(R.string.msg_sent)
     PairingMessage.ManageSent -> stringResource(R.string.manage_sent)
+    PairingMessage.MoveUnderWay -> stringResource(R.string.move_under_way)
     is PairingMessage.NotSent -> stringResource(
         when (message.result) {
             RequestEngine.AskResult.NoGuardians -> R.string.msg_no_guardians

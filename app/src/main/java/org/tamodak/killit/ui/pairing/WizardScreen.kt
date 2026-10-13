@@ -95,8 +95,10 @@ fun WizardScreen(
     follow: suspend () -> Unit,
 ) {
     LaunchedEffect(Unit) { follow() }
-    val ceremony = pairing.ceremony
-    val running = ceremony != null && ceremony.stage != CeremonyStage.PAIRED && ceremony.stage != CeremonyStage.FAILED
+    // A move's ceremony is the move screens'; one under way keeps this wizard from starting.
+    val ceremony = pairing.ceremony?.takeIf { it.purpose == CeremonyPurpose.PAIR }
+    val moving = pairing.ceremony?.let { it.purpose == CeremonyPurpose.MOVE && it.isRunning() } == true
+    val running = ceremony?.isRunning() == true
     val leave = {
         if (running) onCancel()
         if (ceremony != null && !running) onDismiss()
@@ -111,6 +113,7 @@ fun WizardScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             when {
+                moving -> KillitPanel(borderColor = KillitBlue) { KillitBody(stringResource(R.string.move_under_way), color = KillitForeground) }
                 ceremony == null -> Intro(role, isDeviceOwner, appManagement, pairing, onStart, onOpenSetup)
                 else -> Step(ceremony, pairing, onConfirm, onReject, onCancel, onNickname, onDismiss, onBack)
             }
@@ -195,7 +198,7 @@ private fun Intro(
  * Maps what a keyboard typed into the ASCII the code parser accepts (SPEC.md §6.1): a Turkish
  * dotless `ı` or dotted `İ` becomes `I`; anything else outside ASCII is dropped and so refused.
  */
-private fun toAsciiCode(text: String): String = buildString {
+internal fun toAsciiCode(text: String): String = buildString {
     for (char in text) {
         when (char) {
             'ı', 'İ' -> append('I')
@@ -321,6 +324,9 @@ private fun Failed(failure: CeremonyFailure?, onDismiss: () -> Unit) {
     KillitButton(text = stringResource(R.string.wizard_again), onClick = onDismiss)
 }
 
+/** True until the ceremony has paired, moved or failed. */
+internal fun CeremonyEntity.isRunning(): Boolean = stage != CeremonyStage.PAIRED && stage != CeremonyStage.FAILED
+
 /** How a pairing's ceremony, or a move's, ended without one, in words a person can act on. */
 @StringRes
 internal fun failureText(purpose: CeremonyPurpose, failure: CeremonyFailure?): Int = when (purpose) {
@@ -354,8 +360,9 @@ internal fun failureText(purpose: CeremonyPurpose, failure: CeremonyFailure?): I
     }
 }
 
+/** A step that waits on the other phone, with a way out. */
 @Composable
-private fun Waiting(text: String, onCancel: () -> Unit) {
+internal fun Waiting(text: String, onCancel: () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
         CircularProgressIndicator(color = KillitGreen, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
         KillitBody(text, color = KillitForeground)
@@ -365,7 +372,7 @@ private fun Waiting(text: String, onCancel: () -> Unit) {
 
 /** The invite's remaining lifetime, counting down. */
 @Composable
-private fun Countdown(until: Long) {
+internal fun Countdown(until: Long) {
     var now by remember(until) { mutableLongStateOf(System.currentTimeMillis()) }
     LaunchedEffect(until) {
         while (now < until) {

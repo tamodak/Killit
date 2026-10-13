@@ -557,4 +557,51 @@
     <string name="move_failed_limit">The new phone is already linked with too many phones.</string>
     <string name="move_failed_cancelled">The move was cancelled. Nothing moved.</string>
     <string name="move_failed_mismatch">The codes didn\'t match, so nothing moved. Someone may be interfering. Start again.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">Moving from another phone?</string>
+    <string name="hub_my_phone_frozen">Frozen since moving to a new phone</string>
+    <string name="settings_move">Move to a new phone</string>
+    <string name="settings_move_desc">Hand every pairing to your new phone</string>
+    <string name="guard_settings_move_guarded">This phone has guardians, so it moves from My phone › Settings, while Killit is unlocked.</string>
+    <string name="move_in_title">Move from another phone</string>
+    <string name="move_in_intro">This phone takes over everything your old phone is paired with: its guardians and the phones it guards. Nobody has to pair again.</string>
+    <string name="move_in_needs_owner">To take over guardians, Killit must protect this phone first. Moving only the phones you guard works without it.</string>
+    <string name="move_in_start">Show a code</string>
+    <string name="move_in_give_code">On the old phone, open Killit, choose Settings › Move to a new phone, and type this code.</string>
+    <string name="move_compare_title">Put the two phones side by side</string>
+    <string name="move_compare_body">Both must show the same 6 digits. If they don\'t, someone may be interfering.</string>
+    <string name="move_in_receiving">Receiving from the old phone…</string>
+    <string name="move_in_ready_title">Confirm on the old phone</string>
+    <string name="move_in_ready_body">This moves here once the old phone confirms:</string>
+    <string name="move_in_give_up_in">If the old phone doesn\'t confirm, you can give up in %1$s.</string>
+    <string name="move_in_give_up">Give up</string>
+    <string name="move_in_done_title">Moved here</string>
+    <string name="move_in_done_body">This phone has every pairing of the old one now, and its pairs have been told.</string>
+    <string name="move_out_title">Move to a new phone</string>
+    <string name="move_out_intro">On the new phone, install Killit and choose Moving from another phone? on its first screen. It shows a code: type it here.</string>
+    <string name="move_out_moves">This moves to the new phone:</string>
+    <string name="move_out_frozen_warning">This phone has guardians. After the move it stays as it is: blocked apps stay blocked, and nothing on it can be unblocked. Only removing Killit, after its waiting period, ends that.</string>
+    <string name="move_out_connect">Connect</string>
+    <string name="move_out_sending">Sending everything to the new phone…</string>
+    <string name="move_out_ready_title">Move to %1$s?</string>
+    <string name="move_out_ready_title_bare">Move to the new phone?</string>
+    <string name="move_out_ready_window">Confirm within %1$s.</string>
+    <string name="move_out_confirm">Move</string>
+    <string name="move_out_moving">Moving. Keep this phone online until it\'s done.</string>
+    <string name="move_out_done_title">Moved</string>
+    <string name="move_out_done_body">Everything moved to the new phone. This phone has no pairings any more.</string>
+    <string name="move_out_done_frozen">Its apps stay as they are. Only removing Killit ends that.</string>
+    <string name="move_under_way">A move to or from this phone is under way. It finishes first.</string>
+    <string name="frozen_title">Protection moved to a new phone</string>
+    <string name="frozen_body">Its guardians moved to %1$s on %2$s. Its blocked apps stay blocked, and nothing here can be unblocked. Removing Killit, after its waiting period, ends that.</string>
+    <string name="frozen_body_bare">Its guardians moved to the new phone on %1$s. Its blocked apps stay blocked, and nothing here can be unblocked. Removing Killit, after its waiting period, ends that.</string>
+    <plurals name="move_guardians">
+        <item quantity="one">%1$d guardian</item>
+        <item quantity="other">%1$d guardians</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="one">%1$d phone you guard</item>
+        <item quantity="other">%1$d phones you guard</item>
+    </plurals>
 </resources>

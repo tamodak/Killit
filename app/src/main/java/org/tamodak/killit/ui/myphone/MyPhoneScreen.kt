@@ -73,6 +73,7 @@ import org.tamodak.killit.ui.components.KillitStatusPanel
 import org.tamodak.killit.ui.components.KillitStep
 import org.tamodak.killit.ui.components.KillitTextButton
 import org.tamodak.killit.ui.components.KillitToggleRow
+import org.tamodak.killit.ui.components.formatDate
 import org.tamodak.killit.ui.formatDuration
 import org.tamodak.killit.ui.theme.KillitBlue
 import org.tamodak.killit.ui.theme.KillitBorderDim
@@ -97,7 +98,7 @@ import kotlinx.coroutines.delay
 private enum class SetupMethod { Adb, Shizuku, Qr }
 
 /**
- * This phone (PLAN.md §15.2), behind the passkey. It has three faces:
+ * This phone (PLAN.md §15.2), behind the passkey. It has four faces:
  *
  * - **Not device owner yet:** the three ways to become one, each a step-by-step page, and the app
  *   list as a read-only preview, so the user can see what Killit will manage before committing to
@@ -106,6 +107,8 @@ private enum class SetupMethod { Adb, Shizuku, Qr }
  *   Apps · Guardians · Settings (§15.5).
  * - **Locked** (has guardians): what the protected user can still do on their own — ask to unlock,
  *   ask about an app, block more, see their guardians (§15.4).
+ * - **Frozen** (its guardians moved to a new phone, §3.10): where they went, and giving up device
+ *   owner, the only way out.
  *
  * Nothing is drawn until the number of guardians is known, so a guarded phone never flashes its
  * unlocked face.
@@ -124,6 +127,9 @@ fun MyPhoneScreen(
     onProvisionViaShizuku: () -> Unit,
     onDismissShizukuOutcome: () -> Unit,
     onRefreshStatus: () -> Unit,
+    onRequestRelease: () -> Unit,
+    onCancelRelease: () -> Unit,
+    onReleaseDeviceOwner: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -167,6 +173,7 @@ fun MyPhoneScreen(
                         CircularProgressIndicator(color = KillitGreen)
                     }
                     !state.isDeviceOwner -> SetupFace(state, onRefreshStatus, onManageApps) { setupMethod = it }
+                    state.movedAway != null -> FrozenFace(state, onRequestRelease, onCancelRelease, onReleaseDeviceOwner)
                     state.fullControl -> UnlockedFace(state, guardians, onRefreshStatus, onManageApps, onGuardians, onSettings)
                     else -> LockedFace(state, pairing, guardians, onUnlock, onAskUnblock, onBlockMore, onGuardians)
                 }
@@ -288,6 +295,35 @@ private fun UnlockedFace(
             onClick = onSettings,
         )
     }
+}
+
+/**
+ * A phone whose guardians moved to a new phone (PLAN.md §3.10). Its blocks stay, nothing can be
+ * unblocked, and giving up device owner, after its wait, is the only way out: otherwise moving to
+ * a spare phone would be a way to shed the guardians.
+ */
+@Composable
+private fun FrozenFace(
+    state: KillitUiState,
+    onRequestRelease: () -> Unit,
+    onCancelRelease: () -> Unit,
+    onReleaseDeviceOwner: () -> Unit,
+) {
+    val moved = state.movedAway ?: return
+    val model = moved.toModel.ifEmpty { null }
+    val date = formatDate(moved.at)
+    KillitStatusPanel(
+        icon = KillitIcons.Lock,
+        title = stringResource(R.string.frozen_title),
+        subtitle = if (model != null) stringResource(R.string.frozen_body, model, date) else stringResource(R.string.frozen_body_bare, date),
+        accent = KillitBlue,
+    ) {
+        KillitBody(
+            text = pluralStringResource(R.plurals.home_blocked_count, state.blocked.size, state.blocked.size),
+            color = KillitForeground,
+        )
+    }
+    ReleaseControls(state, guarded = false, onRequestRelease, onCancelRelease, onReleaseDeviceOwner)
 }
 
 /**

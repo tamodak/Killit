@@ -578,4 +578,55 @@
     <string name="move_failed_limit">Новый телефон уже связан со слишком многими телефонами.</string>
     <string name="move_failed_cancelled">Перенос отменён. Ничего не перенесено.</string>
     <string name="move_failed_mismatch">Коды не совпали, поэтому ничего не перенесено. Возможно, кто-то вмешивается. Начните заново.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">Переходите с другого телефона?</string>
+    <string name="hub_my_phone_frozen">Заморожен после переноса на новый телефон</string>
+    <string name="settings_move">Перенести на новый телефон</string>
+    <string name="settings_move_desc">Передать все связи новому телефону</string>
+    <string name="guard_settings_move_guarded">У этого телефона есть опекуны, поэтому перенос — через Мой телефон › Настройки, пока Killit разблокирован.</string>
+    <string name="move_in_title">Перенос с другого телефона</string>
+    <string name="move_in_intro">Этот телефон получит всё, с чем связан ваш старый телефон: его опекунов и телефоны под его опекой. Никому не нужно связываться заново.</string>
+    <string name="move_in_needs_owner">Чтобы принять опекунов, Killit сначала должен защитить этот телефон. Перенести только телефоны под вашей опекой можно и без этого.</string>
+    <string name="move_in_start">Показать код</string>
+    <string name="move_in_give_code">На старом телефоне откройте Killit, выберите Настройки › Перенести на новый телефон и введите этот код.</string>
+    <string name="move_compare_title">Положите телефоны рядом</string>
+    <string name="move_compare_body">Оба должны показывать одни и те же 6 цифр. Если нет, возможно, кто-то вмешивается.</string>
+    <string name="move_in_receiving">Получение данных со старого телефона…</string>
+    <string name="move_in_ready_title">Подтвердите на старом телефоне</string>
+    <string name="move_in_ready_body">Это перейдёт сюда, как только старый телефон подтвердит:</string>
+    <string name="move_in_give_up_in">Если старый телефон не подтвердит, отменить можно будет через %1$s.</string>
+    <string name="move_in_give_up">Отменить</string>
+    <string name="move_in_done_title">Перенесено сюда</string>
+    <string name="move_in_done_body">Теперь у этого телефона все связи старого, и связанные телефоны оповещены.</string>
+    <string name="move_out_title">Перенести на новый телефон</string>
+    <string name="move_out_intro">Установите Killit на новый телефон и выберите на его первом экране «Переходите с другого телефона?». Он покажет код — введите его здесь.</string>
+    <string name="move_out_moves">На новый телефон перейдёт:</string>
+    <string name="move_out_frozen_warning">У этого телефона есть опекуны. После переноса он останется как есть: заблокированные приложения останутся заблокированными, и ничего нельзя будет разблокировать. Это закончится, только если удалить Killit после периода ожидания.</string>
+    <string name="move_out_connect">Подключить</string>
+    <string name="move_out_sending">Отправка всего на новый телефон…</string>
+    <string name="move_out_ready_title">Перенести на %1$s?</string>
+    <string name="move_out_ready_title_bare">Перенести на новый телефон?</string>
+    <string name="move_out_ready_window">Подтвердите в течение %1$s.</string>
+    <string name="move_out_confirm">Перенести</string>
+    <string name="move_out_moving">Идёт перенос. Не отключайте этот телефон от сети до конца.</string>
+    <string name="move_out_done_title">Перенесено</string>
+    <string name="move_out_done_body">Всё перенесено на новый телефон. У этого телефона больше нет связей.</string>
+    <string name="move_out_done_frozen">Его приложения останутся как есть. Это закончится, только если удалить Killit.</string>
+    <string name="move_under_way">Идёт перенос на этот телефон или с него. Сначала он завершится.</string>
+    <string name="frozen_title">Защита перенесена на новый телефон</string>
+    <string name="frozen_body">Его опекуны перешли на %1$s %2$s. Заблокированные приложения останутся заблокированными, и здесь ничего нельзя разблокировать. Это закончится, если удалить Killit после периода ожидания.</string>
+    <string name="frozen_body_bare">Его опекуны перешли на новый телефон %1$s. Заблокированные приложения останутся заблокированными, и здесь ничего нельзя разблокировать. Это закончится, если удалить Killit после периода ожидания.</string>
+    <plurals name="move_guardians">
+        <item quantity="one">%1$d опекун</item>
+        <item quantity="few">%1$d опекуна</item>
+        <item quantity="many">%1$d опекунов</item>
+        <item quantity="other">%1$d опекуна</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="one">%1$d телефон под вашей опекой</item>
+        <item quantity="few">%1$d телефона под вашей опекой</item>
+        <item quantity="many">%1$d телефонов под вашей опекой</item>
+        <item quantity="other">%1$d телефона под вашей опекой</item>
+    </plurals>
 </resources>

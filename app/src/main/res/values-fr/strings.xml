@@ -558,4 +558,53 @@
     <string name="move_failed_limit">Le nouveau téléphone est déjà relié à trop de téléphones.</string>
     <string name="move_failed_cancelled">Le transfert a été annulé. Rien n\'a été transféré.</string>
     <string name="move_failed_mismatch">Les codes ne correspondaient pas, donc rien n\'a été transféré. Quelqu\'un essaie peut-être d\'interférer. Recommence.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">Tu viens d\'un autre téléphone ?</string>
+    <string name="hub_my_phone_frozen">Figé depuis le passage à un nouveau téléphone</string>
+    <string name="settings_move">Passer à un nouveau téléphone</string>
+    <string name="settings_move_desc">Confier tous les appairages à ton nouveau téléphone</string>
+    <string name="guard_settings_move_guarded">Ce téléphone a des gardiens, il se transfère donc depuis Mon téléphone › Réglages, Killit déverrouillé.</string>
+    <string name="move_in_title">Venir d\'un autre téléphone</string>
+    <string name="move_in_intro">Ce téléphone reprend tout ce avec quoi ton ancien téléphone est appairé : ses gardiens et les téléphones qu\'il garde. Personne n\'a besoin de s\'appairer à nouveau.</string>
+    <string name="move_in_needs_owner">Pour reprendre des gardiens, Killit doit d\'abord protéger ce téléphone. Transférer seulement les téléphones que tu gardes fonctionne sans cela.</string>
+    <string name="move_in_start">Afficher un code</string>
+    <string name="move_in_give_code">Sur l\'ancien téléphone, ouvre Killit, choisis Réglages › Passer à un nouveau téléphone et saisis ce code.</string>
+    <string name="move_compare_title">Pose les deux téléphones côte à côte</string>
+    <string name="move_compare_body">Les deux doivent afficher les mêmes 6 chiffres. Sinon, quelqu\'un essaie peut-être d\'interférer.</string>
+    <string name="move_in_receiving">Réception depuis l\'ancien téléphone…</string>
+    <string name="move_in_ready_title">Confirme sur l\'ancien téléphone</string>
+    <string name="move_in_ready_body">Ceci arrive ici dès que l\'ancien téléphone confirme :</string>
+    <string name="move_in_give_up_in">Si l\'ancien téléphone ne confirme pas, tu pourras abandonner dans %1$s.</string>
+    <string name="move_in_give_up">Abandonner</string>
+    <string name="move_in_done_title">Transféré ici</string>
+    <string name="move_in_done_body">Ce téléphone a maintenant tous les appairages de l\'ancien, et ses partenaires ont été prévenus.</string>
+    <string name="move_out_title">Passer à un nouveau téléphone</string>
+    <string name="move_out_intro">Sur le nouveau téléphone, installe Killit et choisis « Tu viens d\'un autre téléphone ? » sur son premier écran. Il affiche un code : saisis-le ici.</string>
+    <string name="move_out_moves">Ceci passe au nouveau téléphone :</string>
+    <string name="move_out_frozen_warning">Ce téléphone a des gardiens. Après le transfert, il reste tel quel : les applis bloquées restent bloquées et rien ne peut y être débloqué. Seul le retrait de Killit, après son délai d\'attente, y met fin.</string>
+    <string name="move_out_connect">Connecter</string>
+    <string name="move_out_sending">Envoi de tout au nouveau téléphone…</string>
+    <string name="move_out_ready_title">Passer à %1$s ?</string>
+    <string name="move_out_ready_title_bare">Passer au nouveau téléphone ?</string>
+    <string name="move_out_ready_window">Confirme d\'ici %1$s.</string>
+    <string name="move_out_confirm">Transférer</string>
+    <string name="move_out_moving">Transfert en cours. Garde ce téléphone en ligne jusqu\'à la fin.</string>
+    <string name="move_out_done_title">Transféré</string>
+    <string name="move_out_done_body">Tout est passé au nouveau téléphone. Ce téléphone n\'a plus aucun appairage.</string>
+    <string name="move_out_done_frozen">Ses applis restent telles quelles. Seul le retrait de Killit y met fin.</string>
+    <string name="move_under_way">Un transfert vers ou depuis ce téléphone est en cours. Il se termine d\'abord.</string>
+    <string name="frozen_title">La protection est passée à un nouveau téléphone</string>
+    <string name="frozen_body">Ses gardiens sont passés à %1$s le %2$s. Les applis bloquées restent bloquées et rien ne peut être débloqué ici. Le retrait de Killit, après son délai d\'attente, y met fin.</string>
+    <string name="frozen_body_bare">Ses gardiens sont passés au nouveau téléphone le %1$s. Les applis bloquées restent bloquées et rien ne peut être débloqué ici. Le retrait de Killit, après son délai d\'attente, y met fin.</string>
+    <plurals name="move_guardians">
+        <item quantity="one">%1$d gardien</item>
+        <item quantity="many">%1$d gardiens</item>
+        <item quantity="other">%1$d gardiens</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="one">%1$d téléphone que tu gardes</item>
+        <item quantity="many">%1$d téléphones que tu gardes</item>
+        <item quantity="other">%1$d téléphones que tu gardes</item>
+    </plurals>
 </resources>

@@ -98,10 +98,6 @@ class PairingEngine(
     private val lock = Mutex()
     private val dao = store.dao
 
-    /** Whether this phone is frozen by a move of its own (PLAN.md §3.10); read once per process. */
-    @Volatile
-    private var frozen: Boolean? = null
-
     private val canTakeGuardians: suspend () -> Boolean = { canBeProtected() && !isFrozen() }
 
     val effects = RemoteEffects(
@@ -258,7 +254,7 @@ class PairingEngine(
      * True when this phone's protection moved to a new phone (PLAN.md §3.10): its blocks stay, it
      * can't take guardians, and only releasing device owner ends that.
      */
-    suspend fun isFrozen(): Boolean = frozen ?: (durable.isAvailable() && durable.readMovedAway() != null).also { frozen = it }
+    suspend fun isFrozen(): Boolean = movedAway() != null
 
     /** Where this phone's protection moved, when it did. */
     suspend fun movedAway(): MovedAway? = if (durable.isAvailable()) durable.readMovedAway() else null
@@ -384,7 +380,6 @@ class PairingEngine(
      */
     private suspend fun finishMove(): Boolean {
         if (!lock.withLock { moves.finishIfSent() }) return false
-        frozen = null
         try {
             forgetIdentity()
         } catch (e: CancellationException) {
@@ -453,7 +448,6 @@ class PairingEngine(
     suspend fun releaseAll() {
         locked { peers.releaseAll() }
         store.clearProtection()
-        frozen = null
     }
 
     // ---------------------------------------------------------------- guardian side

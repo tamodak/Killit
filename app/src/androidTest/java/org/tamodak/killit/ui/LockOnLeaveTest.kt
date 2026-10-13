@@ -16,6 +16,7 @@ import org.tamodak.killit.data.DurableStore
 import org.tamodak.killit.data.LockPreferences
 import org.tamodak.killit.data.LockRepository
 import org.tamodak.killit.data.LockType
+import org.tamodak.killit.data.MovedAway
 import org.tamodak.killit.data.PersistedStateSnapshot
 import org.tamodak.killit.pairing.EnginePhone
 import org.tamodak.killit.pairing.FakeServer
@@ -32,6 +33,7 @@ import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -192,6 +194,44 @@ class LockOnLeaveTest {
             }
             viewModel.navigateTo(Screen.AskUnblock)
             assertEquals(Screen.AskUnblock, viewModel.state.value.screen)
+        }
+    }
+
+    /**
+     * A phone whose guardians moved to a new phone is frozen (§3.10): its passkey opens My phone,
+     * but nothing that needs full control, and giving up device owner stays possible.
+     */
+    @Test
+    fun aFrozenPhoneCanOnlyBeReleased(): Unit = runBlocking {
+        phone.durable.movedAway = MovedAway(at = 1_790_000_000_000L, toModel = "Test Ali 2")
+        unlock()
+        assertFalse(viewModel.state.value.fullControl)
+        assertEquals("Test Ali 2", viewModel.state.value.movedAway?.toModel)
+
+        withContext(Dispatchers.Main) {
+            listOf(Screen.Apps, Screen.Settings).forEach { screen ->
+                viewModel.navigateTo(screen)
+                assertEquals("$screen must be refused on a frozen phone", Screen.MyPhone, viewModel.state.value.screen)
+            }
+            viewModel.requestRelease()
+        }
+        awaitState { it.releaseRequest != null }
+    }
+
+    /** Guardians that move away don't leave their phone free: the session gains no full control. */
+    @Test
+    fun guardiansMovingAwayDoNotFreeThePhone(): Unit = runBlocking {
+        phone.dao.upsertPairing(guardian())
+        unlock()
+        assertFalse(viewModel.state.value.fullControl)
+
+        phone.store.clear(MovedAway(at = 1_790_000_000_000L, toModel = "Test Ali 2"))
+        awaitState { it.guardianCount == 0 }
+        assertFalse(viewModel.state.value.fullControl)
+        assertNotNull(viewModel.state.value.movedAway)
+        withContext(Dispatchers.Main) {
+            viewModel.navigateTo(Screen.Apps)
+            assertEquals(Screen.MyPhone, viewModel.state.value.screen)
         }
     }
 

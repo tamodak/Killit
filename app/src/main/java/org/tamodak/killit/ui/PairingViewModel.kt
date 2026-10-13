@@ -66,6 +66,9 @@ sealed interface PairingMessage {
 
     /** Changes to a guarded phone's apps were sent; it applies them once it is online. */
     data object ManageSent : PairingMessage
+
+    /** A move to or from this phone must finish before another ceremony starts. */
+    data object MoveUnderWay : PairingMessage
 }
 
 /**
@@ -168,14 +171,55 @@ class PairingViewModel(
     fun startCeremony(role: PairRole, name: String, code: String?) = act {
         prefs.setSelfName(name.trim())
         _state.update { it.copy(selfName = name.trim()) }
-        if (code == null) {
-            engine.ceremony.create(role, name)
-        } else {
-            when (engine.ceremony.join(code, role, name)) {
-                CeremonyEngine.JoinResult.JOINED -> Unit
-                CeremonyEngine.JoinResult.CODE_NOT_FOUND -> say(PairingMessage.CodeNotFound)
-                CeremonyEngine.JoinResult.RATE_LIMITED -> say(PairingMessage.RateLimited)
-            }
+        unlessMoving {
+            if (code == null) engine.ceremony.create(role, name) else joined(engine.ceremony.join(code, role, name))
+        }
+    }
+
+    // ---------------------------------------------------------------- moving to a new phone
+
+    /** New phone: shows the code the old phone types (PLAN.md §3.10). */
+    fun startMoveIn() = act { unlessMoving { engine.startMoveIn() } }
+
+    /**
+     * Old phone: joins the new phone's code.
+     *
+     * @param mayMove whether this session may move this phone ([KillitViewModel.mayMoveOut]).
+     */
+    fun startMoveOut(code: String, mayMove: suspend () -> Boolean) = act {
+        if (!mayMove()) return@act
+        unlessMoving { joined(engine.startMoveOut(code)) }
+    }
+
+    /**
+     * Old phone: the user confirmed the move. What it led to shows on the move screen; only a
+     * server out of reach is said here, since nothing changed and the user may try again.
+     *
+     * @param mayMove whether this session may move this phone ([KillitViewModel.mayMoveOut]).
+     */
+    fun commitMove(mayMove: suspend () -> Boolean) = act {
+        if (!mayMove()) return@act
+        if (engine.commitMove() == PairingEngine.MoveCommitResult.OFFLINE) say(PairingMessage.Offline)
+    }
+
+    private fun joined(result: CeremonyEngine.JoinResult) {
+        when (result) {
+            CeremonyEngine.JoinResult.JOINED -> Unit
+            CeremonyEngine.JoinResult.CODE_NOT_FOUND -> say(PairingMessage.CodeNotFound)
+            CeremonyEngine.JoinResult.RATE_LIMITED -> say(PairingMessage.RateLimited)
+        }
+    }
+
+    /**
+     * Runs [block], which starts a ceremony. The engine refuses one while a move it can't cut short
+     * is under way; the screens don't offer it then, so this is only a race lost.
+     */
+    private suspend fun unlessMoving(block: suspend () -> Unit) {
+        try {
+            block()
+        } catch (e: IllegalStateException) {
+            KillitLog.w(KillitLog.PAIR, "Not starting a ceremony: ${e.message}")
+            say(PairingMessage.MoveUnderWay)
         }
     }
 

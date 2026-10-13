@@ -538,4 +538,51 @@
     <string name="move_failed_limit">Das neue Handy ist schon mit zu vielen Handys verbunden.</string>
     <string name="move_failed_cancelled">Der Umzug wurde abgebrochen. Nichts wurde übertragen.</string>
     <string name="move_failed_mismatch">Die Codes stimmten nicht überein, daher wurde nichts übertragen. Vielleicht mischt sich jemand ein. Fang neu an.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">Du ziehst von einem anderen Handy um?</string>
+    <string name="hub_my_phone_frozen">Nach dem Umzug auf ein neues Handy eingefroren</string>
+    <string name="settings_move">Auf ein neues Handy umziehen</string>
+    <string name="settings_move_desc">Alle Kopplungen an dein neues Handy übergeben</string>
+    <string name="guard_settings_move_guarded">Dieses Handy hat Wächter, deshalb zieht es über Mein Handy › Einstellungen um, während Killit entsperrt ist.</string>
+    <string name="move_in_title">Von einem anderen Handy umziehen</string>
+    <string name="move_in_intro">Dieses Handy übernimmt alles, womit dein altes Handy gekoppelt ist: seine Wächter und die Handys, die es bewacht. Niemand muss neu koppeln.</string>
+    <string name="move_in_needs_owner">Um Wächter zu übernehmen, muss Killit dieses Handy zuerst schützen. Nur die Handys umzuziehen, die du bewachst, geht auch ohne.</string>
+    <string name="move_in_start">Code zeigen</string>
+    <string name="move_in_give_code">Öffne auf dem alten Handy Killit, wähle Einstellungen › Auf ein neues Handy umziehen und tippe diesen Code ein.</string>
+    <string name="move_compare_title">Leg die beiden Handys nebeneinander</string>
+    <string name="move_compare_body">Beide müssen dieselben 6 Ziffern zeigen. Wenn nicht, mischt sich vielleicht jemand ein.</string>
+    <string name="move_in_receiving">Daten vom alten Handy werden empfangen…</string>
+    <string name="move_in_ready_title">Auf dem alten Handy bestätigen</string>
+    <string name="move_in_ready_body">Das zieht hierher um, sobald das alte Handy bestätigt:</string>
+    <string name="move_in_give_up_in">Wenn das alte Handy nicht bestätigt, kannst du in %1$s aufgeben.</string>
+    <string name="move_in_give_up">Aufgeben</string>
+    <string name="move_in_done_title">Hierher umgezogen</string>
+    <string name="move_in_done_body">Dieses Handy hat jetzt alle Kopplungen des alten, und seine Partner wurden benachrichtigt.</string>
+    <string name="move_out_title">Auf ein neues Handy umziehen</string>
+    <string name="move_out_intro">Installiere Killit auf dem neuen Handy und wähle auf seinem ersten Bildschirm „Du ziehst von einem anderen Handy um?“. Es zeigt einen Code: Tippe ihn hier ein.</string>
+    <string name="move_out_moves">Das zieht auf das neue Handy um:</string>
+    <string name="move_out_frozen_warning">Dieses Handy hat Wächter. Nach dem Umzug bleibt es, wie es ist: Blockierte Apps bleiben blockiert, und nichts darauf lässt sich freigeben. Nur das Entfernen von Killit nach der Wartezeit beendet das.</string>
+    <string name="move_out_connect">Verbinden</string>
+    <string name="move_out_sending">Alles wird an das neue Handy gesendet…</string>
+    <string name="move_out_ready_title">Auf %1$s umziehen?</string>
+    <string name="move_out_ready_title_bare">Auf das neue Handy umziehen?</string>
+    <string name="move_out_ready_window">Bestätige innerhalb von %1$s.</string>
+    <string name="move_out_confirm">Umziehen</string>
+    <string name="move_out_moving">Umzug läuft. Lass dieses Handy online, bis er fertig ist.</string>
+    <string name="move_out_done_title">Umgezogen</string>
+    <string name="move_out_done_body">Alles ist auf das neue Handy umgezogen. Dieses Handy hat keine Kopplungen mehr.</string>
+    <string name="move_out_done_frozen">Seine Apps bleiben, wie sie sind. Nur das Entfernen von Killit beendet das.</string>
+    <string name="move_under_way">Ein Umzug auf oder von diesem Handy läuft. Er wird zuerst abgeschlossen.</string>
+    <string name="frozen_title">Schutz auf ein neues Handy umgezogen</string>
+    <string name="frozen_body">Seine Wächter sind am %2$s auf %1$s umgezogen. Blockierte Apps bleiben blockiert, und hier lässt sich nichts freigeben. Das Entfernen von Killit nach der Wartezeit beendet das.</string>
+    <string name="frozen_body_bare">Seine Wächter sind am %1$s auf das neue Handy umgezogen. Blockierte Apps bleiben blockiert, und hier lässt sich nichts freigeben. Das Entfernen von Killit nach der Wartezeit beendet das.</string>
+    <plurals name="move_guardians">
+        <item quantity="one">%1$d Wächter</item>
+        <item quantity="other">%1$d Wächter</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="one">%1$d Handy, das du bewachst</item>
+        <item quantity="other">%1$d Handys, die du bewachst</item>
+    </plurals>
 </resources>

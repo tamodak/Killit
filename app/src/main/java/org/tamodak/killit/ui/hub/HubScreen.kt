@@ -37,6 +37,7 @@ import org.tamodak.killit.ui.LanguagePicker
 import org.tamodak.killit.ui.PairingUiState
 import org.tamodak.killit.ui.components.KillitGutter
 import org.tamodak.killit.ui.components.KillitRule
+import org.tamodak.killit.ui.components.KillitTextButton
 import org.tamodak.killit.ui.theme.KillitBackground
 import org.tamodak.killit.ui.theme.KillitBlue
 import org.tamodak.killit.ui.theme.KillitBorderDim
@@ -49,13 +50,15 @@ import org.tamodak.killit.ui.theme.KillitTextMuted
 
 /**
  * The first screen (PLAN.md §15.3): this phone, and the phones it guards. Either card asks for the
- * passkey on the way in (J1).
+ * passkey on the way in (J1), and so does moving here from another phone (§3.10), which a phone
+ * without pairings offers below them.
  *
  * Before the passkey only counts are shown, never an app's or a person's name (I5): whoever holds
  * the phone learns that there is something waiting, not what.
  *
  * @param onMyPhone opens My phone, through the gate.
  * @param onGuard opens Phones I guard, through the gate.
+ * @param onMoveIn opens the new phone's side of a move, through the gate.
  */
 @Composable
 fun HubScreen(
@@ -63,6 +66,7 @@ fun HubScreen(
     pairing: PairingUiState,
     onMyPhone: () -> Unit,
     onGuard: () -> Unit,
+    onMoveIn: () -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
 ) {
     var pickingLanguage by remember { mutableStateOf(false) }
@@ -121,6 +125,7 @@ fun HubScreen(
         ) {
             MyPhoneCard(state, pairing, onMyPhone)
             GuardCard(pairing, onGuard)
+            if (pairing.pairings.isEmpty()) KillitTextButton(text = stringResource(R.string.hub_move_in), onClick = onMoveIn)
         }
     }
 }
@@ -131,6 +136,7 @@ private fun MyPhoneCard(state: KillitUiState, pairing: PairingUiState, onClick: 
     val (status, accent) = when {
         // Default-blocking needs both; until then nothing on this phone is protected.
         !state.isDeviceOwner || state.lockType == null -> stringResource(R.string.hub_my_phone_setup) to KillitRed
+        state.movedAway != null -> stringResource(R.string.hub_my_phone_frozen) to KillitBlue
         guardians == 0 -> stringResource(R.string.hub_my_phone_protected) to KillitGreen
         else -> pluralStringResource(R.plurals.hub_my_phone_guardians, guardians, guardians) to KillitGreen
     }

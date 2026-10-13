@@ -538,4 +538,51 @@
     <string name="move_failed_limit">Yeni telefon zaten çok fazla telefona bağlı.</string>
     <string name="move_failed_cancelled">Taşınma iptal edildi. Hiçbir şey taşınmadı.</string>
     <string name="move_failed_mismatch">Kodlar eşleşmedi, bu yüzden hiçbir şey taşınmadı. Biri araya giriyor olabilir. Yeniden başla.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">Başka bir telefondan mı geçiyorsun?</string>
+    <string name="hub_my_phone_frozen">Yeni telefona geçildiğinden beri donduruldu</string>
+    <string name="settings_move">Yeni telefona geç</string>
+    <string name="settings_move_desc">Tüm eşleşmeleri yeni telefonuna devret</string>
+    <string name="guard_settings_move_guarded">Bu telefonun koruyucuları var; bu yüzden Killit\'in kilidi açıkken Telefonum › Ayarlar\'dan taşınır.</string>
+    <string name="move_in_title">Başka bir telefondan geç</string>
+    <string name="move_in_intro">Bu telefon, eski telefonunun eşleştiği her şeyi devralır: koruyucularını ve koruduğu telefonları. Kimsenin yeniden eşleşmesi gerekmez.</string>
+    <string name="move_in_needs_owner">Koruyucuları devralmak için önce Killit bu telefonu korumalı. Yalnızca koruduğun telefonları taşımak bu olmadan da olur.</string>
+    <string name="move_in_start">Kod göster</string>
+    <string name="move_in_give_code">Eski telefonda Killit\'i aç, Ayarlar › Yeni telefona geç\'i seç ve bu kodu yaz.</string>
+    <string name="move_compare_title">İki telefonu yan yana koy</string>
+    <string name="move_compare_body">İkisi de aynı 6 rakamı göstermeli. Göstermiyorlarsa biri araya giriyor olabilir.</string>
+    <string name="move_in_receiving">Eski telefondan alınıyor…</string>
+    <string name="move_in_ready_title">Eski telefonda onayla</string>
+    <string name="move_in_ready_body">Eski telefon onaylayınca bunlar buraya taşınır:</string>
+    <string name="move_in_give_up_in">Eski telefon onaylamazsa %1$s sonra vazgeçebilirsin.</string>
+    <string name="move_in_give_up">Vazgeç</string>
+    <string name="move_in_done_title">Buraya taşındı</string>
+    <string name="move_in_done_body">Bu telefon artık eskisinin bütün eşleşmelerine sahip; eşleştiği telefonlar da bilgilendirildi.</string>
+    <string name="move_out_title">Yeni telefona geç</string>
+    <string name="move_out_intro">Yeni telefona Killit\'i kur ve ilk ekranında Başka bir telefondan mı geçiyorsun?\'u seç. Bir kod gösterir: onu buraya yaz.</string>
+    <string name="move_out_moves">Bunlar yeni telefona taşınır:</string>
+    <string name="move_out_frozen_warning">Bu telefonun koruyucuları var. Taşındıktan sonra olduğu gibi kalır: engelli uygulamalar engelli kalır ve hiçbir şeyin engeli kaldırılamaz. Bunu yalnızca bekleme süresinin ardından Killit\'i kaldırmak bitirir.</string>
+    <string name="move_out_connect">Bağlan</string>
+    <string name="move_out_sending">Her şey yeni telefona gönderiliyor…</string>
+    <string name="move_out_ready_title">%1$s cihazına geçilsin mi?</string>
+    <string name="move_out_ready_title_bare">Yeni telefona geçilsin mi?</string>
+    <string name="move_out_ready_window">%1$s içinde onayla.</string>
+    <string name="move_out_confirm">Geç</string>
+    <string name="move_out_moving">Taşınıyor. Bitene kadar bu telefonu çevrimiçi tut.</string>
+    <string name="move_out_done_title">Taşındı</string>
+    <string name="move_out_done_body">Her şey yeni telefona taşındı. Bu telefonun artık hiç eşleşmesi yok.</string>
+    <string name="move_out_done_frozen">Uygulamaları olduğu gibi kalır. Bunu yalnızca Killit\'i kaldırmak bitirir.</string>
+    <string name="move_under_way">Bu telefona ya da bu telefondan bir taşınma sürüyor. Önce o biter.</string>
+    <string name="frozen_title">Koruma yeni telefona taşındı</string>
+    <string name="frozen_body">Koruyucuları %2$s tarihinde %1$s cihazına taşındı. Engelli uygulamaları engelli kalır ve burada hiçbir şeyin engeli kaldırılamaz. Bunu bekleme süresinin ardından Killit\'i kaldırmak bitirir.</string>
+    <string name="frozen_body_bare">Koruyucuları %1$s tarihinde yeni telefona taşındı. Engelli uygulamaları engelli kalır ve burada hiçbir şeyin engeli kaldırılamaz. Bunu bekleme süresinin ardından Killit\'i kaldırmak bitirir.</string>
+    <plurals name="move_guardians">
+        <item quantity="one">%1$d koruyucu</item>
+        <item quantity="other">%1$d koruyucu</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="one">Koruduğun %1$d telefon</item>
+        <item quantity="other">Koruduğun %1$d telefon</item>
+    </plurals>
 </resources>

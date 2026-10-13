@@ -558,4 +558,53 @@
     <string name="move_failed_limit">O telemóvel novo já está ligado a demasiados telemóveis.</string>
     <string name="move_failed_cancelled">A mudança foi cancelada. Nada foi transferido.</string>
     <string name="move_failed_mismatch">Os códigos não coincidiam, por isso nada foi transferido. Alguém pode estar a interferir. Recomeça.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">Vens de outro telemóvel?</string>
+    <string name="hub_my_phone_frozen">Congelado desde a mudança para um telemóvel novo</string>
+    <string name="settings_move">Mudar para um telemóvel novo</string>
+    <string name="settings_move_desc">Passar todos os emparelhamentos para o teu telemóvel novo</string>
+    <string name="guard_settings_move_guarded">Este telemóvel tem guardiões, por isso muda a partir de O meu telemóvel › Definições, com o Killit desbloqueado.</string>
+    <string name="move_in_title">Vir de outro telemóvel</string>
+    <string name="move_in_intro">Este telemóvel fica com tudo aquilo com que o teu telemóvel antigo está emparelhado: os guardiões e os telemóveis que guarda. Ninguém precisa de emparelhar de novo.</string>
+    <string name="move_in_needs_owner">Para ficar com guardiões, o Killit tem primeiro de proteger este telemóvel. Trazer só os telemóveis que guardas funciona sem isso.</string>
+    <string name="move_in_start">Mostrar um código</string>
+    <string name="move_in_give_code">No telemóvel antigo, abre o Killit, escolhe Definições › Mudar para um telemóvel novo e escreve este código.</string>
+    <string name="move_compare_title">Põe os dois telemóveis lado a lado</string>
+    <string name="move_compare_body">Os dois têm de mostrar os mesmos 6 dígitos. Se não, alguém pode estar a interferir.</string>
+    <string name="move_in_receiving">A receber do telemóvel antigo…</string>
+    <string name="move_in_ready_title">Confirma no telemóvel antigo</string>
+    <string name="move_in_ready_body">Isto passa para aqui quando o telemóvel antigo confirmar:</string>
+    <string name="move_in_give_up_in">Se o telemóvel antigo não confirmar, podes desistir daqui a %1$s.</string>
+    <string name="move_in_give_up">Desistir</string>
+    <string name="move_in_done_title">Transferido para aqui</string>
+    <string name="move_in_done_body">Este telemóvel tem agora todos os emparelhamentos do antigo, e os seus pares foram avisados.</string>
+    <string name="move_out_title">Mudar para um telemóvel novo</string>
+    <string name="move_out_intro">No telemóvel novo, instala o Killit e escolhe Vens de outro telemóvel? no primeiro ecrã. Mostra um código: escreve-o aqui.</string>
+    <string name="move_out_moves">Isto passa para o telemóvel novo:</string>
+    <string name="move_out_frozen_warning">Este telemóvel tem guardiões. Depois da mudança fica como está: as apps bloqueadas continuam bloqueadas e não se pode desbloquear nada. Só remover o Killit, depois do período de espera, põe fim a isso.</string>
+    <string name="move_out_connect">Ligar</string>
+    <string name="move_out_sending">A enviar tudo para o telemóvel novo…</string>
+    <string name="move_out_ready_title">Mudar para %1$s?</string>
+    <string name="move_out_ready_title_bare">Mudar para o telemóvel novo?</string>
+    <string name="move_out_ready_window">Confirma dentro de %1$s.</string>
+    <string name="move_out_confirm">Mudar</string>
+    <string name="move_out_moving">A mudar. Mantém este telemóvel ligado à internet até terminar.</string>
+    <string name="move_out_done_title">Mudança feita</string>
+    <string name="move_out_done_body">Tudo passou para o telemóvel novo. Este telemóvel já não tem emparelhamentos.</string>
+    <string name="move_out_done_frozen">As apps ficam como estão. Só remover o Killit põe fim a isso.</string>
+    <string name="move_under_way">Está a decorrer uma mudança para ou deste telemóvel. Termina primeiro.</string>
+    <string name="frozen_title">A proteção passou para um telemóvel novo</string>
+    <string name="frozen_body">Os guardiões passaram para %1$s em %2$s. As apps bloqueadas continuam bloqueadas e aqui não se pode desbloquear nada. Remover o Killit, depois do período de espera, põe fim a isso.</string>
+    <string name="frozen_body_bare">Os guardiões passaram para o telemóvel novo em %1$s. As apps bloqueadas continuam bloqueadas e aqui não se pode desbloquear nada. Remover o Killit, depois do período de espera, põe fim a isso.</string>
+    <plurals name="move_guardians">
+        <item quantity="one">%1$d guardião</item>
+        <item quantity="many">%1$d guardiões</item>
+        <item quantity="other">%1$d guardiões</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="one">%1$d telemóvel que guardas</item>
+        <item quantity="many">%1$d telemóveis que guardas</item>
+        <item quantity="other">%1$d telemóveis que guardas</item>
+    </plurals>
 </resources>

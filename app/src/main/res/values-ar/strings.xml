@@ -621,4 +621,59 @@
     <string name="move_failed_limit">الهاتف الجديد مرتبط بالفعل بعدد كبير جدًا من الهواتف.</string>
     <string name="move_failed_cancelled">أُلغي الانتقال. لم يُنقل شيء.</string>
     <string name="move_failed_mismatch">لم تتطابق الرموز، لذلك لم يُنقل شيء. ربما يتدخّل أحدهم. ابدأ من جديد.</string>
+
+    <!-- ============================== Moving to a new phone: screens (PLAN.md §3.10) ============================== -->
+    <string name="hub_move_in">هل تنتقل من هاتف آخر؟</string>
+    <string name="hub_my_phone_frozen">مجمّد منذ الانتقال إلى هاتف جديد</string>
+    <string name="settings_move">الانتقال إلى هاتف جديد</string>
+    <string name="settings_move_desc">تسليم كل الاقترانات إلى هاتفك الجديد</string>
+    <string name="guard_settings_move_guarded">لهذا الهاتف حرّاس، لذلك ينتقل من هاتفي › الإعدادات، وKillit مفتوح.</string>
+    <string name="move_in_title">الانتقال من هاتف آخر</string>
+    <string name="move_in_intro">يتسلّم هذا الهاتف كل ما يقترن به هاتفك القديم: حرّاسه والهواتف التي يحرسها. لا يحتاج أحد إلى الاقتران من جديد.</string>
+    <string name="move_in_needs_owner">لاستلام الحرّاس، يجب أن يحمي Killit هذا الهاتف أولًا. نقل الهواتف التي تحرسها فقط يعمل من دون ذلك.</string>
+    <string name="move_in_start">إظهار رمز</string>
+    <string name="move_in_give_code">على الهاتف القديم، افتح Killit واختر الإعدادات › الانتقال إلى هاتف جديد، ثم اكتب هذا الرمز.</string>
+    <string name="move_compare_title">ضع الهاتفين جنبًا إلى جنب</string>
+    <string name="move_compare_body">يجب أن يُظهر كلاهما الأرقام الستة نفسها. إن لم يكن كذلك، فربما يتدخّل أحدهم.</string>
+    <string name="move_in_receiving">جارٍ الاستلام من الهاتف القديم…</string>
+    <string name="move_in_ready_title">أكّد على الهاتف القديم</string>
+    <string name="move_in_ready_body">ينتقل هذا إلى هنا حين يؤكّد الهاتف القديم:</string>
+    <string name="move_in_give_up_in">إن لم يؤكّد الهاتف القديم، يمكنك التراجع بعد %1$s.</string>
+    <string name="move_in_give_up">تراجع</string>
+    <string name="move_in_done_title">انتقل إلى هنا</string>
+    <string name="move_in_done_body">صار لهذا الهاتف كل اقترانات القديم، وأُبلغت الهواتف المقترنة به.</string>
+    <string name="move_out_title">الانتقال إلى هاتف جديد</string>
+    <string name="move_out_intro">على الهاتف الجديد، ثبّت Killit واختر «هل تنتقل من هاتف آخر؟» في شاشته الأولى. سيُظهر رمزًا: اكتبه هنا.</string>
+    <string name="move_out_moves">ينتقل هذا إلى الهاتف الجديد:</string>
+    <string name="move_out_frozen_warning">لهذا الهاتف حرّاس. بعد الانتقال يبقى كما هو: تبقى التطبيقات المحظورة محظورة، ولا يمكن رفع الحظر عن أي شيء فيه. لا ينهي ذلك إلا إزالة Killit بعد فترة الانتظار.</string>
+    <string name="move_out_connect">اتصال</string>
+    <string name="move_out_sending">جارٍ إرسال كل شيء إلى الهاتف الجديد…</string>
+    <string name="move_out_ready_title">الانتقال إلى %1$s؟</string>
+    <string name="move_out_ready_title_bare">الانتقال إلى الهاتف الجديد؟</string>
+    <string name="move_out_ready_window">أكّد خلال %1$s.</string>
+    <string name="move_out_confirm">انتقال</string>
+    <string name="move_out_moving">جارٍ الانتقال. أبقِ هذا الهاتف متصلًا حتى ينتهي.</string>
+    <string name="move_out_done_title">تمّ الانتقال</string>
+    <string name="move_out_done_body">انتقل كل شيء إلى الهاتف الجديد. لم يعد لهذا الهاتف أي اقتران.</string>
+    <string name="move_out_done_frozen">تبقى تطبيقاته كما هي. لا ينهي ذلك إلا إزالة Killit.</string>
+    <string name="move_under_way">يجري انتقال إلى هذا الهاتف أو منه. ينتهي أولًا.</string>
+    <string name="frozen_title">انتقلت الحماية إلى هاتف جديد</string>
+    <string name="frozen_body">انتقل حرّاسه إلى %1$s في %2$s. تبقى التطبيقات المحظورة محظورة، ولا يمكن رفع الحظر عن أي شيء هنا. تنهي إزالةُ Killit بعد فترة الانتظار ذلك.</string>
+    <string name="frozen_body_bare">انتقل حرّاسه إلى الهاتف الجديد في %1$s. تبقى التطبيقات المحظورة محظورة، ولا يمكن رفع الحظر عن أي شيء هنا. تنهي إزالةُ Killit بعد فترة الانتظار ذلك.</string>
+    <plurals name="move_guardians">
+        <item quantity="zero">لا حرّاس</item>
+        <item quantity="one">حارس واحد</item>
+        <item quantity="two">حارسان</item>
+        <item quantity="few">%1$d حرّاس</item>
+        <item quantity="many">%1$d حارسًا</item>
+        <item quantity="other">%1$d حارس</item>
+    </plurals>
+    <plurals name="move_wards">
+        <item quantity="zero">لا هواتف تحرسها</item>
+        <item quantity="one">هاتف واحد تحرسه</item>
+        <item quantity="two">هاتفان تحرسهما</item>
+        <item quantity="few">%1$d هواتف تحرسها</item>
+        <item quantity="many">%1$d هاتفًا تحرسه</item>
+        <item quantity="other">%1$d هاتف تحرسه</item>
+    </plurals>
 </resources>

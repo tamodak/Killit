@@ -28,7 +28,14 @@ import org.tamodak.killit.ui.theme.KillitIcons
 
 /**
  * The guardian side's settings (PLAN.md §15.2): what the passkey means now (§15.11, always
- * readable here), the language, and changing the passkey. There is no reset (I3).
+ * readable here), the language, changing the passkey, and moving to a new phone (§3.10). There is
+ * no reset (I3).
+ *
+ * A phone with guardians of its own moves from My phone instead, where the move needs their
+ * approval of an unlock: from here, a guardian's passkey would be enough.
+ *
+ * @param canMove whether this phone has pairings to move.
+ * @param guarded whether this phone has guardians.
  */
 @Composable
 fun GuardSettingsScreen(
@@ -36,6 +43,9 @@ fun GuardSettingsScreen(
     onBack: () -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
     onChangePasskey: () -> Unit,
+    canMove: Boolean,
+    guarded: Boolean,
+    onMove: () -> Unit,
 ) {
     BackHandler(onBack = onBack)
     var pickingLanguage by remember { mutableStateOf(false) }
@@ -55,6 +65,16 @@ fun GuardSettingsScreen(
                 onClick = { pickingLanguage = true },
             )
             KillitRow(title = stringResource(R.string.home_change_passkey), icon = KillitIcons.Key, onClick = onChangePasskey)
+            when {
+                !canMove -> Unit
+                guarded -> KillitBody(stringResource(R.string.guard_settings_move_guarded))
+                else -> KillitRow(
+                    title = stringResource(R.string.settings_move),
+                    subtitle = stringResource(R.string.settings_move_desc),
+                    icon = KillitIcons.People,
+                    onClick = onMove,
+                )
+            }
         }
     }
     if (pickingLanguage) {
