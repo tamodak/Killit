@@ -2,6 +2,7 @@ package org.tamodak.killit.ui.pairing
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import kotlinx.coroutines.delay
 import org.tamodak.killit.R
 import org.tamodak.killit.pairing.store.CeremonyEntity
 import org.tamodak.killit.pairing.store.CeremonyFailure
+import org.tamodak.killit.pairing.store.CeremonyPurpose
 import org.tamodak.killit.pairing.store.CeremonyStage
 import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.protocol.TextRule
@@ -315,20 +317,41 @@ private fun Paired(ceremony: CeremonyEntity, pairing: PairingUiState, onNickname
 /** How a ceremony ended without a pairing, in words a person can act on. */
 @Composable
 private fun Failed(failure: CeremonyFailure?, onDismiss: () -> Unit) {
-    val text = stringResource(
-        when (failure) {
-            CeremonyFailure.MISMATCH -> R.string.wizard_failed_mismatch
-            CeremonyFailure.EXPIRED -> R.string.wizard_failed_expired
-            CeremonyFailure.CODE_NOT_FOUND -> R.string.wizard_failed_code
-            CeremonyFailure.INVALID -> R.string.wizard_failed_invalid
-            CeremonyFailure.ROLE_CONFLICT -> R.string.wizard_failed_roles
-            CeremonyFailure.DECLINED -> R.string.wizard_failed_declined
-            CeremonyFailure.LINK_LIMIT -> R.string.wizard_failed_limit
-            CeremonyFailure.CANCELLED, null -> R.string.wizard_failed_cancelled
-        },
-    )
-    KillitPanel(borderColor = KillitRed) { KillitBody(text, color = KillitForeground) }
+    KillitPanel(borderColor = KillitRed) { KillitBody(stringResource(failureText(CeremonyPurpose.PAIR, failure)), color = KillitForeground) }
     KillitButton(text = stringResource(R.string.wizard_again), onClick = onDismiss)
+}
+
+/** How a pairing's ceremony, or a move's, ended without one, in words a person can act on. */
+@StringRes
+internal fun failureText(purpose: CeremonyPurpose, failure: CeremonyFailure?): Int = when (purpose) {
+    CeremonyPurpose.PAIR -> when (failure) {
+        CeremonyFailure.MISMATCH -> R.string.wizard_failed_mismatch
+        CeremonyFailure.EXPIRED -> R.string.wizard_failed_expired
+        CeremonyFailure.CODE_NOT_FOUND -> R.string.wizard_failed_code
+        CeremonyFailure.INVALID -> R.string.wizard_failed_invalid
+        CeremonyFailure.ROLE_CONFLICT -> R.string.wizard_failed_roles
+        CeremonyFailure.DECLINED -> R.string.wizard_failed_declined
+        CeremonyFailure.LINK_LIMIT -> R.string.wizard_failed_limit
+        CeremonyFailure.WRONG_PURPOSE -> R.string.wizard_failed_wrong_purpose
+        // Only a move ends these ways.
+        CeremonyFailure.NOT_DEVICE_OWNER, CeremonyFailure.HAS_PAIRINGS, CeremonyFailure.ABANDONED,
+        CeremonyFailure.PAIRINGS_CHANGED, CeremonyFailure.CANCELLED, null -> R.string.wizard_failed_cancelled
+    }
+    CeremonyPurpose.MOVE -> when (failure) {
+        CeremonyFailure.MISMATCH -> R.string.move_failed_mismatch
+        CeremonyFailure.EXPIRED -> R.string.move_failed_expired
+        CeremonyFailure.CODE_NOT_FOUND -> R.string.wizard_failed_code
+        // A move has no roles to conflict.
+        CeremonyFailure.INVALID, CeremonyFailure.ROLE_CONFLICT -> R.string.move_failed_invalid
+        CeremonyFailure.DECLINED -> R.string.move_failed_declined
+        CeremonyFailure.LINK_LIMIT -> R.string.move_failed_limit
+        CeremonyFailure.WRONG_PURPOSE -> R.string.move_failed_wrong_purpose
+        CeremonyFailure.NOT_DEVICE_OWNER -> R.string.move_failed_not_device_owner
+        CeremonyFailure.HAS_PAIRINGS -> R.string.move_failed_has_pairings
+        CeremonyFailure.ABANDONED -> R.string.move_failed_abandoned
+        CeremonyFailure.PAIRINGS_CHANGED -> R.string.move_failed_changed
+        CeremonyFailure.CANCELLED, null -> R.string.move_failed_cancelled
+    }
 }
 
 @Composable

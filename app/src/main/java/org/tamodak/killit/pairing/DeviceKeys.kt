@@ -138,8 +138,8 @@ class DeviceKeys(
     }
 
     /**
-     * Deletes both keys. Used when a phone with no pairings abandons an identity the server
-     * refused; with pairings, the identity is never thrown away.
+     * Deletes both keys, once this phone's pairings moved to a new phone and no peer trusts them
+     * any more ([Registration.forget]). With pairings, the identity is never thrown away.
      */
     suspend fun destroy() = lock.withLock {
         withContext(io) {

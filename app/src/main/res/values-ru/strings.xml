@@ -557,4 +557,25 @@
     <string name="event_app_unblocked_by_you">Вы разблокировали %1$s</string>
     <string name="event_app_refused">Android не стал блокировать %1$s</string>
     <string name="notif_app_unblocked_by_guardians">Опекуны его разблокировали.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">Новый телефон: %1$s</string>
+    <string name="event_moved_bare">Перенесено на новый телефон</string>
+    <string name="event_guardian_moved">%1$s теперь на новом телефоне</string>
+    <string name="event_moved_here">Перенесено сюда со старого телефона</string>
+    <string name="notif_moved_title">%1$s теперь на новом телефоне</string>
+    <string name="notif_moved_text">Новый телефон: %1$s. Картинка рядом с именем сменилась вместе с телефоном, так и должно быть.</string>
+    <string name="notif_moved_text_bare">Картинка рядом с именем сменилась вместе с телефоном, так и должно быть.</string>
+    <string name="wizard_failed_wrong_purpose">Этот код был для переноса на новый телефон, а не для связывания.</string>
+    <string name="move_failed_wrong_purpose">Этот код был для связывания, а не для переноса. Начните перенос на новом телефоне.</string>
+    <string name="move_failed_not_device_owner">Новый телефон не может принять ваших опекунов: сначала Killit должен защитить его ключом.</string>
+    <string name="move_failed_has_pairings">У нового телефона уже есть связи. Для переноса нужен телефон без связей.</string>
+    <string name="move_failed_abandoned">Старый телефон отменил перенос. Ничего не перенесено.</string>
+    <string name="move_failed_declined">Новый телефон отменил перенос. Ничего не перенесено.</string>
+    <string name="move_failed_changed">Во время переноса изменилась одна из связей, поэтому ничего не перенесено. Начните заново.</string>
+    <string name="move_failed_expired">Время вышло, поэтому ничего не перенесено. Начните заново.</string>
+    <string name="move_failed_invalid">Что-то на другом телефоне не прошло проверку, поэтому ничего не перенесено.</string>
+    <string name="move_failed_limit">Новый телефон уже связан со слишком многими телефонами.</string>
+    <string name="move_failed_cancelled">Перенос отменён. Ничего не перенесено.</string>
+    <string name="move_failed_mismatch">Коды не совпали, поэтому ничего не перенесено. Возможно, кто-то вмешивается. Начните заново.</string>
 </resources>

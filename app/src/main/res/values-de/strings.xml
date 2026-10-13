@@ -517,4 +517,25 @@
     <string name="event_app_unblocked_by_you">Du hast %1$s freigegeben</string>
     <string name="event_app_refused">Android hat %1$s nicht blockiert</string>
     <string name="notif_app_unblocked_by_guardians">Deine Wächter haben es freigegeben.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">Auf ein neues Handy umgezogen: %1$s</string>
+    <string name="event_moved_bare">Auf ein neues Handy umgezogen</string>
+    <string name="event_guardian_moved">%1$s ist auf ein neues Handy umgezogen</string>
+    <string name="event_moved_here">Vom alten Handy hierher umgezogen</string>
+    <string name="notif_moved_title">%1$s ist auf ein neues Handy umgezogen</string>
+    <string name="notif_moved_text">Jetzt auf %1$s. Das Bild neben dem Namen hat sich mit dem Handy geändert, wie es sein soll.</string>
+    <string name="notif_moved_text_bare">Das Bild neben dem Namen hat sich mit dem Handy geändert, wie es sein soll.</string>
+    <string name="wizard_failed_wrong_purpose">Dieser Code war für den Umzug auf ein neues Handy, nicht zum Koppeln.</string>
+    <string name="move_failed_wrong_purpose">Dieser Code war zum Koppeln, nicht für einen Umzug. Starte den Umzug auf dem neuen Handy.</string>
+    <string name="move_failed_not_device_owner">Das neue Handy kann deine Wächter nicht übernehmen: Killit muss es zuerst schützen, mit einem Schlüssel.</string>
+    <string name="move_failed_has_pairings">Das neue Handy ist schon gekoppelt. Ein Umzug braucht ein Handy ohne Kopplungen.</string>
+    <string name="move_failed_abandoned">Das alte Handy hat den Umzug abgebrochen. Nichts wurde übertragen.</string>
+    <string name="move_failed_declined">Das neue Handy hat den Umzug abgebrochen. Nichts wurde übertragen.</string>
+    <string name="move_failed_changed">Während des Umzugs hat sich eine Kopplung geändert, daher wurde nichts übertragen. Fang neu an.</string>
+    <string name="move_failed_expired">Die Zeit ist abgelaufen, daher wurde nichts übertragen. Fang neu an.</string>
+    <string name="move_failed_invalid">Etwas am anderen Handy ließ sich nicht prüfen, daher wurde nichts übertragen.</string>
+    <string name="move_failed_limit">Das neue Handy ist schon mit zu vielen Handys verbunden.</string>
+    <string name="move_failed_cancelled">Der Umzug wurde abgebrochen. Nichts wurde übertragen.</string>
+    <string name="move_failed_mismatch">Die Codes stimmten nicht überein, daher wurde nichts übertragen. Vielleicht mischt sich jemand ein. Fang neu an.</string>
 </resources>

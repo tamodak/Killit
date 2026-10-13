@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import org.tamodak.killit.data.DurableAppChances
 import org.tamodak.killit.data.DurableGuardian
 import org.tamodak.killit.data.DurablePairingStore
+import org.tamodak.killit.data.MovedAway
 import org.tamodak.killit.data.UnlockLimits
 import org.tamodak.killit.data.db.KillitDatabase
 import org.junit.Assert.assertArrayEquals
@@ -20,6 +21,7 @@ import org.tamodak.killit.pairing.store.PairingEntity
 import org.tamodak.killit.protection.RemoteBlock
 import org.tamodak.killit.protocol.AppChange
 import org.tamodak.killit.protocol.AppInfo
+import org.tamodak.killit.protocol.AppRef
 import org.tamodak.killit.protocol.AppState
 import org.tamodak.killit.protocol.ListedApp
 import org.tamodak.killit.protocol.Vectors
@@ -73,6 +75,18 @@ class EnginePhone(
 
     /** Each time the guarded policies were applied: true with guardians, false without. */
     val guarded = mutableListOf<Boolean>()
+
+    /** Whether this phone could take guardians: device owner, with a passkey. */
+    var deviceOwner = true
+
+    /** This phone's protection options, as MOVE_STATE's bits. */
+    var protection = 0
+
+    /** The protection options moves brought, in order. */
+    val adoptedProtection = mutableListOf<Int>()
+
+    /** True once this phone deleted its identity after moving away. */
+    var forgotten = false
     val store = PairingStore(this.database.pairing(), durable)
     val engine = PairingEngine(
         store = store,
@@ -89,8 +103,14 @@ class EnginePhone(
             silenceAlertMillis = 7L * 24 * 60 * 60 * 1000,
             listAnswersPerHour = 4,
         ),
-        canBeProtected = { true },
+        canBeProtected = { deviceOwner },
         onGuarded = { guarded += it },
+        protectionBits = { protection },
+        adoptProtection = { adoptedProtection += it },
+        forgetIdentity = {
+            forgotten = true
+            server.deleteDevice(vector.fp)
+        },
         now = clock.now,
     )
     val dao = this.database.pairing()
@@ -129,6 +149,26 @@ class FakeApps : AppBlocker {
         else -> RemoteBlock.BLOCKED
     }
 
+    /** What a move handed this phone. */
+    val adopted = mutableListOf<Pair<AppRef, AppState>>()
+
+    /** Apps a move should treat as installed here by the user and never decided about. */
+    val installedHereOnly = mutableSetOf<String>()
+
+    override suspend fun decisionsToMove(): List<Pair<AppRef, AppState>> = digests.map { (name, digest) ->
+        AppRef(name, digest) to if (name in blocked) AppState.BLOCKED else AppState.ALLOWED
+    }
+
+    override suspend fun adoptMoved(decisions: List<Pair<AppRef, AppState>>): List<String> {
+        adopted += decisions
+        for ((app, state) in decisions) {
+            digests[app.packageName] = app.certDigest
+            if (state == AppState.ALLOWED) blocked -= app.packageName else blocked += app.packageName
+        }
+        blocked += installedHereOnly
+        return installedHereOnly.toList()
+    }
+
     override suspend fun listForGuardians(): List<ListedApp> = digests.map { (name, digest) ->
         ListedApp(name, digest, "App ${name.substringAfterLast('.')}", "com.android.vending", 1_789_000_000_000L,
             if (name in blocked) AppState.BLOCKED else AppState.ALLOWED, null)
@@ -154,8 +194,11 @@ class FakeDurable(var available: Boolean = true) : DurablePairingStore {
     var chances: List<DurableAppChances> = emptyList()
     var limits: UnlockLimits? = null
     var appManagement = false
+    var movedAway: MovedAway? = null
 
     override suspend fun isAvailable() = available
+
+    override suspend fun readMovedAway() = if (available) movedAway else null
 
     override suspend fun readAppManagement() = if (available) appManagement else null
 
@@ -185,11 +228,12 @@ class FakeDurable(var available: Boolean = true) : DurablePairingStore {
         return true
     }
 
-    override suspend fun clearPairing(): Boolean {
+    override suspend fun clearPairing(movedAway: MovedAway?): Boolean {
         guardians = emptyList()
         chances = emptyList()
         limits = null
         appManagement = false
+        this.movedAway = movedAway
         return true
     }
 }
@@ -224,6 +268,10 @@ class RecordingNotifier : PairingNotifier {
 
     override suspend fun noticeArrived(from: PairingEntity, event: EventEntity) {
         events += "notice ${event.type}"
+    }
+
+    override suspend fun peerMoved(pairing: PairingEntity, event: EventEntity) {
+        events += "moved ${pairing.myRole}"
     }
 
     override suspend fun silence(pairing: PairingEntity) {

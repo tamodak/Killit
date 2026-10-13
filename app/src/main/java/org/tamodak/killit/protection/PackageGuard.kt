@@ -40,7 +40,9 @@ import kotlinx.coroutines.withContext
  * Two narrow exceptions come from pairing, and only from it: [approveRemotely] unblocks one app
  * every guardian approved, and [blockMore] lets a guarded phone block more apps without its
  * guardians (D7), which can only make it stricter. [blockRemotely] is a guardian blocking an app,
- * stricter too.
+ * stricter too. [adoptMoved] takes over an old phone's decisions in a move, which may allow what
+ * the old phone approved; pairing allows it only on a phone without guardians, whose user could
+ * have approved those apps alone.
  *
  * ### Concurrency
  *
@@ -203,6 +205,39 @@ class PackageGuard(
         // A new app a guardian blocked is decided, so it no longer waits.
         refreshWaitingNotification(store.readAll(), alert = false)
         if (wasBlocked) RemoteBlock.ALREADY_BLOCKED else RemoteBlock.BLOCKED
+    }
+
+    /** The decisions an old phone hands its new phone in a move ([NewPackagePolicy.decisionsToMove]). */
+    suspend fun decisionsToMove(): List<KnownPackage> = lock.withLock {
+        NewPackagePolicy.decisionsToMove(store.readAll().values, scanner.scanAll(), ownPackage)
+    }
+
+    /**
+     * Takes over an old phone's decisions in a move ([NewPackagePolicy.adoptMoved]).
+     *
+     * The listener isn't told: pairing is the caller, and it tells the guardians itself.
+     *
+     * @return the apps blocked as new here, which the guardians hear about like any install (D1).
+     */
+    suspend fun adoptMoved(decisions: List<KnownPackage>): List<String> = lock.withLock {
+        if (!isActive()) return@withLock emptyList()
+        val plan = NewPackagePolicy.adoptMoved(decisions, scanner.scanAll(), ownPackage, clock())
+        val refused = dpc.blockPackages(plan.toBlock).toSet()
+        // One Android won't unblock keeps what this phone decided: it is blocked either way.
+        val stuck = if (plan.toAllow.isEmpty()) {
+            emptySet()
+        } else {
+            dpc.applyBlocklist(desired = emptySet(), current = plan.toAllow).let { if (it.error != null) plan.toAllow else it.failedToUnblock.toSet() }
+        }
+        // Like a new install, one Android won't block counts as approved: it is usable either way.
+        store.put(
+            plan.updates.filter { it.packageName !in stuck }
+                .map { if (it.packageName in refused && it.status == PackageStatus.PENDING) it.copy(status = PackageStatus.APPROVED) else it },
+        )
+        val blocked = plan.newHere.filter { it !in refused }
+        refreshWaitingNotification(store.readAll(), alert = blocked.isNotEmpty())
+        KillitLog.i(KillitLog.GUARD, "Took over ${decisions.size} decisions from the old phone; ${blocked.size} apps here are new")
+        blocked
     }
 
     /** Every decision so far, keyed by package name, the two copies brought in step first. */

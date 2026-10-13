@@ -537,4 +537,25 @@
     <string name="event_app_unblocked_by_you">Desbloqueaste %1$s</string>
     <string name="event_app_refused">O Android não quis bloquear %1$s</string>
     <string name="notif_app_unblocked_by_guardians">Os teus guardiões desbloquearam-na.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">Mudou para um telemóvel novo: %1$s</string>
+    <string name="event_moved_bare">Mudou para um telemóvel novo</string>
+    <string name="event_guardian_moved">%1$s mudou para um telemóvel novo</string>
+    <string name="event_moved_here">Transferido para aqui a partir do telemóvel antigo</string>
+    <string name="notif_moved_title">%1$s mudou para um telemóvel novo</string>
+    <string name="notif_moved_text">Telemóvel novo: %1$s. A imagem ao lado do nome mudou com o telemóvel, como deve ser.</string>
+    <string name="notif_moved_text_bare">A imagem ao lado do nome mudou com o telemóvel, como deve ser.</string>
+    <string name="wizard_failed_wrong_purpose">Esse código era para mudar para um telemóvel novo, não para emparelhar.</string>
+    <string name="move_failed_wrong_purpose">Esse código era para emparelhar, não para mudar de telemóvel. Começa a mudança no telemóvel novo.</string>
+    <string name="move_failed_not_device_owner">O telemóvel novo não pode receber os teus guardiões: primeiro o Killit tem de o proteger, com uma chave.</string>
+    <string name="move_failed_has_pairings">O telemóvel novo já tem emparelhamentos. Uma mudança precisa de um telemóvel sem nenhum.</string>
+    <string name="move_failed_abandoned">O telemóvel antigo desistiu da mudança. Nada foi transferido.</string>
+    <string name="move_failed_declined">O telemóvel novo desistiu da mudança. Nada foi transferido.</string>
+    <string name="move_failed_changed">Um emparelhamento mudou durante a mudança, por isso nada foi transferido. Recomeça.</string>
+    <string name="move_failed_expired">O tempo acabou, por isso nada foi transferido. Recomeça.</string>
+    <string name="move_failed_invalid">Algo no outro telemóvel não foi verificado, por isso nada foi transferido.</string>
+    <string name="move_failed_limit">O telemóvel novo já está ligado a demasiados telemóveis.</string>
+    <string name="move_failed_cancelled">A mudança foi cancelada. Nada foi transferido.</string>
+    <string name="move_failed_mismatch">Os códigos não coincidiam, por isso nada foi transferido. Alguém pode estar a interferir. Recomeça.</string>
 </resources>

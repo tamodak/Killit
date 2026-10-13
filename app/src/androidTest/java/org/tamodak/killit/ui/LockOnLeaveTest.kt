@@ -211,6 +211,7 @@ class LockOnLeaveTest {
         peerFp = ByteArray(32) { 2 },
         peerSignPk = ByteArray(65) { 3 },
         peerEncPk = ByteArray(32) { 4 },
+        peerEncSig = ByteArray(64) { 5 },
         myRole = PairRole.PROTECTED,
         peerName = "Mom",
         nickname = "Mom",

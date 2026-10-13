@@ -1,11 +1,13 @@
 package org.tamodak.killit.protection
 
 import org.tamodak.killit.data.KnownPackage
+import org.tamodak.killit.data.PackageStatus
 
 /**
- * Decides what default-blocking does with one installed package.
+ * Decides what default-blocking does with one installed package, and what a move to a new phone
+ * hands on and takes over.
  *
- * Pure: it sees only the package and what was decided about it before, so every rule below is
+ * Pure: it sees only the packages and what was decided about them before, so every rule below is
  * covered by JVM tests. `PackageGuard` carries the decisions out.
  *
  * ### The rules
@@ -21,6 +23,16 @@ import org.tamodak.killit.data.KnownPackage
  *   VPNs and launchers included.
  * - A disabled package nobody has decided about is left alone until it is enabled. Enabling it then
  *   makes it new, which is how a preinstalled app switched back on gets caught.
+ *
+ * ### Moving to a new phone (PLAN.md §3.10)
+ *
+ * - The old phone hands on every decision except the approvals of its own system image, which
+ *   another phone's system doesn't share ([decisionsToMove]).
+ * - The new phone keeps them, by the same rules as its own: blocked stays blocked and approved stays
+ *   approved, for the app decided about ([adoptMoved]).
+ * - An app the user installed on the new phone that the old one never decided about is new, enabled
+ *   or not, so a move is no way around default-blocking. The new phone's own system apps keep what
+ *   was decided there.
  */
 object NewPackagePolicy {
 
@@ -76,6 +88,77 @@ object NewPackagePolicy {
             isPartOfSystem(pkg) -> Decision.AutoApprove
             else -> Decision.BlockAsNew
         }
+    }
+
+    /** What taking over a moved phone's decisions comes to. */
+    class MovePlan(
+        /** Decisions to record: the old phone's, and the apps new here. */
+        val updates: List<KnownPackage>,
+        /** Installed packages to suspend: blocked on the old phone, or new here. */
+        val toBlock: Set<String>,
+        /** Installed packages to unsuspend: approved on the old phone. */
+        val toAllow: Set<String>,
+        /** The apps new here, which the guardians hear about like any install (D1). */
+        val newHere: List<String>,
+    )
+
+    /**
+     * The decisions an old phone hands its new phone (SPEC.md §11.14).
+     *
+     * @param known every decision made on this phone.
+     * @param installed every installed package, which tells the system's own apart.
+     * @param ownPackage Killit's own package, which is never handed on.
+     */
+    fun decisionsToMove(known: Collection<KnownPackage>, installed: List<InstalledPackage>, ownPackage: String): List<KnownPackage> {
+        val system = installed.filter { it.isSystem }.mapTo(mutableSetOf()) { it.packageName }
+        return known.filter { it.packageName != ownPackage && !(it.status == PackageStatus.APPROVED && it.packageName in system) }
+    }
+
+    /**
+     * Takes over an old phone's decisions on its new phone.
+     *
+     * @param moved the old phone's decisions.
+     * @param installed every package installed here.
+     * @param now when the decisions are taken over; each is dated then.
+     */
+    fun adoptMoved(moved: List<KnownPackage>, installed: List<InstalledPackage>, ownPackage: String, now: Long): MovePlan {
+        val decisions = moved.filter { it.packageName != ownPackage }.associateBy { it.packageName }
+        val updates = mutableListOf<KnownPackage>()
+        val toBlock = mutableSetOf<String>()
+        val toAllow = mutableSetOf<String>()
+        val newHere = mutableListOf<String>()
+        for (pkg in installed) {
+            val decision = decisions[pkg.packageName]
+            when (val result = decide(pkg, decision, ownPackage)) {
+                Decision.Keep -> {
+                    updates += decision!!.copy(sinceMillis = now)
+                    toAllow += pkg.packageName
+                }
+                Decision.EnforceBlock -> {
+                    updates += decision!!.copy(sinceMillis = now)
+                    toBlock += pkg.packageName
+                }
+                is Decision.AdoptRotatedKey -> {
+                    updates += result.updated.copy(sinceMillis = now)
+                    (if (result.updated.status.isBlocked) toBlock else toAllow) += pkg.packageName
+                }
+                // Never decided about there, or a different app under the name.
+                Decision.BlockAsNew, Decision.Ignore, Decision.AutoApprove ->
+                    if (pkg.packageName != ownPackage && !pkg.isSystem && !pkg.isOverlay) {
+                        updates += KnownPackage(pkg.packageName, pkg.certDigest, PackageStatus.PENDING, now)
+                        toBlock += pkg.packageName
+                        newHere += pkg.packageName
+                    }
+            }
+        }
+        // Decisions about apps this phone doesn't have wait for them, and nothing waits on a person.
+        val here = installed.mapTo(mutableSetOf()) { it.packageName }
+        for (decision in decisions.values) {
+            if (decision.packageName in here) continue
+            val status = if (decision.status == PackageStatus.PENDING) PackageStatus.USER_BLOCKED else decision.status
+            updates += decision.copy(status = status, sinceMillis = now)
+        }
+        return MovePlan(updates, toBlock, toAllow, newHere)
     }
 
     /**

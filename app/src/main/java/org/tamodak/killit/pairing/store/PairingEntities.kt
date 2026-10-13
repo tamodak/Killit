@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 /*
- * Pairing's tables (Room schema version 3).
+ * Pairing's tables (Room schema version 4).
  *
  * Entities holding byte arrays are plain classes, because a generated `equals` would compare the
  * arrays by identity; the few that are data classes compare their arrays by content. Every byte
@@ -24,6 +24,8 @@ import androidx.room.Relation
  * @param peerFp the peer's fingerprint: its address, from the bundle it revealed.
  * @param peerSignPk the key the peer's signatures verify under.
  * @param peerEncPk the key envelopes to the peer are sealed to.
+ * @param peerEncSig the peer's signature binding [peerEncPk] to [peerSignPk] (SPEC.md §3.2), kept
+ *   so a move can hand the whole bundle on and the new phone can check it again.
  * @param myRole this phone's side.
  * @param peerName the name the peer gave itself; it can't be edited here, so STATUS uses it (§11.1).
  * @param nickname what this phone calls the peer (A5); starts as [peerName].
@@ -43,6 +45,7 @@ class PairingEntity(
     @ColumnInfo(name = "peer_fp", typeAffinity = ColumnInfo.BLOB) val peerFp: ByteArray,
     @ColumnInfo(name = "peer_sign_pk", typeAffinity = ColumnInfo.BLOB) val peerSignPk: ByteArray,
     @ColumnInfo(name = "peer_enc_pk", typeAffinity = ColumnInfo.BLOB) val peerEncPk: ByteArray,
+    @ColumnInfo(name = "peer_enc_sig", typeAffinity = ColumnInfo.BLOB) val peerEncSig: ByteArray,
     @ColumnInfo(name = "my_role") val myRole: PairRole,
     @ColumnInfo(name = "peer_name") val peerName: String,
     @ColumnInfo(name = "nickname") val nickname: String,
@@ -68,6 +71,14 @@ class PairingEntity(
  *   revealing, which is the copy its reveal is checked against (SPEC.md §6.3).
  * @param inviteVersion the last invite version seen, for the long poll.
  * @param nickname what the user chose to call the peer, once chosen.
+ * @param purpose a pairing, or a move (SPEC.md §6.5). A move uses [myRole] for nothing.
+ * @param moveStage a move's progress once linked.
+ * @param moveId the move's id (SPEC.md §11.14): chosen by the old phone, learnt by the new one.
+ * @param moveReadyAt when the new phone said READY: the old phone may commit for 30 minutes
+ *   after it arrived, and the new phone may give up an hour after it was sent.
+ * @param movePeerModel old phone: the new phone's model, which every HANDOVER names.
+ * @param moveGuardians how many of the moving pairings are guardians of the phone moving.
+ * @param moveWards how many are phones it guards.
  */
 @Entity(tableName = "ceremony")
 data class CeremonyEntity(
@@ -90,10 +101,18 @@ data class CeremonyEntity(
     @ColumnInfo(name = "peer_model") val peerModel: String?,
     @ColumnInfo(name = "nickname") val nickname: String?,
     @ColumnInfo(name = "created_at") val createdAt: Long,
+    @ColumnInfo(name = "purpose") val purpose: CeremonyPurpose = CeremonyPurpose.PAIR,
+    @ColumnInfo(name = "move_stage") val moveStage: MoveStage? = null,
+    @ColumnInfo(name = "move_id", typeAffinity = ColumnInfo.BLOB) val moveId: ByteArray? = null,
+    @ColumnInfo(name = "move_ready_at") val moveReadyAt: Long? = null,
+    @ColumnInfo(name = "move_peer_model") val movePeerModel: String? = null,
+    @ColumnInfo(name = "move_guardians") val moveGuardians: Int = 0,
+    @ColumnInfo(name = "move_wards") val moveWards: Int = 0,
 ) {
     private fun fields(): Array<Any?> = arrayOf(
         inviteId, side, myRole, selfName, code, expiresAt, myNonce, myReveal, commit, peerReveal, pairId,
         safetyCode, stage, failure, inviteVersion, peerName, peerModel, nickname, createdAt,
+        purpose, moveStage, moveId, moveReadyAt, movePeerModel, moveGuardians, moveWards,
     )
 
     /** Compares by content, byte arrays included, unlike the generated implementation. */
@@ -367,4 +386,15 @@ class WardAppEntity(
     @ColumnInfo(name = "state") val state: WardAppState,
     @ColumnInfo(name = "icon", typeAffinity = ColumnInfo.BLOB) val icon: ByteArray?,
     @ColumnInfo(name = "pending_block") val pendingBlock: Boolean?,
+)
+
+/**
+ * New phone of a move: one MOVE_STATE page as it arrived (SPEC.md §11.14), its body kept as it was
+ * signed. The pages are put together and checked when the last one comes, and taken into use only
+ * once the old phone commits.
+ */
+@Entity(tableName = "move_pages")
+class MovePageEntity(
+    @PrimaryKey @ColumnInfo(name = "page") val page: Int,
+    @ColumnInfo(name = "body", typeAffinity = ColumnInfo.BLOB) val body: ByteArray,
 )

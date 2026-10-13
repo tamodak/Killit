@@ -74,6 +74,12 @@ class LinkInfo(val peer: String, val lastSeenDaysAgo: Int)
 class LinksResponse(val links: List<LinkInfo>)
 
 @Serializable
+class HandoverRequest(val to: String)
+
+@Serializable
+class HandoverResponse(val copied: Int)
+
+@Serializable
 class OutgoingMessage(val to: String, val envelope: String)
 
 @Serializable

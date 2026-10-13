@@ -9,9 +9,11 @@ import org.tamodak.killit.net.ApiError
 import org.tamodak.killit.net.InviteView
 import org.tamodak.killit.pairing.store.CeremonyEntity
 import org.tamodak.killit.pairing.store.CeremonyFailure
+import org.tamodak.killit.pairing.store.CeremonyPurpose
 import org.tamodak.killit.pairing.store.CeremonySide
 import org.tamodak.killit.pairing.store.CeremonyStage
 import org.tamodak.killit.pairing.store.LinkDeletionEntity
+import org.tamodak.killit.pairing.store.MoveStage
 import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.pairing.store.PairingEntity
 import org.tamodak.killit.protocol.Answer
@@ -57,6 +59,10 @@ import org.tamodak.killit.protocol.verifyBundle
  *   phone"), and declines a conflict without asking. Otherwise it accepts at once: the people
  *   already said yes by comparing the code.
  *
+ * A move to a new phone runs the same ceremony between two phones of one person (SPEC.md §6.5),
+ * the new phone creating; once linked, [MoveEngine] takes over. Each phone knows which of the two
+ * it started, and a phone that receives the other one's first message ends the ceremony.
+ *
  * The state lives in the `ceremony` table, so the ceremony survives leaving Killit to make the
  * call. Network calls run without the engine's lock; state changes take it.
  *
@@ -81,6 +87,9 @@ class CeremonyEngine(
 ) {
     private val dao = store.dao
 
+    /** Takes a move over once its ceremony is linked. */
+    lateinit var moves: MoveEngine
+
     /** The ceremony in progress, or the last one until it is dismissed. */
     val ceremony: Flow<CeremonyEntity?> = dao.observeCeremony()
 
@@ -97,15 +106,7 @@ class CeremonyEngine(
     suspend fun create(myRole: PairRole, selfName: String) {
         val name = checkedName(selfName)
         check(myRole != PairRole.PROTECTED || canBeProtected()) { "only a device owner can be protected" }
-        abandonCurrent()
-        val me = identity()
-        val created = server.createInvite()
-        val nonce = randomBytes(CEREMONY_NONCE_BYTES)
-        lock.withLock {
-            dao.replaceCeremony(
-                newCeremony(created.id, CeremonySide.CREATOR, myRole, name, created.code, created.expiresAt, nonce, encodeReveal(me.bundle(), nonce), null, CeremonyStage.WAITING_FOR_JOINER),
-            )
-        }
+        createInvite(CeremonyPurpose.PAIR, myRole, name)
         KillitLog.i(KillitLog.PAIR, "Invite created; this phone will be $myRole")
     }
 
@@ -117,6 +118,39 @@ class CeremonyEngine(
     suspend fun join(code: String, myRole: PairRole, selfName: String): JoinResult {
         val name = checkedName(selfName)
         check(myRole != PairRole.PROTECTED || canBeProtected()) { "only a device owner can be protected" }
+        return joinInvite(code, CeremonyPurpose.PAIR, myRole, name).also {
+            if (it == JoinResult.JOINED) KillitLog.i(KillitLog.PAIR, "Joined an invite; this phone will be $myRole")
+        }
+    }
+
+    /**
+     * New phone of a move: shows a code for the old phone to join (SPEC.md §6.5). Only a phone
+     * without pairings takes a move; the caller checks.
+     */
+    suspend fun createMove() {
+        createInvite(CeremonyPurpose.MOVE, MOVE_ROLE, "")
+        KillitLog.i(KillitLog.PAIR, "Move invite created")
+    }
+
+    /** Old phone of a move: joins the new phone's code, committing to this phone's keys first. */
+    suspend fun joinMove(code: String): JoinResult = joinInvite(code, CeremonyPurpose.MOVE, MOVE_ROLE, "").also {
+        if (it == JoinResult.JOINED) KillitLog.i(KillitLog.PAIR, "Joined a move invite")
+    }
+
+    private suspend fun createInvite(purpose: CeremonyPurpose, myRole: PairRole, name: String) {
+        abandonCurrent()
+        val me = identity()
+        val created = server.createInvite()
+        val nonce = randomBytes(CEREMONY_NONCE_BYTES)
+        val reveal = encodeReveal(me.bundle(), nonce)
+        lock.withLock {
+            dao.replaceCeremony(
+                newCeremony(purpose, created.id, CeremonySide.CREATOR, myRole, name, created.code, created.expiresAt, nonce, reveal, null, CeremonyStage.WAITING_FOR_JOINER),
+            )
+        }
+    }
+
+    private suspend fun joinInvite(code: String, purpose: CeremonyPurpose, myRole: PairRole, name: String): JoinResult {
         val bytes = InviteCode.parse(code).valueOrNull() ?: return JoinResult.CODE_NOT_FOUND
         val normalized = InviteCode.format(bytes)
         abandonCurrent()
@@ -134,9 +168,10 @@ class CeremonyEngine(
             }
         }
         lock.withLock {
-            dao.replaceCeremony(newCeremony(joined.id, CeremonySide.JOINER, myRole, name, normalized, joined.expiresAt, nonce, reveal, commit, CeremonyStage.WAITING_FOR_CREATOR))
+            dao.replaceCeremony(
+                newCeremony(purpose, joined.id, CeremonySide.JOINER, myRole, name, normalized, joined.expiresAt, nonce, reveal, commit, CeremonyStage.WAITING_FOR_CREATOR),
+            )
         }
-        KillitLog.i(KillitLog.PAIR, "Joined an invite; this phone will be $myRole")
         return JoinResult.JOINED
     }
 
@@ -236,12 +271,21 @@ class CeremonyEngine(
         KillitLog.w(KillitLog.PAIR, "Safety codes didn't match; ceremony cancelled")
     }
 
-    /** Gives up on the ceremony: back, or a timeout the user accepted. */
-    suspend fun cancel() {
-        val current = dao.ceremony() ?: return
-        if (current.stage == CeremonyStage.PAIRED || current.stage == CeremonyStage.FAILED) return
+    /**
+     * Gives up on the ceremony: back, or a timeout the user accepted. A linked move follows its
+     * own rules ([MoveEngine.cancel]).
+     *
+     * @return false when it is a move that can't be given up now.
+     */
+    suspend fun cancel(): Boolean {
+        val current = dao.ceremony() ?: return true
+        if (current.stage == CeremonyStage.PAIRED || current.stage == CeremonyStage.FAILED) return true
+        if (current.purpose == CeremonyPurpose.MOVE && current.stage == CeremonyStage.LINKED) {
+            return lock.withLock { dao.ceremony()?.takeIf { it.inviteId == current.inviteId }?.let { moves.cancel(it) } ?: true }
+        }
         cancelQuietly(current.inviteId)
         lock.withLock { fail(CeremonyFailure.CANCELLED) }
+        return true
     }
 
     /** Sets the nickname chosen on the last step (A5). */
@@ -268,6 +312,12 @@ class CeremonyEngine(
         val peer = peerBundle(current) ?: return
         val pairIdBytes = current.pairId ?: return
         val peerFp = fingerprint(peer.signPk)
+        if (current.purpose == CeremonyPurpose.MOVE) {
+            // The code was a pairing's, and this phone joined it to move: neither happens.
+            mailbox.post(pairIdBytes, peerFp, peer.encPk, MessageBody.PairAnswer(Answer.DECLINE, DeclineReason.USER, "", "", appManagement = false))
+            fail(CeremonyFailure.WRONG_PURPOSE)
+            return
+        }
         val expected = if (current.myRole == PairRole.GUARDIAN) Role.PROTECTED else Role.GUARDIAN
         val conflict = offer.senderRole != expected
         if (conflict || (current.myRole == PairRole.PROTECTED && !canBeProtected())) {
@@ -298,6 +348,7 @@ class CeremonyEngine(
     suspend fun onAnswer(received: Mailbox.Received) {
         val current = received.ceremony ?: return
         if (current.side != CeremonySide.CREATOR || current.stage != CeremonyStage.LINKED) return
+        if (current.purpose != CeremonyPurpose.PAIR) return
         val answer = received.body as MessageBody.PairAnswer
         if (answer.answer == Answer.DECLINE) {
             fail(if (answer.reason == DeclineReason.ROLE_CONFLICT) CeremonyFailure.ROLE_CONFLICT else CeremonyFailure.DECLINED)
@@ -365,6 +416,15 @@ class CeremonyEngine(
      */
     private suspend fun linked(current: CeremonyEntity) {
         if (current.stage == CeremonyStage.LINKED || current.stage == CeremonyStage.PAIRED) return
+        if (current.purpose == CeremonyPurpose.MOVE) {
+            if (current.side == CeremonySide.CREATOR) {
+                moves.onLinked(current)
+            } else {
+                dao.updateCeremony(current.copy(stage = CeremonyStage.LINKED, moveStage = MoveStage.AWAITING_REQUEST))
+                KillitLog.i(KillitLog.PAIR, "Linked to the new phone")
+            }
+            return
+        }
         if (current.side == CeremonySide.CREATOR) {
             val peer = peerBundle(current) ?: return
             val role = if (current.myRole == PairRole.GUARDIAN) Role.GUARDIAN else Role.PROTECTED
@@ -378,6 +438,9 @@ class CeremonyEngine(
         dao.updateCeremony(current.copy(stage = CeremonyStage.LINKED))
         KillitLog.i(KillitLog.PAIR, "Linked")
     }
+
+    /** Ends the ceremony without a pairing or a move. Called with the lock held. */
+    internal suspend fun failCurrent(failure: CeremonyFailure) = fail(failure)
 
     /** Ends the ceremony without a pairing. Called with the lock held. */
     private suspend fun fail(failure: CeremonyFailure) {
@@ -393,10 +456,20 @@ class CeremonyEngine(
         KillitLog.i(KillitLog.PAIR, "Ceremony ended: $failure")
     }
 
-    /** Cancels whatever ceremony is in progress before a new one starts. */
+    /**
+     * Cancels whatever ceremony is in progress before a new one starts. A move the other phone
+     * may be committing can't be cut short.
+     *
+     * @throws IllegalStateException for such a move.
+     */
     private suspend fun abandonCurrent() {
         val current = dao.ceremony() ?: return
-        if (current.stage != CeremonyStage.PAIRED && current.stage != CeremonyStage.FAILED) cancelQuietly(current.inviteId)
+        check(!moves.mustFinish(current)) { "a move is under way" }
+        if (current.purpose == CeremonyPurpose.MOVE && current.stage == CeremonyStage.LINKED) {
+            lock.withLock { dao.ceremony()?.let { moves.cancel(it) } }
+        } else if (current.stage != CeremonyStage.PAIRED && current.stage != CeremonyStage.FAILED) {
+            cancelQuietly(current.inviteId)
+        }
         lock.withLock { dao.deleteCeremony() }
     }
 
@@ -419,7 +492,8 @@ class CeremonyEngine(
         return reveal
     }
 
-    private fun peerBundle(current: CeremonyEntity): Bundle? =
+    /** The peer's bundle, from its reveal: what the safety code covered. */
+    internal fun peerBundle(current: CeremonyEntity): Bundle? =
         current.peerReveal?.let { decodeReveal(it).valueOrNull()?.bundle }
 
     private fun pairing(current: CeremonyEntity, peer: Bundle, peerName: String, peerModel: String, peerAppManagement: Boolean) =
@@ -428,6 +502,7 @@ class CeremonyEngine(
             peerFp = fingerprint(peer.signPk),
             peerSignPk = peer.signPk,
             peerEncPk = peer.encPk,
+            peerEncSig = peer.encSig,
             myRole = current.myRole,
             peerName = peerName,
             nickname = peerName,
@@ -442,6 +517,7 @@ class CeremonyEngine(
         )
 
     private fun newCeremony(
+        purpose: CeremonyPurpose,
         inviteId: String,
         side: CeremonySide,
         myRole: PairRole,
@@ -472,6 +548,7 @@ class CeremonyEngine(
         peerModel = null,
         nickname = null,
         createdAt = now(),
+        purpose = purpose,
     )
 
     private fun decode(text: String, size: Int): ByteArray? =
@@ -485,6 +562,9 @@ class CeremonyEngine(
     }
 
     private companion object {
+        /** A move's ceremony stores a role it never uses: no pairing comes out of it. */
+        val MOVE_ROLE = PairRole.GUARDIAN
+
         /** The stages in which the invite itself is followed. */
         val POLLED = setOf(
             CeremonyStage.WAITING_FOR_JOINER,

@@ -537,4 +537,25 @@
     <string name="event_app_unblocked_by_you">Desbloqueaste %1$s</string>
     <string name="event_app_refused">Android no quiso bloquear %1$s</string>
     <string name="notif_app_unblocked_by_guardians">Tus guardianes la desbloquearon.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">Se cambió a un teléfono nuevo: %1$s</string>
+    <string name="event_moved_bare">Se cambió a un teléfono nuevo</string>
+    <string name="event_guardian_moved">%1$s se cambió a un teléfono nuevo</string>
+    <string name="event_moved_here">Se trasladó aquí desde el teléfono anterior</string>
+    <string name="notif_moved_title">%1$s se cambió a un teléfono nuevo</string>
+    <string name="notif_moved_text">Ahora en %1$s. La imagen junto al nombre cambió con el teléfono, como debe ser.</string>
+    <string name="notif_moved_text_bare">La imagen junto al nombre cambió con el teléfono, como debe ser.</string>
+    <string name="wizard_failed_wrong_purpose">Ese código era para cambiarse a un teléfono nuevo, no para emparejar.</string>
+    <string name="move_failed_wrong_purpose">Ese código era para emparejar, no para cambiarse de teléfono. Empieza el cambio en el teléfono nuevo.</string>
+    <string name="move_failed_not_device_owner">El teléfono nuevo no puede recibir a tus guardianes: primero Killit tiene que protegerlo, con una clave.</string>
+    <string name="move_failed_has_pairings">El teléfono nuevo ya tiene emparejamientos. Para cambiarse hace falta un teléfono sin ninguno.</string>
+    <string name="move_failed_abandoned">El teléfono anterior abandonó el cambio. No se trasladó nada.</string>
+    <string name="move_failed_declined">El teléfono nuevo abandonó el cambio. No se trasladó nada.</string>
+    <string name="move_failed_changed">Un emparejamiento cambió durante el cambio, así que no se trasladó nada. Empieza de nuevo.</string>
+    <string name="move_failed_expired">Se acabó el tiempo, así que no se trasladó nada. Empieza de nuevo.</string>
+    <string name="move_failed_invalid">Algo del otro teléfono no se pudo verificar, así que no se trasladó nada.</string>
+    <string name="move_failed_limit">El teléfono nuevo ya está vinculado con demasiados teléfonos.</string>
+    <string name="move_failed_cancelled">Se canceló el cambio. No se trasladó nada.</string>
+    <string name="move_failed_mismatch">Los códigos no coincidían, así que no se trasladó nada. Puede que alguien esté interfiriendo. Empieza de nuevo.</string>
 </resources>

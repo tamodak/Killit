@@ -10,6 +10,7 @@ import org.tamodak.killit.pairing.store.EventEntity
 import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.LinkDeletionEntity
 import org.tamodak.killit.pairing.store.ManageSeqEntity
+import org.tamodak.killit.pairing.store.MovePageEntity
 import org.tamodak.killit.pairing.store.OutboxEntity
 import org.tamodak.killit.pairing.store.OutgoingRequestEntity
 import org.tamodak.killit.pairing.store.PairingDao
@@ -29,7 +30,7 @@ import org.tamodak.killit.pairing.store.WardListPageEntity
  * matters has a durable copy in the device owner's application restrictions as well. The schema of
  * every version is exported to `app/schemas`.
  *
- * Version 2 added pairing, and version 3 guardians managing apps and moving to a new phone.
+ * Version 2 added pairing, version 3 guardians managing apps, and version 4 moving to a new phone.
  * Killit has no users yet (PLAN.md K5), so an older database is simply dropped: the known-package
  * list and a protected phone's guardians come back from their durable copies.
  */
@@ -52,8 +53,9 @@ import org.tamodak.killit.pairing.store.WardListPageEntity
         WardListEntity::class,
         WardListPageEntity::class,
         WardAppEntity::class,
+        MovePageEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class KillitDatabase : RoomDatabase() {
@@ -77,7 +79,7 @@ abstract class KillitDatabase : RoomDatabase() {
          */
         fun create(context: Context): KillitDatabase =
             Room.databaseBuilder(context.applicationContext, KillitDatabase::class.java, FILE_NAME)
-                .fallbackToDestructiveMigrationFrom(dropAllTables = true, 1, 2)
+                .fallbackToDestructiveMigrationFrom(dropAllTables = true, 1, 2, 3)
                 .build()
     }
 }

@@ -311,6 +311,29 @@ class RequestEngine(
         }
     }
 
+    /**
+     * A guardian moved to a new phone (SPEC.md §11.13). Its copies go to the new phone from now on,
+     * and the requests it hadn't answered are sent there again: the new phone never saw them. Its
+     * answers so far stand, given by the key this phone trusted then.
+     *
+     * @param guardian the pairing, already handed over.
+     */
+    suspend fun onGuardianMoved(guardian: PairingEntity) {
+        dao.setCopyGuardian(guardian.pairId, guardian.peerFp)
+        dao.setUnpairTarget(guardian.pairId, guardian.peerFp)
+        for (open in dao.openOutgoing()) {
+            val copy = open.copies.firstOrNull { it.pairId.contentEquals(guardian.pairId) } ?: continue
+            if (copy.vote != Vote.WAITING) continue
+            mailbox.post(guardian, bodyOf(open.request, open.copies.size) ?: continue)
+            sendStatus(open.request.requestId)
+        }
+    }
+
+    /** This phone is moving to a new one (SPEC.md §11.14): every request it has open is withdrawn. */
+    suspend fun withdrawAll() {
+        for (open in dao.openOutgoing()) close(open.request, RequestState.CANCELLED, CancelCause.WITHDRAWN)
+    }
+
     /** G6, E-C2: a new guardian receives every request still open, and everyone the new count. */
     suspend fun onGuardianAdded(guardian: PairingEntity) {
         for (open in dao.openOutgoing()) {
@@ -456,7 +479,17 @@ class RequestEngine(
                 RequestCopyEntity(request.requestId, it.pairId, it.peerFp, if (proposed) Vote.APPROVED else Vote.WAITING, "", if (proposed) now() else null)
             },
         )
-        val count = (existing.size + fresh.size).coerceIn(1, MAX_GUARDIANS)
+        val body = bodyOf(request, existing.size + fresh.size) ?: return
+        fresh.forEach { mailbox.post(it, body) }
+    }
+
+    /**
+     * The request as each guardian receives it, counting [guardians] guardians.
+     *
+     * @return null for a GUARDIAN_UNBLOCK whose proposer is gone, which onGuardianRemoved closes.
+     */
+    private suspend fun bodyOf(request: OutgoingRequestEntity, guardians: Int): MessageBody? {
+        val count = guardians.coerceIn(1, MAX_GUARDIANS)
         val app = AppInfo(
             packageName = request.packageName.orEmpty(),
             certDigest = request.certDigest ?: ByteArray(0),
@@ -465,7 +498,7 @@ class RequestEngine(
             firstInstalled = request.firstInstalled ?: 0L,
             icon = request.icon,
         )
-        val body = when (request.type) {
+        return when (request.type) {
             RequestType.UNBLOCK_APP -> MessageBody.UnblockApp(
                 requestId = request.requestId,
                 app = app,
@@ -474,8 +507,7 @@ class RequestEngine(
                 guardianCount = count,
             )
             RequestType.GUARDIAN_UNBLOCK -> {
-                // Closed by onGuardianRemoved before its proposer's pairing could be missing.
-                val by = dao.pairing(proposer ?: return) ?: return
+                val by = dao.pairing(request.proposerPairId ?: return null) ?: return null
                 MessageBody.GuardianUnblock(request.requestId, app, by.peerFp, by.peerName, count)
             }
             RequestType.UNPAIR -> MessageBody.Unpair(
@@ -489,7 +521,6 @@ class RequestEngine(
             )
             RequestType.UNLOCK -> error("a live unlock is LiveUnlock's")
         }
-        fresh.forEach { mailbox.post(it, body) }
     }
 
     /**

@@ -536,4 +536,25 @@
     <string name="event_app_unblocked_by_you">You unblocked %1$s</string>
     <string name="event_app_refused">Android wouldn\'t block %1$s</string>
     <string name="notif_app_unblocked_by_guardians">Your guardians unblocked it.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">Moved to a new phone: %1$s</string>
+    <string name="event_moved_bare">Moved to a new phone</string>
+    <string name="event_guardian_moved">%1$s moved to a new phone</string>
+    <string name="event_moved_here">Moved here from the old phone</string>
+    <string name="notif_moved_title">%1$s moved to a new phone</string>
+    <string name="notif_moved_text">Now on %1$s. The picture next to the name changed with the phone, as it should.</string>
+    <string name="notif_moved_text_bare">The picture next to the name changed with the phone, as it should.</string>
+    <string name="wizard_failed_wrong_purpose">That code was for moving to a new phone, not for pairing.</string>
+    <string name="move_failed_wrong_purpose">That code was for pairing, not for moving. Start the move on the new phone.</string>
+    <string name="move_failed_not_device_owner">The new phone can\'t take your guardians: Killit must protect it first, with a passkey.</string>
+    <string name="move_failed_has_pairings">The new phone already has pairings. A move needs a phone without any.</string>
+    <string name="move_failed_abandoned">The old phone gave the move up. Nothing moved.</string>
+    <string name="move_failed_declined">The new phone gave the move up. Nothing moved.</string>
+    <string name="move_failed_changed">A pairing changed while you were moving, so nothing moved. Start again.</string>
+    <string name="move_failed_expired">Time ran out, so nothing moved. Start again.</string>
+    <string name="move_failed_invalid">Something about the other phone didn\'t check out, so nothing moved.</string>
+    <string name="move_failed_limit">The new phone is already linked with too many phones.</string>
+    <string name="move_failed_cancelled">The move was cancelled. Nothing moved.</string>
+    <string name="move_failed_mismatch">The codes didn\'t match, so nothing moved. Someone may be interfering. Start again.</string>
 </resources>

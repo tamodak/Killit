@@ -600,4 +600,25 @@
     <string name="event_app_unblocked_by_you">رفعتَ الحظر عن %1$s</string>
     <string name="event_app_refused">لم يقبل Android حظر %1$s</string>
     <string name="notif_app_unblocked_by_guardians">رفع حرّاسك الحظر عنه.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">انتقل إلى هاتف جديد: %1$s</string>
+    <string name="event_moved_bare">انتقل إلى هاتف جديد</string>
+    <string name="event_guardian_moved">انتقل %1$s إلى هاتف جديد</string>
+    <string name="event_moved_here">نُقل إلى هنا من الهاتف القديم</string>
+    <string name="notif_moved_title">انتقل %1$s إلى هاتف جديد</string>
+    <string name="notif_moved_text">الهاتف الجديد: %1$s. تغيّرت الصورة بجانب الاسم مع الهاتف، وهذا متوقَّع.</string>
+    <string name="notif_moved_text_bare">تغيّرت الصورة بجانب الاسم مع الهاتف، وهذا متوقَّع.</string>
+    <string name="wizard_failed_wrong_purpose">كان هذا الرمز للانتقال إلى هاتف جديد، لا للاقتران.</string>
+    <string name="move_failed_wrong_purpose">كان هذا الرمز للاقتران، لا للانتقال. ابدأ الانتقال من الهاتف الجديد.</string>
+    <string name="move_failed_not_device_owner">لا يستطيع الهاتف الجديد استقبال حرّاسك: يجب أن يحميه Killit أولًا، بمفتاح.</string>
+    <string name="move_failed_has_pairings">الهاتف الجديد مقترن بالفعل. يحتاج الانتقال إلى هاتف بلا أي اقتران.</string>
+    <string name="move_failed_abandoned">تراجع الهاتف القديم عن الانتقال. لم يُنقل شيء.</string>
+    <string name="move_failed_declined">تراجع الهاتف الجديد عن الانتقال. لم يُنقل شيء.</string>
+    <string name="move_failed_changed">تغيّر أحد الاقترانات أثناء الانتقال، لذلك لم يُنقل شيء. ابدأ من جديد.</string>
+    <string name="move_failed_expired">انتهى الوقت، لذلك لم يُنقل شيء. ابدأ من جديد.</string>
+    <string name="move_failed_invalid">تعذّر التحقق من شيء ما في الهاتف الآخر، لذلك لم يُنقل شيء.</string>
+    <string name="move_failed_limit">الهاتف الجديد مرتبط بالفعل بعدد كبير جدًا من الهواتف.</string>
+    <string name="move_failed_cancelled">أُلغي الانتقال. لم يُنقل شيء.</string>
+    <string name="move_failed_mismatch">لم تتطابق الرموز، لذلك لم يُنقل شيء. ربما يتدخّل أحدهم. ابدأ من جديد.</string>
 </resources>

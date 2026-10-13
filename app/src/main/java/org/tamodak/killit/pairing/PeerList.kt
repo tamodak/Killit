@@ -16,10 +16,12 @@ import org.tamodak.killit.protocol.UnpairedHow
 import org.tamodak.killit.protocol.decodeReveal
 import org.tamodak.killit.protocol.fingerprint
 import org.tamodak.killit.protocol.fromBase64Url
+import org.tamodak.killit.protocol.verifyBundle
 
 /**
- * The pairings themselves: their beginning and end, the notices a protected phone owes its
- * guardians about them, and the links they leave behind (SPEC.md §7, §11.8, §11.9).
+ * The pairings themselves: their beginning and end, a peer moving to a new phone, the notices a
+ * protected phone owes its guardians about them, and the links they leave behind (SPEC.md §7,
+ * §11.8, §11.9, §11.13).
  *
  * Ending a pairing never needs the other side's consent in the direction that weakens nobody: a
  * guardian may stop guarding at once (LEAVE), and a protected phone is told it lost a guardian
@@ -116,6 +118,40 @@ class PeerList(
     }
 
     /**
+     * The peer moved to a new phone (HANDOVER, SPEC.md §11.13). The pairing belongs to that phone
+     * from now on, under the key the old phone vouched for by signing the message; its id, names
+     * and counters stay. What counted the old phone's commands, or showed the old phone's apps, is
+     * forgotten.
+     *
+     * A protected phone sends the new phone the requests the guardian hadn't answered, and tells
+     * its other guardians (B6).
+     */
+    suspend fun onHandover(received: Mailbox.Received) {
+        val pairing = received.pairing ?: return
+        val handover = received.body as MessageBody.Handover
+        val newFp = fingerprint(handover.newBundle.signPk)
+        if (!verifyBundle(handover.newBundle) || newFp.contentEquals(received.header.recipientFp) || newFp.contentEquals(pairing.peerFp)) {
+            KillitLog.w(KillitLog.PAIR, "A handover from ${pairing.peerFp.short()} names keys that don't verify; ignored")
+            return
+        }
+        store.replacePeer(pairing.pairId, newFp, handover.newBundle, handover.deviceModel)
+        dao.deleteManageSeqsFor(pairing.pairId)
+        dao.forgetWardApps(pairing.pairId)
+        dao.deleteLinkDeletion(newFp)
+        // A mutual pairing moves in two handovers; the old link goes after the last.
+        if (dao.pairingsWith(pairing.peerFp).isEmpty()) dao.requestLinkDeletion(LinkDeletionEntity(pairing.peerFp, now()))
+        val moved = dao.pairing(pairing.pairId) ?: return
+        val event = event(EventType.MOVED, moved, otherName = handover.deviceModel).also { dao.insertEvent(it) }
+        if (moved.myRole == PairRole.PROTECTED) {
+            requests.onGuardianMoved(moved)
+            unlock.onGuardianMoved(moved)
+            notifyGuardians(NoticeBody.GuardianMoved(newFp, moved.peerName), except = moved.pairId)
+        }
+        KillitLog.i(KillitLog.PAIR, "${pairing.peerFp.short()} moved to ${newFp.short()}")
+        notifier.peerMoved(moved, event)
+    }
+
+    /**
      * Guardian side: a NOTICE from a phone this phone guards. It informs, and changes nothing but
      * this phone's picture of the guarded phone: its management setting and its apps.
      */
@@ -152,8 +188,8 @@ class PeerList(
                     flag = notice.guardianFp.contentEquals(received.header.recipientFp),
                 )
             }
+            is NoticeBody.GuardianMoved -> event(EventType.GUARDIAN_MOVED, pairing, otherName = notice.guardianName)
             is NoticeBody.Unknown -> event(EventType.UNKNOWN_NOTICE, pairing, value = notice.code)
-            is NoticeBody.GuardianMoved -> return
         }
         dao.insertEvent(event)
         when {

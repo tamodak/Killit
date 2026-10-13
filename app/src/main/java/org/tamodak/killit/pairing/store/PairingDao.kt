@@ -59,6 +59,13 @@ interface PairingDao {
     @Query("UPDATE pairings SET manage_seq = :seq WHERE pair_id = :pairId")
     suspend fun setManageSeqSent(pairId: ByteArray, seq: Long)
 
+    /** A HANDOVER (SPEC.md §11.13): the pairing now belongs to the peer's new phone. */
+    @Query(
+        "UPDATE pairings SET peer_fp = :peerFp, peer_sign_pk = :signPk, peer_enc_pk = :encPk, peer_enc_sig = :encSig, " +
+            "peer_model = :model, last_seen_days = NULL, silence_alerted = 0 WHERE pair_id = :pairId",
+    )
+    suspend fun replacePeer(pairId: ByteArray, peerFp: ByteArray, signPk: ByteArray, encPk: ByteArray, encSig: ByteArray, model: String)
+
     // ---------------------------------------------------------------- ceremony
 
     @Query("SELECT * FROM ceremony LIMIT 1")
@@ -137,6 +144,13 @@ interface PairingDao {
 
     @Query("DELETE FROM request_copies WHERE request_id = :requestId AND pair_id = :pairId")
     suspend fun deleteCopy(requestId: ByteArray, pairId: ByteArray)
+
+    /** The guardian of a pairing moved: its copies of open requests now go to its new phone. */
+    @Query("UPDATE request_copies SET guardian_fp = :guardianFp WHERE pair_id = :pairId")
+    suspend fun setCopyGuardian(pairId: ByteArray, guardianFp: ByteArray)
+
+    @Query("UPDATE outgoing_requests SET target_fp = :targetFp WHERE target_pair_id = :targetPairId")
+    suspend fun setUnpairTarget(targetPairId: ByteArray, targetFp: ByteArray)
 
     @Query("DELETE FROM outgoing_requests WHERE state != 'OPEN' AND closed_at < :before")
     suspend fun pruneOutgoing(before: Long)
@@ -346,9 +360,26 @@ interface PairingDao {
     @Query("DELETE FROM ward_lists WHERE pair_id = :pairId")
     suspend fun deleteWardList(pairId: ByteArray)
 
+    // ---------------------------------------------------------------- moving to a new phone
+
+    @Query("SELECT * FROM move_pages ORDER BY page")
+    suspend fun movePages(): List<MovePageEntity>
+
+    @Query("SELECT * FROM move_pages WHERE page = :page")
+    suspend fun movePage(page: Int): MovePageEntity?
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertMovePage(page: MovePageEntity)
+
+    @Query("DELETE FROM move_pages")
+    suspend fun deleteMovePages()
+
     // ---------------------------------------------------------------- everything
 
-    /** Forgets every pairing and everything that hangs off one: used when device owner is released. */
+    /**
+     * Forgets every pairing and everything that hangs off one, the history and the mailbox's local
+     * state included: what an old phone does once its pairings belong to a new one.
+     */
     @Transaction
     suspend fun clearAll() {
         clearPairings()
@@ -361,7 +392,28 @@ interface PairingDao {
         clearWardApps()
         clearWardLists()
         clearWardListPages()
+        deleteMovePages()
+        clearOutbox()
+        clearSeen()
+        clearLinkDeletions()
+        clearUnknown()
+        clearEvents()
     }
+
+    @Query("DELETE FROM outbox")
+    suspend fun clearOutbox()
+
+    @Query("DELETE FROM seen_messages")
+    suspend fun clearSeen()
+
+    @Query("DELETE FROM link_deletions")
+    suspend fun clearLinkDeletions()
+
+    @Query("DELETE FROM unknown_messages")
+    suspend fun clearUnknown()
+
+    @Query("DELETE FROM events")
+    suspend fun clearEvents()
 
     @Query("DELETE FROM manage_seqs")
     suspend fun clearManageSeqs()

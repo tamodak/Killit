@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.protection.RemoteBlock
 import org.tamodak.killit.protocol.AppInfo
+import org.tamodak.killit.protocol.AppRef
+import org.tamodak.killit.protocol.AppState
 import org.tamodak.killit.protocol.ListedApp
 
 /**
@@ -45,6 +47,16 @@ interface AppBlocker {
      * has a launcher icon, Killit excepted, with its state and a 16 × 16 icon (SPEC.md §11.10).
      */
     suspend fun listForGuardians(): List<ListedApp>
+
+    /** The decisions this phone hands its new phone when it moves (SPEC.md §11.14). */
+    suspend fun decisionsToMove(): List<Pair<AppRef, AppState>>
+
+    /**
+     * Takes over an old phone's decisions in a move (PLAN.md §3.10).
+     *
+     * @return the apps blocked as new here: installed by the user, and never decided about there.
+     */
+    suspend fun adoptMoved(decisions: List<Pair<AppRef, AppState>>): List<String>
 }
 
 /**
@@ -57,18 +69,29 @@ interface AppBlocker {
  * - (b) open the gate for the live unlock session whose in-memory nonce approvals were bound to;
  * - (c) block or unblock a named app on its guardians' signed, sequence-numbered commands, with the
  *   quorum of G2, and only while this phone lets its guardians manage its apps. The check sits here
- *   as well as in the code that decides, so no other path can reach these effects with management off.
+ *   as well as in the code that decides, so no other path can reach these effects with management off;
+ * - (e) take over the protection of the old phone in a move this phone's user started and checked
+ *   with the safety code (PLAN.md §3.10): its decisions about apps, its management setting and its
+ *   protection options. Only while this phone has no guardians, whose user could have chosen all of
+ *   that alone, so a move can never loosen anything a guardian holds.
  *
  * The fourth effect, (d) changing the peer list, stays inside pairing's tables: adding, removing or
- * handing over a pairing. There is no effect for hardening, uninstalling, releasing device owner,
- * wiping, the passkey or any toggle, and adding one means adding a case here, in review.
+ * handing over a pairing. There is no other effect on hardening, and none for uninstalling,
+ * releasing device owner, wiping, the passkey or any toggle; adding one means adding a case here,
+ * in review.
  *
- * @param apps carries out (a) and (c).
+ * @param apps carries out (a), (c) and the decisions of (e).
  * @param managementEnabled whether this phone lets its guardians manage its apps (PLAN.md §3.8).
+ * @param hasGuardians whether this phone has guardians, which rules (e) out.
+ * @param adoptManagement stores the management setting a move brought.
+ * @param adoptProtection applies the protection options a move brought, as MOVE_STATE's bits.
  */
 class RemoteEffects(
     private val apps: AppBlocker,
     private val managementEnabled: suspend () -> Boolean,
+    private val hasGuardians: suspend () -> Boolean = { false },
+    private val adoptManagement: suspend (Boolean) -> Unit = {},
+    private val adoptProtection: suspend (Int) -> Unit = {},
 ) {
 
     /** One permitted effect. */
@@ -87,6 +110,21 @@ class RemoteEffects(
 
         /** (c) Every guardian unblocked this app, still signed by this certificate. */
         class ManagedUnblock(val packageName: String, val certDigest: ByteArray) : Effect
+
+        /**
+         * (e) The protection a move hands this phone (SPEC.md §11.14).
+         *
+         * @param protection the old phone's protection options, bit (option − 1) each.
+         */
+        class AdoptMove(
+            val decisions: List<Pair<AppRef, AppState>>,
+            val appManagement: Boolean,
+            val protection: Int,
+        ) : Effect {
+            /** Once applied: the apps blocked as new here, which the guardians hear about (D1). */
+            var blockedAsNew: List<String> = emptyList()
+                internal set
+        }
     }
 
     /** What applying an effect did. */
@@ -100,7 +138,7 @@ class RemoteEffects(
         /** Android, or the app's certificate, stood in the way. */
         REFUSED,
 
-        /** The effect isn't permitted now: management is off. */
+        /** The effect isn't permitted now: management is off, or a move met a phone with guardians. */
         NOT_ALLOWED,
     }
 
@@ -123,6 +161,15 @@ class RemoteEffects(
             }.also { KillitLog.i(KillitLog.REQ, "Guardian blocked ${effect.packageName}: $it") }
         }
         is Effect.ManagedUnblock -> if (managementEnabled()) unblock(effect.packageName, effect.certDigest) else Outcome.NOT_ALLOWED
+        is Effect.AdoptMove -> if (hasGuardians()) {
+            Outcome.NOT_ALLOWED
+        } else {
+            effect.blockedAsNew = apps.adoptMoved(effect.decisions)
+            adoptManagement(effect.appManagement)
+            adoptProtection(effect.protection)
+            KillitLog.i(KillitLog.PAIR, "Took over the old phone's protection: ${effect.decisions.size} decisions")
+            Outcome.APPLIED
+        }
     }
 
     private suspend fun unblock(packageName: String, certDigest: ByteArray): Outcome {

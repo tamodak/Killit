@@ -8,6 +8,7 @@ import org.tamodak.killit.core.KillitLog
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -88,6 +89,24 @@ class DurableStoreTest {
      * The known-package list comes back entry for entry, nested bundles and all, and writing it
      * leaves the credential record beside it untouched.
      */
+    /**
+     * A phone whose guardians moved away is frozen in the same write that forgets them, and the
+     * time of the move comes back as written. Releasing device owner clears the freeze.
+     */
+    @Test
+    fun aMoveFreezesThePhoneInTheWriteThatForgetsItsGuardians(): Unit = runBlocking {
+        assertTrue(durable.writeAppManagement(true))
+
+        assertTrue(durable.clearPairing(MovedAway(at = 1_790_000_000_123L, toModel = "Google Pixel 9")))
+
+        val moved = durable.readMovedAway()
+        assertEquals(1_790_000_000_123L, moved?.at)
+        assertEquals("Google Pixel 9", moved?.toModel)
+        assertEquals(false, durable.readAppManagement())
+        assertTrue(durable.clearPairing())
+        assertNull(durable.readMovedAway())
+    }
+
     @Test
     fun knownPackagesSurviveARoundTripBesideTheRecord(): Unit = runBlocking {
         val record = CredentialRecord(LockType.PATTERN, ByteArray(16) { 1 }, ByteArray(32) { 2 })

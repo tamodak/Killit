@@ -500,4 +500,25 @@
     <string name="event_app_unblocked_by_you">Kamu membuka blokir %1$s</string>
     <string name="event_app_refused">Android tidak mau memblokir %1$s</string>
     <string name="notif_app_unblocked_by_guardians">Penjagamu membuka blokirnya.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">Pindah ke ponsel baru: %1$s</string>
+    <string name="event_moved_bare">Pindah ke ponsel baru</string>
+    <string name="event_guardian_moved">%1$s pindah ke ponsel baru</string>
+    <string name="event_moved_here">Dipindahkan ke sini dari ponsel lama</string>
+    <string name="notif_moved_title">%1$s pindah ke ponsel baru</string>
+    <string name="notif_moved_text">Sekarang di %1$s. Gambar di samping namanya ikut berubah bersama ponselnya, memang seharusnya begitu.</string>
+    <string name="notif_moved_text_bare">Gambar di samping namanya ikut berubah bersama ponselnya, memang seharusnya begitu.</string>
+    <string name="wizard_failed_wrong_purpose">Kode itu untuk pindah ke ponsel baru, bukan untuk memasangkan.</string>
+    <string name="move_failed_wrong_purpose">Kode itu untuk memasangkan, bukan untuk pindah. Mulai pindahannya di ponsel baru.</string>
+    <string name="move_failed_not_device_owner">Ponsel baru tidak bisa menerima penjagamu: Killit harus melindunginya dulu, dengan kunci.</string>
+    <string name="move_failed_has_pairings">Ponsel baru sudah punya pasangan. Pindah butuh ponsel yang belum punya pasangan sama sekali.</string>
+    <string name="move_failed_abandoned">Ponsel lama membatalkan pindahan. Tidak ada yang dipindahkan.</string>
+    <string name="move_failed_declined">Ponsel baru membatalkan pindahan. Tidak ada yang dipindahkan.</string>
+    <string name="move_failed_changed">Ada pasangan yang berubah selama pindahan, jadi tidak ada yang dipindahkan. Mulai lagi.</string>
+    <string name="move_failed_expired">Waktunya habis, jadi tidak ada yang dipindahkan. Mulai lagi.</string>
+    <string name="move_failed_invalid">Ada yang tidak lolos pemeriksaan di ponsel lain, jadi tidak ada yang dipindahkan.</string>
+    <string name="move_failed_limit">Ponsel baru sudah terhubung dengan terlalu banyak ponsel.</string>
+    <string name="move_failed_cancelled">Pindahan dibatalkan. Tidak ada yang dipindahkan.</string>
+    <string name="move_failed_mismatch">Kodenya tidak cocok, jadi tidak ada yang dipindahkan. Mungkin ada yang mengganggu. Mulai lagi.</string>
 </resources>

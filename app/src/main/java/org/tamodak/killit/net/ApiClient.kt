@@ -161,6 +161,20 @@ class ApiClient(
         call<Unit>("DELETE", "/v1/links/${deviceId(peerFp)}", null, null)
     }
 
+    /**
+     * `POST /v1/links/handover`: copies this phone's links to the new phone of a move, which it
+     * linked with through their ceremony. Idempotent.
+     *
+     * @return how many links the new phone gained.
+     */
+    override suspend fun handoverLinks(to: ByteArray): Int =
+        call(
+            "POST",
+            "/v1/links/handover",
+            json.encodeToString(HandoverRequest.serializer(), HandoverRequest(deviceId(to))),
+            HandoverResponse.serializer(),
+        ).copied
+
     // ---------------------------------------------------------------- mailbox (SPEC.md §8)
 
     /**

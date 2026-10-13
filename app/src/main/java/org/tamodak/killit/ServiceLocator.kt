@@ -161,6 +161,7 @@ object ServiceLocator {
             dao = database.pairing(),
             onRequestWaiting = { Reminders.schedule(appContext) },
         )
+        val guardedPolicies = GuardedPolicies(devicePolicyController, lockRepository)
         pairing = PairingEngine(
             store = pairingStore,
             server = api,
@@ -176,7 +177,8 @@ object ServiceLocator {
                 silenceAlertMillis = BuildConfig.SILENCE_ALERT_MILLIS,
                 listAnswersPerHour = BuildConfig.LIST_ANSWERS_PER_HOUR,
             ),
-            canBeProtected = { devicePolicyController.isDeviceOwner() },
+            // Default-blocking, which a guarded phone relies on, needs both.
+            canBeProtected = { devicePolicyController.isDeviceOwner() && lockRepository.hasCredential() },
             scheduler = object : PairingEngine.Scheduler {
                 override fun soon() = PairingSync.soon(appContext)
 
@@ -184,8 +186,11 @@ object ServiceLocator {
 
                 override fun at(atMillis: Long) = PairingSync.at(appContext, atMillis)
             },
-            onGuarded = GuardedPolicies(devicePolicyController, lockRepository)::apply,
+            onGuarded = guardedPolicies::apply,
             registerPush = push::register,
+            protectionBits = guardedPolicies::protectionBits,
+            adoptProtection = guardedPolicies::adoptProtection,
+            forgetIdentity = registration::forget,
         )
         packageGuard.listener = PackageGuard.Listener { pairing.onAppsBlocked(it) }
 

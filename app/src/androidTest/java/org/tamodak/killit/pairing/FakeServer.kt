@@ -76,6 +76,14 @@ class FakeServer(private val now: () -> Long) {
     @Synchronized
     fun linked(a: ByteArray, b: ByteArray): Boolean = setOf(deviceId(a), deviceId(b)) in links
 
+    /** `DELETE /v1/devices/me`: the phone's links and mailbox go; what it sent stays (SPEC.md §5.4). */
+    @Synchronized
+    fun deleteDevice(fp: ByteArray) {
+        val id = deviceId(fp)
+        links.removeAll { id in it }
+        messages.removeAll { it.to == id }
+    }
+
     /** Reverses the order of the messages waiting for [to], as a reordering server would. */
     @Synchronized
     fun reverseMailbox(to: ByteArray) {
@@ -162,6 +170,16 @@ class FakeServer(private val now: () -> Long) {
 
         override suspend fun deleteLink(peerFp: ByteArray): Unit = synchronized(this@FakeServer) {
             links -= setOf(me, deviceId(peerFp))
+        }
+
+        override suspend fun handoverLinks(to: ByteArray): Int = synchronized(this@FakeServer) {
+            reach()
+            val target = deviceId(to)
+            if (target == me) throw ApiError(404, "not_found")
+            if (setOf(me, target) !in links) throw ApiError(403, "not_linked", peers = listOf(target))
+            val fresh = links.filter { me in it && target !in it }.map { (it - me).single() }.filter { setOf(target, it) !in links }
+            fresh.forEach { links += setOf(target, it) }
+            fresh.size
         }
 
         override suspend fun send(messages: List<Pair<ByteArray, ByteArray>>): Int = synchronized(this@FakeServer) {

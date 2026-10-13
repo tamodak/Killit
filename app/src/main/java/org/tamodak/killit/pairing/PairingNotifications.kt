@@ -13,6 +13,7 @@ import org.tamodak.killit.core.canPostNotifications
 import org.tamodak.killit.data.AppLanguage
 import org.tamodak.killit.pairing.store.EventEntity
 import org.tamodak.killit.pairing.store.EventType
+import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.OutgoingRequestEntity
 import org.tamodak.killit.pairing.store.PairingDao
@@ -284,6 +285,20 @@ class PairingNotifications(
                 }
             }
             else -> Unit
+        }
+    }
+
+    override suspend fun peerMoved(pairing: PairingEntity, event: EventEntity) {
+        val text = localised()
+        val model = event.otherName?.ifEmpty { null }
+        val body = if (model != null) text.getString(R.string.notif_moved_text, model) else text.getString(R.string.notif_moved_text_bare)
+        val guarding = pairing.myRole == PairRole.GUARDIAN
+        post("moved:${pairing.pairId.toHex()}", if (guarding) NotificationChannels.GUARD_NEWS else NotificationChannels.MY_PHONE, text) {
+            setContentTitle(text.getString(R.string.notif_moved_title, pairing.nickname))
+            setContentText(body)
+            setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            setCategory(NotificationCompat.CATEGORY_STATUS)
+            setContentIntent(open(if (guarding) Destination.Phone(pairing.pairId.toHex()) else Destination.Guardians))
         }
     }
 

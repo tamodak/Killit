@@ -11,7 +11,8 @@ import kotlinx.coroutines.sync.withLock
  * The clear-data-proof copies of Killit's state, kept in the device owner's own application
  * restrictions: the passkey record, the pending release request, the known-package list, and what
  * pairing must not lose — this phone's guardians, the chances left to ask them, the limits on
- * unlock requests, and whether its guardians may manage its apps.
+ * unlock requests, whether its guardians may manage its apps, and whether its protection moved to
+ * a new phone.
  *
  * ### Why application restrictions, of all places
  *
@@ -335,16 +336,38 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
     override suspend fun writeAppManagement(enabled: Boolean): Boolean = update { putBoolean(KEY_APP_MANAGEMENT, enabled) }
 
     /**
-     * Forgets everything pairing kept here. Called once this phone has no guardians and device
-     * owner is being released.
+     * Reads whether this phone's protection moved to a new phone, which leaves it frozen (PLAN.md
+     * §3.10): its blocks stay, and only releasing device owner ends that. Kept here so Clear data
+     * can't thaw it.
+     *
+     * @return the move, or null when there was none or Killit is not device owner.
      */
-    override suspend fun clearPairing(): Boolean = update {
+    override suspend fun readMovedAway(): MovedAway? {
+        val bundle = dpc.readSelfRestrictions() ?: return null
+        val at = bundle.getMillis(KEY_MOVED_AT) ?: return null
+        return MovedAway(at, bundle.getString(KEY_MOVED_TO).orEmpty())
+    }
+
+    /**
+     * Forgets everything pairing kept here: when device owner is being released, and when this
+     * phone's pairings moved to a new phone.
+     *
+     * @param movedAway written in the same update, for a phone whose guardians moved away, so the
+     *   freeze can't be lost between forgetting them and recording it.
+     */
+    override suspend fun clearPairing(movedAway: MovedAway?): Boolean = update {
         remove(KEY_GUARDIANS)
         remove(KEY_APP_CHANCES)
         remove(KEY_UNLOCK_COOLDOWN_UNTIL)
         remove(KEY_UNLOCK_DAY)
         remove(KEY_UNLOCK_COUNT)
         remove(KEY_APP_MANAGEMENT)
+        remove(KEY_MOVED_AT)
+        remove(KEY_MOVED_TO)
+        if (movedAway != null) {
+            putMillis(KEY_MOVED_AT, movedAway.at)
+            putString(KEY_MOVED_TO, movedAway.toModel)
+        }
     }
 
     /**
@@ -404,6 +427,7 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
         putString(KEY_G_PEER_FP, peerFp.encodeBase64())
         putString(KEY_G_SIGN_PK, peerSignPk.encodeBase64())
         putString(KEY_G_ENC_PK, peerEncPk.encodeBase64())
+        putString(KEY_G_ENC_SIG, peerEncSig.encodeBase64())
         putString(KEY_G_NAME, peerName)
         putString(KEY_G_NICKNAME, nickname)
         putString(KEY_G_MODEL, peerModel)
@@ -419,6 +443,7 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
             peerFp = getString(KEY_G_PEER_FP)?.decodeBase64() ?: return null,
             peerSignPk = getString(KEY_G_SIGN_PK)?.decodeBase64() ?: return null,
             peerEncPk = getString(KEY_G_ENC_PK)?.decodeBase64() ?: return null,
+            peerEncSig = getString(KEY_G_ENC_SIG)?.decodeBase64() ?: return null,
             peerName = getString(KEY_G_NAME) ?: return null,
             nickname = getString(KEY_G_NICKNAME) ?: return null,
             peerModel = getString(KEY_G_MODEL) ?: return null,
@@ -451,6 +476,7 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
         const val KEY_G_PEER_FP = "peer_fp"
         const val KEY_G_SIGN_PK = "sign_pk"
         const val KEY_G_ENC_PK = "enc_pk"
+        const val KEY_G_ENC_SIG = "enc_sig"
         const val KEY_G_NAME = "name"
         const val KEY_G_NICKNAME = "nickname"
         const val KEY_G_MODEL = "model"
@@ -463,6 +489,8 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
         const val KEY_UNLOCK_DAY = "killit_unlock_day"
         const val KEY_UNLOCK_COUNT = "killit_unlock_count"
         const val KEY_APP_MANAGEMENT = "killit_app_management"
+        const val KEY_MOVED_AT = "killit_moved_at"
+        const val KEY_MOVED_TO = "killit_moved_to"
     }
 }
 
@@ -491,8 +519,19 @@ interface DurablePairingStore {
 
     suspend fun writeAppManagement(enabled: Boolean): Boolean
 
-    suspend fun clearPairing(): Boolean
+    /** @return the move that froze this phone, or null; null too when the copy is unavailable. */
+    suspend fun readMovedAway(): MovedAway?
+
+    suspend fun clearPairing(movedAway: MovedAway? = null): Boolean
 }
+
+/**
+ * This phone's protection moved to a new phone (PLAN.md §3.10), which leaves this one frozen.
+ *
+ * @param at when it moved.
+ * @param toModel the new phone's model, to say where the protection went.
+ */
+class MovedAway(val at: Long, val toModel: String)
 
 /**
  * One of this phone's guardians, as [DurableStore] keeps it: everything needed to go on verifying
@@ -503,6 +542,7 @@ class DurableGuardian(
     val peerFp: ByteArray,
     val peerSignPk: ByteArray,
     val peerEncPk: ByteArray,
+    val peerEncSig: ByteArray,
     val peerName: String,
     val nickname: String,
     val peerModel: String,

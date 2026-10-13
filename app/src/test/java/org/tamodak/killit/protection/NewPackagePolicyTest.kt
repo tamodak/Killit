@@ -6,6 +6,7 @@ import org.tamodak.killit.protection.NewPackagePolicy.Decision
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -129,7 +130,102 @@ class NewPackagePolicyTest {
         assertFalse(NewPackagePolicy.isPartOfSystem(pkg(launchable = false)))
     }
 
+    // ---------------------------------------------------------------- moving to a new phone
+
+    /** The old phone hands on every decision but its own system's approvals, and never Killit. */
+    @Test
+    fun aMoveHandsOnEverythingButTheSystemsApprovals() {
+        val known = listOf(
+            known(PackageStatus.APPROVED),
+            KnownPackage(CHROME, CERT, PackageStatus.APPROVED, 1L),
+            KnownPackage(YOUTUBE, CERT, PackageStatus.USER_BLOCKED, 1L),
+            KnownPackage(GONE, CERT, PackageStatus.PENDING, 1L),
+            KnownPackage(OWN_PACKAGE, CERT, PackageStatus.APPROVED, 1L),
+        )
+        val installed = listOf(pkg(launchable = true), pkg(CHROME, system = true, launchable = true), pkg(YOUTUBE, system = true, launchable = true))
+
+        val moved = NewPackagePolicy.decisionsToMove(known, installed, OWN_PACKAGE).map { it.packageName }
+
+        assertEquals(setOf(PACKAGE, YOUTUBE, GONE), moved.toSet())
+    }
+
+    /** Blocked stays blocked and approved stays approved; an app still waiting goes on waiting. */
+    @Test
+    fun aMoveKeepsTheOldPhonesDecisions() {
+        val blocked = "com.example.blocked"
+        val waiting = "com.example.waiting"
+        val plan = adopt(
+            moved = listOf(
+                known(PackageStatus.APPROVED),
+                KnownPackage(blocked, CERT, PackageStatus.USER_BLOCKED, 1L),
+                KnownPackage(waiting, CERT, PackageStatus.PENDING, 1L),
+            ),
+            installed = listOf(pkg(launchable = true), pkg(blocked, launchable = true), pkg(waiting, launchable = true)),
+        )
+
+        assertEquals(setOf(PACKAGE), plan.toAllow)
+        assertEquals(setOf(blocked, waiting), plan.toBlock)
+        assertTrue(plan.newHere.isEmpty())
+        assertEquals(PackageStatus.PENDING, plan.status(waiting))
+        assertTrue(plan.updates.all { it.sinceMillis == NOW })
+    }
+
+    /** An app installed here that the old phone never decided about is new, enabled or not. */
+    @Test
+    fun anAppOnlyOnTheNewPhoneIsNew() {
+        val disabled = "com.example.disabled"
+        val plan = adopt(moved = emptyList(), installed = listOf(pkg(launchable = true), pkg(disabled, enabled = false)))
+
+        assertEquals(listOf(PACKAGE, disabled), plan.newHere)
+        assertEquals(setOf(PACKAGE, disabled), plan.toBlock)
+        assertEquals(PackageStatus.PENDING, plan.status(PACKAGE))
+    }
+
+    /** The new phone's system apps keep what was decided there, unless the old phone blocked them. */
+    @Test
+    fun theNewPhonesSystemAppsStayAsTheyWere() {
+        val plan = adopt(
+            moved = listOf(KnownPackage(YOUTUBE, CERT, PackageStatus.USER_BLOCKED, 1L)),
+            installed = listOf(
+                pkg(CHROME, system = true, launchable = true),
+                pkg(YOUTUBE, system = true, launchable = true),
+                pkg("com.example.overlay", overlay = true),
+            ),
+        )
+
+        assertEquals(setOf(YOUTUBE), plan.toBlock)
+        assertTrue(plan.newHere.isEmpty())
+        assertNull(plan.updates.firstOrNull { it.packageName == CHROME })
+    }
+
+    /** A moved decision counts only for the app decided about, or its rotated key. */
+    @Test
+    fun aMovedDecisionOnlyCountsForTheAppDecidedAbout() {
+        val impostor = adopt(listOf(known(PackageStatus.APPROVED)), listOf(pkg(cert = NEW_CERT, lineage = listOf(NEW_CERT), launchable = true)))
+        assertEquals(listOf(PACKAGE), impostor.newHere)
+        assertTrue(impostor.toAllow.isEmpty())
+
+        val rotated = adopt(listOf(known(PackageStatus.APPROVED)), listOf(pkg(cert = NEW_CERT, lineage = listOf(CERT, NEW_CERT), launchable = true)))
+        assertEquals(setOf(PACKAGE), rotated.toAllow)
+        assertArrayEquals(NEW_CERT, rotated.updates.single().certDigest)
+    }
+
+    /** A decision about an app this phone doesn't have is kept for it, and waits on nobody. */
+    @Test
+    fun aDecisionAboutAMissingAppWaitsForIt() {
+        val plan = adopt(listOf(known(PackageStatus.PENDING), KnownPackage(OWN_PACKAGE, CERT, PackageStatus.USER_BLOCKED, 1L)), installed = emptyList())
+
+        assertEquals(PackageStatus.USER_BLOCKED, plan.status(PACKAGE))
+        assertTrue(plan.toBlock.isEmpty())
+        assertNull("Killit itself is never taken over", plan.updates.firstOrNull { it.packageName == OWN_PACKAGE })
+    }
+
     // ---------------------------------------------------------------- helpers
+
+    private fun adopt(moved: List<KnownPackage>, installed: List<InstalledPackage>) =
+        NewPackagePolicy.adoptMoved(moved, installed, OWN_PACKAGE, NOW)
+
+    private fun NewPackagePolicy.MovePlan.status(name: String) = updates.single { it.packageName == name }.status
 
     /** Runs the policy with Killit's real package name. */
     private fun decide(pkg: InstalledPackage, known: KnownPackage? = null) =
@@ -152,6 +248,10 @@ class NewPackagePolicyTest {
     private companion object {
         const val PACKAGE = "com.example.app"
         const val OWN_PACKAGE = "org.tamodak.killit"
+        const val CHROME = "com.android.chrome"
+        const val YOUTUBE = "com.google.android.youtube"
+        const val GONE = "com.example.gone"
+        const val NOW = 5L
         val CERT = ByteArray(32) { 1 }
         val NEW_CERT = ByteArray(32) { 2 }
     }

@@ -7,10 +7,12 @@ import org.tamodak.killit.core.KillitLog
 import org.tamodak.killit.data.DurableAppChances
 import org.tamodak.killit.data.DurableGuardian
 import org.tamodak.killit.data.DurablePairingStore
+import org.tamodak.killit.data.MovedAway
 import org.tamodak.killit.pairing.store.AppChancesEntity
 import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.pairing.store.PairingDao
 import org.tamodak.killit.pairing.store.PairingEntity
+import org.tamodak.killit.protocol.Bundle
 import org.tamodak.killit.protocol.toHex
 
 /**
@@ -99,6 +101,15 @@ class PairingStore(
         if (dao.pairing(pairId)?.myRole == PairRole.PROTECTED) writeGuardians()
     }
 
+    /**
+     * A HANDOVER (SPEC.md §11.13): the pairing now belongs to the peer's new phone. The copy of a
+     * guardian is rewritten too, so Clear data restores the guardian this phone trusts now.
+     */
+    suspend fun replacePeer(pairId: ByteArray, peerFp: ByteArray, bundle: Bundle, model: String) = lock.withLock {
+        dao.replacePeer(pairId, peerFp, bundle.signPk, bundle.encPk, bundle.encSig, model)
+        if (dao.pairing(pairId)?.myRole == PairRole.PROTECTED) writeGuardians()
+    }
+
     /** Sets how many more times this phone may ask to remove a guardian (G8). */
     suspend fun setUnpairChances(pairId: ByteArray, chances: Int) = lock.withLock {
         dao.setUnpairChances(pairId, chances)
@@ -112,6 +123,13 @@ class PairingStore(
      */
     suspend fun appChances(packageName: String, certDigest: ByteArray): Int =
         dao.appChances(packageName, certDigest) ?: MAX_CHANCES
+
+    /** Takes the chance counters a move brought (SPEC.md §11.14), in both copies, in one write. */
+    suspend fun setAllAppChances(rows: List<AppChancesEntity>) = lock.withLock {
+        if (rows.isEmpty()) return@withLock
+        dao.upsertAppChances(rows)
+        if (durable.isAvailable()) durable.writeAppChances(dao.appChances().map { it.toDurable() })
+    }
 
     /** Sets the UNBLOCK_APP chances left for an app and certificate, in both copies. */
     suspend fun setAppChances(packageName: String, certDigest: ByteArray, chances: Int) = lock.withLock {
@@ -128,10 +146,17 @@ class PairingStore(
         if (durable.isAvailable()) durable.clearPairing()
     }
 
-    /** Forgets every pairing and counter, in both copies. Used when device owner is released. */
-    suspend fun clear() = lock.withLock {
+    /**
+     * Forgets every pairing and counter, in both copies: what an old phone does once its pairings
+     * belong to a new one (SPEC.md §11.14).
+     *
+     * @param movedAway set when the phone had guardians: it stays frozen, recorded in the same
+     *   durable write that forgets the guardians. If that write fails, the durable guardians come
+     *   back at the next [reconcile], so the phone is never left with neither.
+     */
+    suspend fun clear(movedAway: MovedAway?) = lock.withLock {
         dao.clearAll()
-        if (durable.isAvailable()) durable.clearPairing()
+        if (durable.isAvailable()) durable.clearPairing(movedAway)
         KillitLog.i(KillitLog.PAIR, "Every pairing forgotten")
     }
 
@@ -182,6 +207,7 @@ class PairingStore(
         peerFp = peerFp,
         peerSignPk = peerSignPk,
         peerEncPk = peerEncPk,
+        peerEncSig = peerEncSig,
         peerName = peerName,
         nickname = nickname,
         peerModel = peerModel,
@@ -195,6 +221,7 @@ class PairingStore(
         peerFp = peerFp,
         peerSignPk = peerSignPk,
         peerEncPk = peerEncPk,
+        peerEncSig = peerEncSig,
         myRole = PairRole.PROTECTED,
         peerName = peerName,
         nickname = nickname,

@@ -34,6 +34,9 @@ interface PairingServer {
 
     suspend fun deleteLink(peerFp: ByteArray)
 
+    /** Copies this phone's links to the new phone of a move (SPEC.md §7). */
+    suspend fun handoverLinks(to: ByteArray): Int
+
     suspend fun send(messages: List<Pair<ByteArray, ByteArray>>): Int
 
     suspend fun fetch(waitSeconds: Int = 0): List<InboxMessage>

@@ -53,6 +53,24 @@ class Registration(
         register()
     }
 
+    /**
+     * Deletes this phone's registration and identity, once its pairings moved to a new phone
+     * (SPEC.md §11.14): no peer trusts the key any more. Pairing again later registers a new one.
+     *
+     * Deleting the server's record is best effort. A record left behind has no links the pairs
+     * still want, since they delete theirs when they take the handover, and its key is gone.
+     */
+    suspend fun forget() = lock.withLock {
+        try {
+            api.deleteDevice()
+        } catch (e: IOException) {
+            KillitLog.w(KillitLog.KEYS, "Deleting this phone's registration failed: ${e.message}")
+        }
+        keys.destroy()
+        prefs.setRegistered(null)
+        KillitLog.i(KillitLog.KEYS, "Identity forgotten after moving")
+    }
+
     private suspend fun register(): DeviceKeys.Identity {
         val challenge = try {
             api.challenge().challenge.fromBase64Url(CHALLENGE_BYTES).also { if (it.size != CHALLENGE_BYTES) throw DecodeException("size") }

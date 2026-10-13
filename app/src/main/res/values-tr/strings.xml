@@ -517,4 +517,25 @@
     <string name="event_app_unblocked_by_you">%1$s uygulamasının engelini kaldırdın</string>
     <string name="event_app_refused">Android, %1$s uygulamasını engellemedi</string>
     <string name="notif_app_unblocked_by_guardians">Koruyucuların engelini kaldırdı.</string>
+
+    <!-- ============================== Moving to a new phone: history, notices, failures (PLAN.md §3.10) ============================== -->
+    <string name="event_moved">Yeni telefona geçti: %1$s</string>
+    <string name="event_moved_bare">Yeni telefona geçti</string>
+    <string name="event_guardian_moved">%1$s yeni telefona geçti</string>
+    <string name="event_moved_here">Eski telefondan buraya taşındı</string>
+    <string name="notif_moved_title">%1$s yeni telefona geçti</string>
+    <string name="notif_moved_text">Artık %1$s kullanıyor. Adın yanındaki resim de telefonla birlikte değişti; böyle olması gerekiyor.</string>
+    <string name="notif_moved_text_bare">Adın yanındaki resim de telefonla birlikte değişti; böyle olması gerekiyor.</string>
+    <string name="wizard_failed_wrong_purpose">Bu kod eşleşme için değil, yeni telefona taşınmak içindi.</string>
+    <string name="move_failed_wrong_purpose">Bu kod taşınmak için değil, eşleşme içindi. Taşınmayı yeni telefonda başlat.</string>
+    <string name="move_failed_not_device_owner">Yeni telefon koruyucularını alamaz: önce Killit onu bir şifreyle korumalı.</string>
+    <string name="move_failed_has_pairings">Yeni telefonun zaten eşleşmeleri var. Taşınmak için hiç eşleşmesi olmayan bir telefon gerekir.</string>
+    <string name="move_failed_abandoned">Eski telefon taşınmaktan vazgeçti. Hiçbir şey taşınmadı.</string>
+    <string name="move_failed_declined">Yeni telefon taşınmaktan vazgeçti. Hiçbir şey taşınmadı.</string>
+    <string name="move_failed_changed">Taşınırken bir eşleşme değişti, bu yüzden hiçbir şey taşınmadı. Yeniden başla.</string>
+    <string name="move_failed_expired">Süre doldu, bu yüzden hiçbir şey taşınmadı. Yeniden başla.</string>
+    <string name="move_failed_invalid">Diğer telefonla ilgili bir şey doğrulanamadı, bu yüzden hiçbir şey taşınmadı.</string>
+    <string name="move_failed_limit">Yeni telefon zaten çok fazla telefona bağlı.</string>
+    <string name="move_failed_cancelled">Taşınma iptal edildi. Hiçbir şey taşınmadı.</string>
+    <string name="move_failed_mismatch">Kodlar eşleşmedi, bu yüzden hiçbir şey taşınmadı. Biri araya giriyor olabilir. Yeniden başla.</string>
 </resources>

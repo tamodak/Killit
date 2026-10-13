@@ -71,6 +71,10 @@ object PairingTexts {
                     AppChange.REFUSED, null -> text.getString(R.string.event_app_refused, app)
                 }
             }
+            EventType.MOVED -> event.otherName?.ifEmpty { null }?.let { text.getString(R.string.event_moved, it) }
+                ?: text.getString(R.string.event_moved_bare)
+            EventType.GUARDIAN_MOVED -> text.getString(R.string.event_guardian_moved, event.otherName.orEmpty())
+            EventType.MOVED_HERE -> text.getString(R.string.event_moved_here)
             EventType.UNKNOWN_NOTICE -> text.getString(R.string.update_needed)
         }
     }

@@ -56,6 +56,37 @@ enum class Vote { WAITING, APPROVED, DENIED }
 enum class CeremonySide { CREATOR, JOINER }
 
 /**
+ * What a ceremony is for (SPEC.md §6.5): pairing two people's phones, or moving one person's
+ * pairings from an old phone to a new one. The new phone creates the move's invite and the old
+ * one joins it.
+ */
+enum class CeremonyPurpose { PAIR, MOVE }
+
+/** How far a move has come once its ceremony linked the two phones (SPEC.md §11.14). */
+enum class MoveStage {
+    /** Old phone: waiting for the new phone's MOVE_REQUEST. */
+    AWAITING_REQUEST,
+
+    /** Old phone: its state is on its way; waiting for the new phone's answer. */
+    AWAITING_ANSWER,
+
+    /** New phone: MOVE_REQUEST sent; waiting for the old phone's state. */
+    AWAITING_STATE,
+
+    /**
+     * Old phone: the new phone is ready, and the user may confirm. New phone: the state is
+     * checked and staged; waiting for the old phone to commit.
+     */
+    READY,
+
+    /** Old phone: the pairs and the new phone are being told; it forgets everything once that is sent. */
+    COMMITTING,
+
+    /** Both: done. */
+    MOVED,
+}
+
+/**
  * How far a pairing ceremony has come. The creator and the joiner pass through the steps in a
  * different order; [org.tamodak.killit.pairing.CeremonyEngine] documents both.
  */
@@ -110,6 +141,21 @@ enum class CeremonyFailure {
 
     /** One of the phones already has as many links as the server allows. */
     LINK_LIMIT,
+
+    /** A move met a pairing, or a pairing a move: the code was meant for the other. */
+    WRONG_PURPOSE,
+
+    /** A move of a phone with guardians, to a phone that can't take them: it isn't device owner. */
+    NOT_DEVICE_OWNER,
+
+    /** A move to a phone that has pairings already: a move needs a phone without any. */
+    HAS_PAIRINGS,
+
+    /** The old phone gave the move up. */
+    ABANDONED,
+
+    /** A pairing came or went on the old phone while it was moving; the move starts again. */
+    PAIRINGS_CHANGED,
 }
 
 /** What the local history records (PLAN.md I10: 90 days). */
@@ -133,6 +179,15 @@ enum class EventType {
      * [org.tamodak.killit.protocol.AppChange] code, `flag` true when this phone was that guardian.
      */
     APP_MANAGED,
+
+    /** The peer moved to a new phone (SPEC.md §11.13); `value` is unused, `otherName` holds its model. */
+    MOVED,
+
+    /** Another guardian of the guarded phone moved to a new phone (B6): `otherName` is that guardian. */
+    GUARDIAN_MOVED,
+
+    /** This phone took the pairing over from an old phone (SPEC.md §11.14). */
+    MOVED_HERE,
 
     /** A NOTICE with a code this version doesn't know (E-F1). */
     UNKNOWN_NOTICE,

@@ -12,11 +12,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.tamodak.killit.core.KillitLog
+import org.tamodak.killit.data.KnownPackage
 import org.tamodak.killit.data.PackageStatus
 import org.tamodak.killit.protection.PackageGuard
 import org.tamodak.killit.protection.PackageScanner
 import org.tamodak.killit.protection.RemoteBlock
 import org.tamodak.killit.protocol.AppInfo
+import org.tamodak.killit.protocol.AppRef
 import org.tamodak.killit.protocol.AppState
 import org.tamodak.killit.protocol.ICON_SIDE
 import org.tamodak.killit.protocol.LIST_ICON_SIDE
@@ -65,6 +67,24 @@ class GuardAppBlocker(
 
     override suspend fun blockRemotely(packageName: String, certDigest: ByteArray): RemoteBlock =
         guard.blockRemotely(packageName, certDigest)
+
+    override suspend fun decisionsToMove(): List<Pair<AppRef, AppState>> =
+        guard.decisionsToMove().map { AppRef(it.packageName, it.certDigest) to it.status.toAppState() }
+
+    override suspend fun adoptMoved(decisions: List<Pair<AppRef, AppState>>): List<String> =
+        guard.adoptMoved(decisions.map { (app, state) -> KnownPackage(app.packageName, app.certDigest, state.toStatus(), 0L) })
+
+    private fun PackageStatus.toAppState(): AppState = when (this) {
+        PackageStatus.APPROVED -> AppState.ALLOWED
+        PackageStatus.USER_BLOCKED -> AppState.BLOCKED
+        PackageStatus.PENDING -> AppState.NEW
+    }
+
+    private fun AppState.toStatus(): PackageStatus = when (this) {
+        AppState.ALLOWED -> PackageStatus.APPROVED
+        AppState.BLOCKED -> PackageStatus.USER_BLOCKED
+        AppState.NEW -> PackageStatus.PENDING
+    }
 
     override suspend fun listForGuardians(): List<ListedApp> = withContext(io) {
         val own = appContext.packageName

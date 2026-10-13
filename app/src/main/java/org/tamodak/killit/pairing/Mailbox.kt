@@ -77,8 +77,8 @@ class Mailbox(
     /**
      * A message that passed every check (SPEC.md §10.3 steps 1–8).
      *
-     * @param pairing the pairing it belongs to; null for PAIR_OFFER and PAIR_ANSWER, which belong
-     *   to [ceremony].
+     * @param pairing the pairing it belongs to; null for the ceremony kinds (PAIR_OFFER and
+     *   PAIR_ANSWER, and the four of a move), which belong to [ceremony].
      */
     class Received(
         val header: MessageHeader,
@@ -222,8 +222,8 @@ class Mailbox(
         val header = opened.header
         if (header.version != MESSAGE_VERSION) return keepUnknown(header, opened, pairings.firstOrNull())
 
-        // 5. The pair id names a pairing with this sender, or the ceremony for the pairing kinds.
-        val ceremonyKind = header.kind == Kind.PAIR_OFFER || header.kind == Kind.PAIR_ANSWER
+        // 5. The pair id names a pairing with this sender, or the ceremony for the ceremony kinds.
+        val ceremonyKind = Kind.isCeremonyKind(header.kind)
         val pairing = if (ceremonyKind) null else pairings.firstOrNull { it.pairId.contentEquals(header.pairId) }
         val signPk = if (ceremonyKind) {
             if (ceremony?.pairId?.contentEquals(header.pairId) != true) return "pair id is not the ceremony's"

@@ -93,6 +93,7 @@ class LiveUnlock(
         val id: Long,
         val requestId: ByteArray,
         val nonce: ByteArray,
+        val explanation: String,
         val votes: MutableMap<String, GuardianVote>,
     )
 
@@ -132,6 +133,7 @@ class LiveUnlock(
             id = nextSessionId++,
             requestId = randomBytes(REQUEST_ID_BYTES),
             nonce = randomBytes(SESSION_NONCE_BYTES),
+            explanation = text,
             votes = guardians.associateTo(LinkedHashMap()) { it.pairId.toHex() to GuardianVote(it.pairId, it.nickname, Vote.WAITING, "") },
         )
         dao.insertPendingUnlock(PendingUnlockEntity(current.requestId, now()))
@@ -200,6 +202,19 @@ class LiveUnlock(
         } else {
             evaluate(current)
         }
+    }
+
+    /**
+     * A guardian moved to a new phone while the user waits (SPEC.md §11.13): the request goes to the
+     * new phone too, which never saw it, unless the guardian has answered already.
+     *
+     * @param guardian the pairing, already handed over.
+     */
+    suspend fun onGuardianMoved(guardian: PairingEntity) {
+        val current = session ?: return
+        if (current.votes[guardian.pairId.toHex()]?.vote != Vote.WAITING) return
+        val count = current.votes.size.coerceIn(1, MAX_GUARDIANS)
+        mailbox.post(guardian, MessageBody.Unlock(current.requestId, current.nonce, current.explanation, count))
     }
 
     /**

@@ -35,6 +35,9 @@ interface PairingNotifier {
     /** Guardian side: a NOTICE arrived (D1, A4, B5, C8, H6). */
     suspend fun noticeArrived(from: PairingEntity, event: EventEntity) {}
 
+    /** A peer moved to a new phone (SPEC.md §11.13); [event] is the history line. */
+    suspend fun peerMoved(pairing: PairingEntity, event: EventEntity) {}
+
     /** Guardian side: a guarded phone has been silent for too long (H8). */
     suspend fun silence(pairing: PairingEntity) {}
 

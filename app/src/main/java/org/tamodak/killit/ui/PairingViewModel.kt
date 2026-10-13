@@ -183,7 +183,7 @@ class PairingViewModel(
 
     fun rejectCode() = act { engine.ceremony.reject() }
 
-    fun cancelCeremony() = act { engine.ceremony.cancel() }
+    fun cancelCeremony() = act { engine.cancelCeremony() }
 
     fun setNickname(name: String) = act { engine.ceremony.setNickname(name.trim()) }
 
