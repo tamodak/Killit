@@ -3,6 +3,7 @@ package org.tamodak.killit.pairing
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.delay
 import org.tamodak.killit.data.DurableAppChances
 import org.tamodak.killit.data.DurableGuardian
 import org.tamodak.killit.data.DurablePairingStore
@@ -196,6 +197,9 @@ class FakeDurable(var available: Boolean = true) : DurablePairingStore {
     var appManagement = false
     var movedAway: MovedAway? = null
 
+    /** How long [clearPairing] takes, as a real write through system_server can. */
+    var clearDelayMillis = 0L
+
     override suspend fun isAvailable() = available
 
     override suspend fun readMovedAway() = if (available) movedAway else null
@@ -229,6 +233,7 @@ class FakeDurable(var available: Boolean = true) : DurablePairingStore {
     }
 
     override suspend fun clearPairing(movedAway: MovedAway?): Boolean {
+        if (clearDelayMillis > 0) delay(clearDelayMillis)
         guardians = emptyList()
         chances = emptyList()
         limits = null

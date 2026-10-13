@@ -152,11 +152,12 @@ class PairingStore(
      *
      * @param movedAway set when the phone had guardians: it stays frozen, recorded in the same
      *   durable write that forgets the guardians. If that write fails, the durable guardians come
-     *   back at the next [reconcile], so the phone is never left with neither.
+     *   back at the next [reconcile], so the phone is never left with neither. It goes first: the
+     *   screens see the guardians go from the local tables, and must find the freeze already there.
      */
     suspend fun clear(movedAway: MovedAway?) = lock.withLock {
-        dao.clearAll()
         if (durable.isAvailable()) durable.clearPairing(movedAway)
+        dao.clearAll()
         KillitLog.i(KillitLog.PAIR, "Every pairing forgotten")
     }
 

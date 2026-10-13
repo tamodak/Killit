@@ -218,13 +218,17 @@ class LockOnLeaveTest {
         awaitState { it.releaseRequest != null }
     }
 
-    /** Guardians that move away don't leave their phone free: the session gains no full control. */
+    /**
+     * Guardians that move away don't leave their phone free: the session gains no full control,
+     * even while the durable write that freezes the phone takes its time.
+     */
     @Test
     fun guardiansMovingAwayDoNotFreeThePhone(): Unit = runBlocking {
         phone.dao.upsertPairing(guardian())
         unlock()
         assertFalse(viewModel.state.value.fullControl)
 
+        phone.durable.clearDelayMillis = 500
         phone.store.clear(MovedAway(at = 1_790_000_000_000L, toModel = "Test Ali 2"))
         awaitState { it.guardianCount == 0 }
         assertFalse(viewModel.state.value.fullControl)
