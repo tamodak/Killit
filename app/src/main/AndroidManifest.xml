@@ -180,10 +180,18 @@
             </intent-filter>
         </service>
 
-        <!-- No FCM token until the first pairing asks for one (Push.register). -->
+        <!--
+            FCM reaches Killit by its Firebase Installation ID (SPEC.md §9), which firebase-messaging
+            26 only does when asked to. Nothing is registered until the first pairing asks
+            (Push.register).
+        -->
+        <meta-data
+            android:name="firebase_messaging_installation_id_enabled"
+            android:value="true" />
         <meta-data
             android:name="firebase_messaging_auto_init_enabled"
             android:value="false" />
+
 
         <!--
             Shizuku's own provider, which brokers the connection to its server. Declared verbatim as

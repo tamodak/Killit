@@ -39,11 +39,13 @@ class PushService : FirebaseMessagingService() {
 
     /** FCM registered this phone, or registered it anew: the next sync tells the server. */
     override fun onRegistered(fid: String) {
+        KillitLog.d(KillitLog.SYNC) { "FCM registered this phone" }
         runBlocking { ServiceLocator.push.received(fid) }
         PairingSync.soon(applicationContext)
     }
 
     override fun onUnregistered(fid: String) {
+        KillitLog.d(KillitLog.SYNC) { "FCM dropped this phone's registration" }
         runBlocking { ServiceLocator.push.dropped() }
         PairingSync.soon(applicationContext)
     }

@@ -3,6 +3,8 @@ package org.tamodak.killit.pairing
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.tamodak.killit.core.KillitLog
 
 /**
@@ -27,6 +29,15 @@ class Push(
 ) {
     private val appContext = context.applicationContext
 
+    /** One registration at a time, so two syncs don't both send the same id. */
+    private val lock = Mutex()
+
+    /**
+     * Whether this process already asked FCM to register. Once is enough: from then on FCM retries
+     * by itself, and a phone without Play services would only fail the same way on every sync.
+     */
+    private var asked = false
+
     /** True when this build has a Firebase project to receive pushes through. */
     val available: Boolean get() = FirebaseApp.getApps(appContext).isNotEmpty()
 
@@ -39,16 +50,19 @@ class Push(
      *
      * @throws java.io.IOException when the server can't be reached; the next sync tries again.
      */
-    suspend fun register() {
-        if (!available) return
+    suspend fun register() = lock.withLock {
+        if (!available) return@withLock
         val messaging = FirebaseMessaging.getInstance()
         if (!messaging.isAutoInitEnabled) messaging.isAutoInitEnabled = true
         val fid = prefs.fid()
         if (fid == null) {
-            messaging.register()
-            return
+            if (asked) return@withLock
+            asked = true
+            KillitLog.d(KillitLog.SYNC) { "Asking FCM to register this phone" }
+            messaging.register().addOnFailureListener { KillitLog.w(KillitLog.SYNC, "FCM registration failed", it) }
+            return@withLock
         }
-        if (fid == prefs.sentFid()) return
+        if (fid == prefs.sentFid()) return@withLock
         upload(fid)
         prefs.setSentFid(fid)
         // The id itself is never logged: with the server's FCM credential it reaches this phone.
