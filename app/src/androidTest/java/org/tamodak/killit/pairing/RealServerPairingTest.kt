@@ -18,14 +18,16 @@ import org.junit.runner.RunWith
 import org.tamodak.killit.data.db.KillitDatabase
 import org.tamodak.killit.net.ApiClient
 import org.tamodak.killit.pairing.store.CeremonyStage
+import org.tamodak.killit.pairing.store.MoveStage
 import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.pairing.store.RequestState
 import org.tamodak.killit.protocol.deviceId
 import org.tamodak.killit.protocol.fromBase64Url
 
 /**
- * Two identities on this device pair through a real server and settle a request, end to end:
- * Keystore attestation, signed requests, the invite ceremony, links and the mailbox.
+ * Identities on this device pair through a real server and settle a request, end to end:
+ * Keystore attestation, signed requests, the invite ceremony, links and the mailbox; and they move
+ * to new phones, which the server hands their links to (SPEC.md §7, §11.14).
  *
  * Needs a development server (`KILLIT_ENV=development`, `ATTESTATION_DEV_ACCEPT_ANY_ROOT=true`,
  * the debug certificate's digest, `API_AUDIENCE` matching below), and is skipped without one:
@@ -54,16 +56,28 @@ class RealServerPairingTest {
         val api = ApiClient(baseUrl!!, audience!!, identity = { keys.current() })
         val database: KillitDatabase = Room.inMemoryDatabaseBuilder(context, KillitDatabase::class.java).build()
         val apps = FakeApps()
+        val durable = FakeDurable()
+
+        /** True once this phone deleted its registration and identity after moving away. */
+        var forgotten = false
+
         val engine = PairingEngine(
-            store = PairingStore(database.pairing(), FakeDurable()),
+            store = PairingStore(database.pairing(), durable),
             server = api,
             identity = { identity },
             apps = apps,
-            durable = FakeDurable(),
+            durable = durable,
             notifier = RecordingNotifier(),
             config = PairingEngine.Config("Test $name", 30L * 24 * 60 * 60 * 1000, 300_000, 6, 7L * 24 * 60 * 60 * 1000, listAnswersPerHour = 4),
             canBeProtected = { true },
+            forgetIdentity = {
+                api.deleteDevice()
+                keys.destroy()
+                forgotten = true
+            },
         )
+
+        val dao get() = database.pairing()
 
         suspend fun register() {
             keys.destroy()
@@ -87,43 +101,107 @@ class RealServerPairingTest {
         }
     }
 
+    /** Three phones, each with its registered identity. */
+    private suspend fun phones(vararg names: String): List<RealPhone> =
+        names.map { name -> RealPhone("killit_e2e_${name.lowercase().replace(' ', '_')}", name).also { phones += it; it.register() } }
+
+    /** [guardian] shows the code, [protected] types it, and both confirm. */
+    private suspend fun pair(guardian: RealPhone, protected: RealPhone) {
+        guardian.engine.ceremony.create(PairRole.GUARDIAN, guardian.name)
+        val code = guardian.dao.ceremony()!!.code!!
+        assertEquals(CeremonyEngine.JoinResult.JOINED, protected.engine.ceremony.join(code, PairRole.PROTECTED, protected.name))
+        guardian.engine.followCeremony(0)
+        protected.engine.followCeremony(0)
+        guardian.engine.followCeremony(0)
+        val onGuardian = guardian.dao.ceremony()!!
+        assertEquals(CeremonyStage.COMPARING, onGuardian.stage)
+        assertEquals(onGuardian.safetyCode, protected.dao.ceremony()!!.safetyCode)
+        guardian.engine.ceremony.confirm()
+        protected.engine.ceremony.confirm()
+        guardian.engine.followCeremony(0)
+        protected.engine.sync()
+        guardian.engine.sync()
+    }
+
+    /** Moves [from] to [to]: the ceremony, the state, the user's confirmation and the handover. */
+    private suspend fun move(from: RealPhone, to: RealPhone) {
+        to.engine.startMoveIn()
+        assertEquals(CeremonyEngine.JoinResult.JOINED, from.engine.startMoveOut(to.dao.ceremony()!!.code!!))
+        to.engine.followCeremony(0)
+        from.engine.followCeremony(0)
+        to.engine.followCeremony(0)
+        assertEquals(to.dao.ceremony()!!.safetyCode, from.dao.ceremony()!!.safetyCode)
+        to.engine.ceremony.confirm()
+        from.engine.ceremony.confirm()
+        to.engine.followCeremony(0)
+        from.engine.sync()
+        to.engine.sync()
+        from.engine.sync()
+        assertEquals(MoveStage.READY, from.dao.ceremony()!!.moveStage)
+        assertEquals(PairingEngine.MoveCommitResult.COMMITTED, from.engine.commitMove())
+        assertTrue("the old phone lets go once the commit is out", from.forgotten)
+        assertTrue(from.dao.pairings().isEmpty())
+    }
+
+    /** [protected] asks to unblock an app, [guardian] approves, and the app opens. */
+    private suspend fun approveAnUnblock(guardian: RealPhone, protected: RealPhone) {
+        protected.apps.install("com.example.game")
+        assertTrue(protected.engine.askToUnblock("com.example.game", "My club posts its news there.") is RequestEngine.AskResult.Sent)
+        guardian.engine.sync()
+        val request = guardian.dao.observeIncoming().first().single { it.state.isOpen }
+        assertTrue(guardian.engine.decide(request.pairId, request.requestId, approve = true, note = "Fine."))
+        protected.engine.sync()
+        assertEquals(RequestState.APPROVED, protected.dao.observeOutgoing().first().first().request.state)
+        assertTrue("com.example.game" in protected.apps.unblocked)
+    }
+
     @Test
     fun pairAndApproveThroughTheServer(): Unit = runBlocking {
-        val mom = RealPhone("killit_e2e_mom", "Mom").also { phones += it }
-        val ali = RealPhone("killit_e2e_ali", "Ali").also { phones += it }
-        mom.register()
-        ali.register()
+        val (mom, ali) = phones("Mom", "Ali")
         assertEquals(deviceId(mom.identity.fp), mom.api.me().device)
-
-        mom.engine.ceremony.create(PairRole.GUARDIAN, "Mom")
-        val code = mom.database.pairing().ceremony()!!.code!!
-        assertEquals(CeremonyEngine.JoinResult.JOINED, ali.engine.ceremony.join(code, PairRole.PROTECTED, "Ali"))
-        mom.engine.followCeremony(0)
-        ali.engine.followCeremony(0)
-        mom.engine.followCeremony(0)
-        val onMom = mom.database.pairing().ceremony()!!
-        val onAli = ali.database.pairing().ceremony()!!
-        assertEquals(CeremonyStage.COMPARING, onMom.stage)
-        assertEquals(onMom.safetyCode, onAli.safetyCode)
-        mom.engine.ceremony.confirm()
-        ali.engine.ceremony.confirm()
-        mom.engine.followCeremony(0)
-        ali.engine.sync()
-        mom.engine.sync()
+        pair(mom, ali)
         val pairing = mom.database.pairing().pairings().single()
         assertArrayEquals(pairing.pairId, ali.database.pairing().pairings().single().pairId)
         assertEquals(PairRole.GUARDIAN, pairing.myRole)
 
-        ali.apps.install("com.example.game")
-        assertTrue(ali.engine.askToUnblock("com.example.game", "My club posts its news there.") is RequestEngine.AskResult.Sent)
-        mom.engine.sync()
-        val request = mom.database.pairing().observeIncoming().first().single()
-        assertTrue(mom.engine.decide(request.pairId, request.requestId, approve = true, note = "Fine."))
-        ali.engine.sync()
-        assertEquals(RequestState.APPROVED, ali.database.pairing().observeOutgoing().first().single().request.state)
-        assertEquals(listOf("com.example.game"), ali.apps.unblocked)
+        approveAnUnblock(mom, ali)
 
         mom.engine.refreshLastSeen()
         assertEquals(0, mom.database.pairing().pairings().single().lastSeenDaysAgo)
+    }
+
+    /** A guardian moves to a new phone; the server hands it the links, and it guards on. */
+    @Test
+    fun aGuardianMovesThroughTheServer(): Unit = runBlocking {
+        val (mom, ali, momNew) = phones("Mom", "Ali", "Mom 2")
+        pair(mom, ali)
+        move(from = mom, to = momNew)
+
+        ali.engine.sync()
+        momNew.engine.sync()
+        assertArrayEquals(momNew.identity.fp, ali.dao.guardians().single().peerFp)
+        assertEquals(PairRole.GUARDIAN, momNew.dao.pairings().single().myRole)
+        // The old phone deleted itself, its links with it; Ali's link is to the new phone now.
+        val peers = ali.api.links().map { it.peer.fromBase64Url(32) }
+        assertTrue(peers.any { it.contentEquals(momNew.identity.fp) })
+        assertTrue(peers.none { it.contentEquals(mom.identity.fp) })
+        approveAnUnblock(momNew, ali)
+    }
+
+    /** A protected phone moves to a new phone, which its guardian then guards. */
+    @Test
+    fun aProtectedPhoneMovesThroughTheServer(): Unit = runBlocking {
+        val (mom, ali, aliNew) = phones("Mom", "Ali", "Ali 2")
+        pair(mom, ali)
+        ali.apps.install("com.example.chat")
+        move(from = ali, to = aliNew)
+        assertTrue("a guarded phone stays frozen", ali.engine.isFrozen())
+
+        mom.engine.sync()
+        aliNew.engine.sync()
+        assertArrayEquals(aliNew.identity.fp, mom.dao.wards().single().peerFp)
+        assertEquals(PairRole.PROTECTED, aliNew.dao.pairings().single().myRole)
+        assertTrue("com.example.chat" in aliNew.apps.blocked)
+        approveAnUnblock(mom, aliNew)
     }
 }
