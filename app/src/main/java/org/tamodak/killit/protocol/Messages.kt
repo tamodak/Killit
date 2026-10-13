@@ -17,22 +17,37 @@ object Kind {
     const val LEAVE = 0x15
     const val UNPAIRED = 0x16
     const val NOTICE = 0x20
+    const val LIST_REQUEST = 0x30
+    const val APP_LIST = 0x31
+    const val MANAGE = 0x32
+    const val GUARDIAN_UNBLOCK = 0x33
+    const val HANDOVER = 0x34
+    const val MOVE_REQUEST = 0x35
+    const val MOVE_STATE = 0x36
+    const val MOVE_ANSWER = 0x37
+    const val MOVE_DONE = 0x38
 
     /** True for a kind this version understands. Anything else is kept and shown as "Update Killit". */
     fun isKnown(kind: Int): Boolean = allowedSender(kind) != null
 
     /**
-     * Who may send a kind, by role in the pairing the header names (SPEC.md §10.3 step 8); null
-     * for a kind this version doesn't know.
+     * Who may send a kind (SPEC.md §10.3 step 8): by role in the pairing the header names, or, for
+     * the ceremony kinds, by part in the ceremony. Null for a kind this version doesn't know.
      */
     fun allowedSender(kind: Int): Sender? = when (kind) {
-        PAIR_OFFER -> Sender.CREATOR
-        PAIR_ANSWER -> Sender.JOINER
-        UNBLOCK_APP, UNLOCK, UNPAIR, STATUS, UNPAIRED -> Sender.PROTECTED
-        DECISION, LEAVE -> Sender.GUARDIAN
-        NOTICE -> Sender.EITHER
+        PAIR_OFFER, MOVE_REQUEST, MOVE_ANSWER -> Sender.CREATOR
+        PAIR_ANSWER, MOVE_STATE, MOVE_DONE -> Sender.JOINER
+        UNBLOCK_APP, UNLOCK, UNPAIR, STATUS, UNPAIRED, APP_LIST, GUARDIAN_UNBLOCK -> Sender.PROTECTED
+        DECISION, LEAVE, LIST_REQUEST, MANAGE -> Sender.GUARDIAN
+        NOTICE, HANDOVER -> Sender.EITHER
         else -> null
     }
+
+    /**
+     * True for the kinds two phones exchange in a ceremony, before any pairing exists between
+     * them: their header names the ceremony's pair id (SPEC.md §10.3 step 5).
+     */
+    fun isCeremonyKind(kind: Int): Boolean = allowedSender(kind).let { it == Sender.CREATOR || it == Sender.JOINER }
 }
 
 /** The side of a pairing a kind may come from. The ceremony kinds go by who created the invite. */
@@ -91,6 +106,7 @@ enum class RequestKind(override val code: Int) : WireCode {
     UNBLOCK_APP(Kind.UNBLOCK_APP),
     UNLOCK(Kind.UNLOCK),
     UNPAIR(Kind.UNPAIR),
+    GUARDIAN_UNBLOCK(Kind.GUARDIAN_UNBLOCK),
 }
 
 /** NOTICE codes (SPEC.md §11.9). */
@@ -102,7 +118,39 @@ object NoticeCode {
     const val RELEASE_CANCELLED = 0x0005
     const val PROTECTION_CHANGED = 0x0006
     const val MANAGEMENT_CHANGED = 0x0007
+    const val APP_MANAGED = 0x0008
+    const val GUARDIAN_MOVED = 0x0009
 }
+
+/** An app's state in an APP_LIST or a MOVE_STATE (SPEC.md §11.10, §11.14). */
+enum class AppState(override val code: Int) : WireCode {
+    ALLOWED(1),
+    BLOCKED(2),
+
+    /** Blocked by default-blocking; nobody has decided about it yet. */
+    NEW(3),
+}
+
+/** What a MANAGE asks for one app (SPEC.md §11.11). */
+enum class Desired(override val code: Int) : WireCode { ALLOWED(1), BLOCKED(2) }
+
+/** What NOTICE APP_MANAGED reports. [REFUSED]: Android wouldn't suspend the package. */
+enum class AppChange(override val code: Int) : WireCode { BLOCKED(1), UNBLOCKED(2), REFUSED(3) }
+
+/** A MOVE_ANSWER's answer (SPEC.md §11.14). */
+enum class MoveAnswerCode(override val code: Int) : WireCode { READY(1), DECLINE(2) }
+
+/** Why a MOVE_ANSWER declines; [NONE] exactly when it is READY. */
+enum class MoveDeclineReason(override val code: Int) : WireCode {
+    NONE(0),
+    USER(1),
+    NOT_DEVICE_OWNER(2),
+    HAS_PAIRINGS(3),
+    INVALID(4),
+}
+
+/** How a move ended, from the old phone's side. */
+enum class MoveOutcome(override val code: Int) : WireCode { COMMITTED(1), ABANDONED(2) }
 
 /** Length of a request id. */
 const val REQUEST_ID_BYTES = 16
@@ -128,6 +176,31 @@ const val MAX_STATUS_ENTRIES = 40
 /** The most chances an UNBLOCK_APP or UNPAIR can have left. */
 const val MAX_CHANCES = 3
 
+/** An APP_LIST icon is this many pixels on each side (SPEC.md §11.10). */
+const val LIST_ICON_SIDE = 16
+
+/** 16 × 16 RGBA8888. */
+const val LIST_ICON_BYTES = LIST_ICON_SIDE * LIST_ICON_SIDE * 4
+
+/** The `iconFormat` codes: a request's 32 × 32 icon, and a list's 16 × 16 one. */
+const val ICON_FORMAT_REQUEST = 1
+const val ICON_FORMAT_LIST = 2
+
+/** Length of an APP_LIST's list id and of a move's move id. */
+const val LIST_ID_BYTES = 16
+const val MOVE_ID_BYTES = 16
+
+/** Apps in one MANAGE: 25 of the longest still fit in one body. */
+const val MAX_MANAGE_APPS = 25
+
+/** The longest app list, and the most pairings and apps one move carries (SPEC.md §13). */
+const val MAX_LISTED_APPS = 1000
+const val MAX_MOVED_PAIRINGS = 100
+const val MAX_MOVED_APPS = 4000
+
+/** The protection options are bits 0–5 of MOVE_STATE's `protection`, bit (option − 1) each. */
+const val PROTECTION_BITS = 0b0011_1111
+
 /** An app, as a request binds it: its package and signing-certificate digest. */
 class AppRef(val packageName: String, val certDigest: ByteArray)
 
@@ -149,13 +222,62 @@ class AppInfo(
     val ref: AppRef get() = AppRef(packageName, certDigest)
 }
 
+/**
+ * One app in an APP_LIST (SPEC.md §11.10).
+ *
+ * @param installer the installer's package name, or empty when unknown or sideloaded.
+ * @param icon 16 × 16 RGBA8888 pixels, rows top to bottom, not premultiplied; null when there's none.
+ */
+class ListedApp(
+    val packageName: String,
+    val certDigest: ByteArray,
+    val label: String,
+    val installer: String,
+    val firstInstalled: Long,
+    val state: AppState,
+    val icon: ByteArray?,
+) {
+    val ref: AppRef get() = AppRef(packageName, certDigest)
+}
+
+/** One app a MANAGE changes, and what it should be (SPEC.md §11.11). */
+class ManageEntry(val app: AppRef, val desired: Desired)
+
+/**
+ * One pairing a move hands over, as the old phone holds it (SPEC.md §11.14).
+ *
+ * @param role the old phone's side of the pairing.
+ * @param appManagement the peer's setting when the old phone guards it; always false otherwise.
+ * @param unpairChances the old phone's chances to remove this guardian (G8); always 0 when the old
+ *   phone is the guardian.
+ */
+class MovedPairing(
+    val pairId: ByteArray,
+    val role: Role,
+    val peer: Bundle,
+    val peerName: String,
+    val nickname: String,
+    val peerModel: String,
+    val appManagement: Boolean,
+    val unpairChances: Int,
+    val createdAt: Long,
+)
+
+/** One decision about an app a move hands over, with the chances the app has left (D4). */
+class MovedApp(val app: AppRef, val state: AppState, val chancesLeft: Int)
+
 /** What a DECISION binds: the request's own target, by kind (SPEC.md §11.6). */
 sealed interface DecisionTarget {
     val requestKind: RequestKind
 
-    /** An UNBLOCK_APP's app, down to its signing certificate. */
-    class App(val app: AppRef) : DecisionTarget {
-        override val requestKind: RequestKind get() = RequestKind.UNBLOCK_APP
+    /**
+     * The app of an UNBLOCK_APP or a GUARDIAN_UNBLOCK, down to its signing certificate. The kind
+     * is part of what is signed, so an approval of one can't count for the other.
+     */
+    class App(val app: AppRef, override val requestKind: RequestKind = RequestKind.UNBLOCK_APP) : DecisionTarget {
+        init {
+            require(requestKind == RequestKind.UNBLOCK_APP || requestKind == RequestKind.GUARDIAN_UNBLOCK) { "not a request about an app" }
+        }
     }
 
     /** An UNLOCK's session: a decision for a session the phone has left counts for nothing. */
@@ -202,6 +324,22 @@ sealed interface NoticeBody {
 
     class ManagementChanged(val enabled: Boolean) : NoticeBody {
         override val code: Int get() = NoticeCode.MANAGEMENT_CHANGED
+    }
+
+    /** A guardian's MANAGE changed an app; [guardianName] is that guardian's own name. */
+    class AppManaged(
+        val app: AppRef,
+        val label: String,
+        val change: AppChange,
+        val guardianFp: ByteArray,
+        val guardianName: String,
+    ) : NoticeBody {
+        override val code: Int get() = NoticeCode.APP_MANAGED
+    }
+
+    /** One of the other guardians moved to a new phone, now called [guardianFp] (B6). */
+    class GuardianMoved(val guardianFp: ByteArray, val guardianName: String) : NoticeBody {
+        override val code: Int get() = NoticeCode.GUARDIAN_MOVED
     }
 
     /** A code this version doesn't know. Received ones are kept with their parameters unparsed; none is ever sent. */
@@ -295,6 +433,58 @@ sealed interface MessageBody {
     class Notice(val notice: NoticeBody) : MessageBody {
         override val kind: Int get() = Kind.NOTICE
     }
+
+    class ListRequest(val listId: ByteArray) : MessageBody {
+        override val kind: Int get() = Kind.LIST_REQUEST
+    }
+
+    /** One page of the list that answers a LIST_REQUEST. */
+    class AppList(val listId: ByteArray, val page: Int, val pageCount: Int, val apps: List<ListedApp>) : MessageBody {
+        override val kind: Int get() = Kind.APP_LIST
+    }
+
+    class Manage(val seq: Long, val entries: List<ManageEntry>) : MessageBody {
+        override val kind: Int get() = Kind.MANAGE
+    }
+
+    class GuardianUnblock(
+        val requestId: ByteArray,
+        val app: AppInfo,
+        val proposerFp: ByteArray,
+        val proposerName: String,
+        val guardianCount: Int,
+    ) : MessageBody {
+        override val kind: Int get() = Kind.GUARDIAN_UNBLOCK
+    }
+
+    class Handover(val newBundle: Bundle, val deviceModel: String) : MessageBody {
+        override val kind: Int get() = Kind.HANDOVER
+    }
+
+    class MoveRequest(val deviceModel: String, val deviceOwner: Boolean) : MessageBody {
+        override val kind: Int get() = Kind.MOVE_REQUEST
+    }
+
+    /** One page of a move's state; [protection] holds bit (option − 1) for each option that is on. */
+    class MoveState(
+        val moveId: ByteArray,
+        val page: Int,
+        val pageCount: Int,
+        val appManagement: Boolean,
+        val protection: Int,
+        val pairings: List<MovedPairing>,
+        val apps: List<MovedApp>,
+    ) : MessageBody {
+        override val kind: Int get() = Kind.MOVE_STATE
+    }
+
+    class MoveAnswer(val moveId: ByteArray, val answer: MoveAnswerCode, val reason: MoveDeclineReason) : MessageBody {
+        override val kind: Int get() = Kind.MOVE_ANSWER
+    }
+
+    class MoveDone(val moveId: ByteArray, val outcome: MoveOutcome) : MessageBody {
+        override val kind: Int get() = Kind.MOVE_DONE
+    }
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -344,6 +534,62 @@ private fun ByteReader.appInfo(): AppInfo {
 
 private fun checkCount(value: Int, min: Int, max: Int, what: String) {
     require(value in min..max) { "$what out of range" }
+}
+
+private fun ByteWriter.listedApp(app: ListedApp): ByteWriter {
+    appRef(app.ref)
+    text(app.label, TextRule.APP_LABEL)
+    packageName(app.installer, allowEmpty = true)
+    u64(app.firstInstalled)
+    code(app.state)
+    val icon = app.icon
+    return if (icon == null) u8(0) else u8(ICON_FORMAT_LIST).fixed(icon, LIST_ICON_BYTES)
+}
+
+private fun ByteReader.listedApp(): ListedApp {
+    val ref = appRef()
+    val label = text(TextRule.APP_LABEL)
+    val installer = packageName(allowEmpty = true)
+    val firstInstalled = u64()
+    val state = oneOf(AppState.entries, "app state")
+    val icon = when (u8()) {
+        0 -> null
+        ICON_FORMAT_LIST -> fixed(LIST_ICON_BYTES)
+        else -> throw DecodeException("invalid icon format")
+    }
+    return ListedApp(ref.packageName, ref.certDigest, label, installer, firstInstalled, state, icon)
+}
+
+private fun ByteWriter.movedPairing(pairing: MovedPairing): ByteWriter =
+    fixed(pairing.pairId, PAIR_ID_BYTES)
+        .code(pairing.role)
+        .raw(encodeBundle(pairing.peer))
+        .text(pairing.peerName, TextRule.SELF_NAME)
+        .text(pairing.nickname, TextRule.SELF_NAME)
+        .text(pairing.peerModel, TextRule.DEVICE_MODEL)
+        .bool(pairing.appManagement)
+        .u8(pairing.unpairChances)
+        .u64(pairing.createdAt)
+
+private fun ByteReader.movedPairing(): MovedPairing {
+    val pairId = fixed(PAIR_ID_BYTES)
+    val role = oneOf(Role.entries, "role")
+    val peer = bundle()
+    val peerName = text(TextRule.SELF_NAME)
+    val nickname = text(TextRule.SELF_NAME)
+    val peerModel = text(TextRule.DEVICE_MODEL)
+    // Both fields belong to the protected side of the pairing: the setting is the peer's when the
+    // old phone guards it, and the chances to remove a guardian are the old phone's when it is the
+    // one guarded. Each is zero on the other side.
+    val appManagement = bool()
+    if (role == Role.PROTECTED && appManagement) throw DecodeException("the guarded side states no app-management setting")
+    val unpairChances = inRange(0, if (role == Role.PROTECTED) MAX_CHANCES else 0, "unpairChances")
+    return MovedPairing(pairId, role, peer, peerName, nickname, peerModel, appManagement, unpairChances, u64())
+}
+
+/** Refuses a list that names one package twice. */
+private fun checkUniquePackages(packageNames: List<String>) {
+    if (packageNames.toSet().size != packageNames.size) throw DecodeException("a package appears twice")
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -425,6 +671,52 @@ fun encodeBody(body: MessageBody): ByteArray {
         MessageBody.Leave -> Unit
         is MessageBody.Unpaired -> writer.code(body.how)
         is MessageBody.Notice -> writer.notice(body.notice)
+        is MessageBody.ListRequest -> writer.fixed(body.listId, LIST_ID_BYTES)
+        is MessageBody.AppList -> {
+            checkCount(body.pageCount, 1, 255, "pageCount")
+            checkCount(body.page, 0, body.pageCount - 1, "page")
+            checkCount(body.apps.size, if (body.pageCount == 1) 0 else 1, 255, "apps on a page")
+            writer.fixed(body.listId, LIST_ID_BYTES).u8(body.page).u8(body.pageCount).u8(body.apps.size)
+            body.apps.forEach { writer.listedApp(it) }
+        }
+        is MessageBody.Manage -> {
+            require(body.seq >= 1) { "seq out of range" }
+            checkCount(body.entries.size, 1, MAX_MANAGE_APPS, "apps in a MANAGE")
+            writer.u64(body.seq).u8(body.entries.size)
+            body.entries.forEach { writer.appRef(it.app).code(it.desired) }
+        }
+        is MessageBody.GuardianUnblock -> {
+            checkCount(body.guardianCount, 1, MAX_GUARDIANS, "guardianCount")
+            writer.fixed(body.requestId, REQUEST_ID_BYTES)
+                .appInfo(body.app)
+                .fixed(body.proposerFp, FINGERPRINT_BYTES)
+                .text(body.proposerName, TextRule.SELF_NAME)
+                .u8(body.guardianCount)
+        }
+        is MessageBody.Handover -> writer.raw(encodeBundle(body.newBundle)).text(body.deviceModel, TextRule.DEVICE_MODEL)
+        is MessageBody.MoveRequest -> writer.text(body.deviceModel, TextRule.DEVICE_MODEL).bool(body.deviceOwner)
+        is MessageBody.MoveState -> {
+            checkCount(body.pageCount, 1, 255, "pageCount")
+            checkCount(body.page, 0, body.pageCount - 1, "page")
+            checkCount(body.pairings.size, 0, 255, "pairings on a page")
+            checkCount(body.apps.size, 0, 0xFFFF, "apps on a page")
+            writer.fixed(body.moveId, MOVE_ID_BYTES)
+                .u8(body.page)
+                .u8(body.pageCount)
+                .bool(body.appManagement)
+                .u8(body.protection)
+                .u8(body.pairings.size)
+            body.pairings.forEach { writer.movedPairing(it) }
+            writer.u16(body.apps.size)
+            body.apps.forEach { writer.appRef(it.app).code(it.state).u8(it.chancesLeft) }
+        }
+        is MessageBody.MoveAnswer -> {
+            require((body.answer == MoveAnswerCode.READY) == (body.reason == MoveDeclineReason.NONE)) {
+                "READY has no reason; DECLINE needs one"
+            }
+            writer.fixed(body.moveId, MOVE_ID_BYTES).code(body.answer).code(body.reason)
+        }
+        is MessageBody.MoveDone -> writer.fixed(body.moveId, MOVE_ID_BYTES).code(body.outcome)
     }
     val bytes = writer.finish()
     val check = decodeBody(body.kind, bytes)
@@ -453,6 +745,13 @@ private fun ByteWriter.notice(notice: NoticeBody): ByteWriter {
         NoticeBody.ReleaseCancelled -> this
         is NoticeBody.ProtectionChanged -> code(notice.option).bool(notice.enabled)
         is NoticeBody.ManagementChanged -> bool(notice.enabled)
+        is NoticeBody.AppManaged ->
+            appRef(notice.app)
+                .text(notice.label, TextRule.APP_LABEL)
+                .code(notice.change)
+                .fixed(notice.guardianFp, FINGERPRINT_BYTES)
+                .text(notice.guardianName, TextRule.SELF_NAME)
+        is NoticeBody.GuardianMoved -> fixed(notice.guardianFp, FINGERPRINT_BYTES).text(notice.guardianName, TextRule.SELF_NAME)
         is NoticeBody.Unknown -> this
     }
 }
@@ -543,11 +842,64 @@ private fun ByteReader.body(kind: Int): MessageBody = when (kind) {
     Kind.LEAVE -> MessageBody.Leave
     Kind.UNPAIRED -> MessageBody.Unpaired(oneOf(UnpairedHow.entries, "how"))
     Kind.NOTICE -> MessageBody.Notice(notice())
+    Kind.LIST_REQUEST -> MessageBody.ListRequest(fixed(LIST_ID_BYTES))
+    Kind.APP_LIST -> {
+        val listId = fixed(LIST_ID_BYTES)
+        val page = u8()
+        val pageCount = inRange(1, 255, "pageCount")
+        if (page >= pageCount) throw DecodeException("page out of range")
+        // An empty page only stands for an empty list, which has a single page.
+        val count = inRange(if (pageCount == 1) 0 else 1, 255, "apps on a page")
+        val apps = List(count) { listedApp() }
+        checkUniquePackages(apps.map { it.packageName })
+        MessageBody.AppList(listId, page, pageCount, apps)
+    }
+    Kind.MANAGE -> {
+        val seq = u64()
+        if (seq < 1) throw DecodeException("seq out of range")
+        val count = inRange(1, MAX_MANAGE_APPS, "apps in a MANAGE")
+        val entries = List(count) { ManageEntry(appRef(), oneOf(Desired.entries, "desired")) }
+        checkUniquePackages(entries.map { it.app.packageName })
+        MessageBody.Manage(seq, entries)
+    }
+    Kind.GUARDIAN_UNBLOCK -> MessageBody.GuardianUnblock(
+        requestId = fixed(REQUEST_ID_BYTES),
+        app = appInfo(),
+        proposerFp = fixed(FINGERPRINT_BYTES),
+        proposerName = text(TextRule.SELF_NAME),
+        guardianCount = inRange(1, MAX_GUARDIANS, "guardianCount"),
+    )
+    Kind.HANDOVER -> MessageBody.Handover(bundle(), text(TextRule.DEVICE_MODEL))
+    Kind.MOVE_REQUEST -> MessageBody.MoveRequest(text(TextRule.DEVICE_MODEL), bool())
+    Kind.MOVE_STATE -> {
+        val moveId = fixed(MOVE_ID_BYTES)
+        val page = u8()
+        val pageCount = inRange(1, 255, "pageCount")
+        if (page >= pageCount) throw DecodeException("page out of range")
+        val appManagement = bool()
+        val protection = u8()
+        if (protection and PROTECTION_BITS.inv() != 0) throw DecodeException("unknown protection option")
+        val pairings = List(u8()) { movedPairing() }
+        val apps = List(u16()) { MovedApp(appRef(), oneOf(AppState.entries, "app state"), inRange(0, MAX_CHANCES, "chancesLeft")) }
+        if (pairings.map { it.pairId.toHex() }.toSet().size != pairings.size) throw DecodeException("a pairing appears twice")
+        checkUniquePackages(apps.map { it.app.packageName })
+        MessageBody.MoveState(moveId, page, pageCount, appManagement, protection, pairings, apps)
+    }
+    Kind.MOVE_ANSWER -> {
+        val moveId = fixed(MOVE_ID_BYTES)
+        val answer = oneOf(MoveAnswerCode.entries, "answer")
+        val reason = oneOf(
+            if (answer == MoveAnswerCode.READY) listOf(MoveDeclineReason.NONE) else MoveDeclineReason.entries - MoveDeclineReason.NONE,
+            "decline reason",
+        )
+        MessageBody.MoveAnswer(moveId, answer, reason)
+    }
+    Kind.MOVE_DONE -> MessageBody.MoveDone(fixed(MOVE_ID_BYTES), oneOf(MoveOutcome.entries, "outcome"))
     else -> throw DecodeException("unknown kind")
 }
 
-private fun ByteReader.decisionTarget(): DecisionTarget = when (oneOf(RequestKind.entries, "request kind")) {
-    RequestKind.UNBLOCK_APP -> DecisionTarget.App(appRef())
+private fun ByteReader.decisionTarget(): DecisionTarget = when (val kind = oneOf(RequestKind.entries, "request kind")) {
+    RequestKind.UNBLOCK_APP, RequestKind.GUARDIAN_UNBLOCK -> DecisionTarget.App(appRef(), kind)
     RequestKind.UNLOCK -> DecisionTarget.Session(fixed(SESSION_NONCE_BYTES))
     RequestKind.UNPAIR -> DecisionTarget.Pairing(fixed(PAIR_ID_BYTES))
 }
@@ -561,6 +913,14 @@ private fun ByteReader.notice(): NoticeBody = when (val code = u16()) {
     NoticeCode.RELEASE_CANCELLED -> NoticeBody.ReleaseCancelled
     NoticeCode.PROTECTION_CHANGED -> NoticeBody.ProtectionChanged(oneOf(ProtectionOption.entries, "protection option"), bool())
     NoticeCode.MANAGEMENT_CHANGED -> NoticeBody.ManagementChanged(bool())
+    NoticeCode.APP_MANAGED -> NoticeBody.AppManaged(
+        app = appRef(),
+        label = text(TextRule.APP_LABEL),
+        change = oneOf(AppChange.entries, "change"),
+        guardianFp = fixed(FINGERPRINT_BYTES),
+        guardianName = text(TextRule.SELF_NAME),
+    )
+    NoticeCode.GUARDIAN_MOVED -> NoticeBody.GuardianMoved(fixed(FINGERPRINT_BYTES), text(TextRule.SELF_NAME))
     else -> NoticeBody.Unknown(code, rest())
 }
 

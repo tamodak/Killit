@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -156,14 +157,90 @@ class MessageVectorsTest {
             MessageBody.Status(ByteArray(16), RequestKind.UNLOCK, Outcome.OPEN, CancelReason.WITHDRAWN, emptyList()),
             MessageBody.Notice(NoticeBody.Unknown(0x0100, byteArrayOf(1))),
             MessageBody.Decision(ByteArray(16), DecisionTarget.Session(ByteArray(32)), Verdict.DENY, " padded"),
+            MessageBody.AppList(ByteArray(16), page = 1, pageCount = 2, apps = emptyList()),
+            MessageBody.AppList(ByteArray(16), page = 2, pageCount = 2, apps = emptyList()),
+            MessageBody.Manage(seq = 0, entries = listOf(ManageEntry(AppRef("com.example", ByteArray(32)), Desired.BLOCKED))),
+            MessageBody.Manage(seq = 1, entries = emptyList()),
+            MessageBody.Manage(
+                seq = 1,
+                entries = List(2) { ManageEntry(AppRef("com.example", ByteArray(32)), Desired.BLOCKED) },
+            ),
+            MessageBody.MoveAnswer(ByteArray(16), MoveAnswerCode.READY, MoveDeclineReason.USER),
+            MessageBody.MoveAnswer(ByteArray(16), MoveAnswerCode.DECLINE, MoveDeclineReason.NONE),
+            MessageBody.MoveState(ByteArray(16), page = 0, pageCount = 1, appManagement = false, protection = 0x40, emptyList(), emptyList()),
         )
         for (body in invalid) {
             assertTrue(body::class.simpleName!!, runCatching { encodeBody(body) }.exceptionOrNull() is IllegalArgumentException)
         }
     }
 
-    private fun JsonObject.toDecisionTarget(): DecisionTarget = when (int("requestKind")) {
-        Kind.UNBLOCK_APP -> DecisionTarget.App(AppRef(obj("app").str("packageName"), obj("app").hex("certDigest")))
+    /** Each case puts APP_LIST pages back together to the reference's outcome (SPEC.md §11.10). */
+    @Test
+    fun listAssemblies() {
+        for (element in vectors.array("listAssemblies")) {
+            val case = element.obj
+            val name = case.str("name")
+            val pages = case.array("pages").map { decodeBody(Kind.APP_LIST, it.jsonPrimitive.content.fromHex()).ok(name) as MessageBody.AppList }
+            val result = assembleAppList(pages)
+            assertEquals(name, case.str("outcome"), result.outcome())
+            if (result is Assembly.Complete) {
+                assertEquals(name, case.array("packages").map { it.jsonPrimitive.content }, result.value.map { it.packageName })
+            }
+        }
+    }
+
+    /** Each case puts MOVE_STATE pages back together to the reference's outcome (SPEC.md §11.14). */
+    @Test
+    fun moveAssemblies() {
+        for (element in vectors.array("moveAssemblies")) {
+            val case = element.obj
+            val name = case.str("name")
+            val pages = case.array("pages").map { decodeBody(Kind.MOVE_STATE, it.jsonPrimitive.content.fromHex()).ok(name) as MessageBody.MoveState }
+            val result = assembleMoveState(pages, Vectors.phone(case.str("newPhone")).fp, Vectors.phone(case.str("oldPhone")).fp)
+            assertEquals(name, case.str("outcome"), result.outcome())
+            if (result is Assembly.Complete) {
+                assertEquals(name, case.array("pairIds").map { it.jsonPrimitive.content }, result.value.pairings.map { it.pairId.toHex() })
+                assertEquals(name, case.array("packages").map { it.jsonPrimitive.content }, result.value.apps.map { it.app.packageName })
+            }
+        }
+    }
+
+    /** What packing produces always fits, and comes back whole. */
+    @Test
+    fun pagingRoundTrips() {
+        val apps = List(60) { i ->
+            ListedApp("org.example.app${59 - i}", ByteArray(32) { i.toByte() }, "App $i", "com.android.vending", 0L, AppState.ALLOWED, ByteArray(LIST_ICON_BYTES))
+        }
+        val pages = pageAppList(ByteArray(16), apps)
+        assertTrue(pages.size > 1)
+        pages.forEach { assertTrue(encodeBody(it).size <= MAX_BODY_BYTES) }
+        val assembled = assembleAppList(pages.map { decodeBody(Kind.APP_LIST, encodeBody(it)).ok() as MessageBody.AppList })
+        assertEquals(apps.map { it.packageName }.sorted(), (assembled as Assembly.Complete).value.map { it.packageName })
+
+        val b = Vectors.phone("B")
+        val bundle = decodeBundle(b.bundle).ok()
+        val pairings = List(40) { i ->
+            MovedPairing(ByteArray(32) { i.toByte() }, Role.GUARDIAN, bundle, "Ali", "Ali", "", appManagement = false, unpairChances = 0, createdAt = 0L)
+        }
+        val state = MovedState(ByteArray(16), appManagement = false, protection = 0, pairings = pairings, apps = emptyList())
+        val movePages = pageMoveState(state)
+        assertTrue(movePages.size > 1)
+        movePages.forEach { assertTrue(encodeBody(it).size <= MAX_BODY_BYTES) }
+        val moved = assembleMoveState(movePages, Vectors.phone("D").fp, Vectors.phone("A").fp)
+        assertEquals(pairings.map { it.pairId.toHex() }, (moved as Assembly.Complete).value.pairings.map { it.pairId.toHex() })
+    }
+
+    private fun Assembly<*>.outcome(): String = when (this) {
+        is Assembly.Complete -> "complete"
+        is Assembly.Incomplete -> "incomplete"
+        is Assembly.Invalid -> "invalid"
+    }
+
+    private fun JsonObject.toDecisionTarget(): DecisionTarget = when (val kind = int("requestKind")) {
+        Kind.UNBLOCK_APP, Kind.GUARDIAN_UNBLOCK -> DecisionTarget.App(
+            AppRef(obj("app").str("packageName"), obj("app").hex("certDigest")),
+            RequestKind.entries.first { it.code == kind },
+        )
         Kind.UNLOCK -> DecisionTarget.Session(hex("sessionNonce"))
         Kind.UNPAIR -> DecisionTarget.Pairing(hex("targetPairId"))
         else -> throw AssertionError("not a request kind")
@@ -188,6 +265,34 @@ private fun AppInfo.toJson() = buildJsonObject {
     put("installer", installer)
     put("firstInstalled", firstInstalled)
     put("icon", icon?.json() ?: JsonNull)
+}
+
+private fun Bundle.toJson() = buildJsonObject {
+    put("signPk", signPk.json())
+    put("encPk", encPk.json())
+    put("encSig", encSig.json())
+}
+
+private fun ListedApp.toJson() = buildJsonObject {
+    put("packageName", packageName)
+    put("certDigest", certDigest.json())
+    put("label", label)
+    put("installer", installer)
+    put("firstInstalled", firstInstalled)
+    put("state", state.code)
+    put("icon", icon?.json() ?: JsonNull)
+}
+
+private fun MovedPairing.toJson() = buildJsonObject {
+    put("pairId", pairId.json())
+    put("role", role.code)
+    put("peer", peer.toJson())
+    put("peerName", peerName)
+    put("nickname", nickname)
+    put("peerModel", peerModel)
+    put("appManagement", appManagement)
+    put("unpairChances", unpairChances)
+    put("createdAt", createdAt)
 }
 
 private fun DecisionTarget.toJson() = buildJsonObject {
@@ -222,6 +327,17 @@ private fun NoticeBody.toJson() = buildJsonObject {
             put("enabled", notice.enabled)
         }
         is NoticeBody.ManagementChanged -> put("enabled", notice.enabled)
+        is NoticeBody.AppManaged -> {
+            put("app", notice.app.toJson())
+            put("label", notice.label)
+            put("change", notice.change.code)
+            put("guardianFp", notice.guardianFp.json())
+            put("guardianName", notice.guardianName)
+        }
+        is NoticeBody.GuardianMoved -> {
+            put("guardianFp", notice.guardianFp.json())
+            put("guardianName", notice.guardianName)
+        }
         is NoticeBody.Unknown -> {
             put("unknown", true)
             put("params", notice.params.json())
@@ -294,5 +410,72 @@ private fun MessageBody.toJson(): JsonElement = buildJsonObject {
         MessageBody.Leave -> Unit
         is MessageBody.Unpaired -> put("how", body.how.code)
         is MessageBody.Notice -> put("notice", body.notice.toJson())
+        is MessageBody.ListRequest -> put("listId", body.listId.json())
+        is MessageBody.AppList -> {
+            put("listId", body.listId.json())
+            put("page", body.page)
+            put("pageCount", body.pageCount)
+            put("apps", JsonArray(body.apps.map { it.toJson() }))
+        }
+        is MessageBody.Manage -> {
+            put("seq", body.seq)
+            put(
+                "entries",
+                JsonArray(
+                    body.entries.map { entry ->
+                        buildJsonObject {
+                            put("packageName", entry.app.packageName)
+                            put("certDigest", entry.app.certDigest.json())
+                            put("desired", entry.desired.code)
+                        }
+                    },
+                ),
+            )
+        }
+        is MessageBody.GuardianUnblock -> {
+            put("requestId", body.requestId.json())
+            put("app", body.app.toJson())
+            put("proposerFp", body.proposerFp.json())
+            put("proposerName", body.proposerName)
+            put("guardianCount", body.guardianCount)
+        }
+        is MessageBody.Handover -> {
+            put("newBundle", body.newBundle.toJson())
+            put("deviceModel", body.deviceModel)
+        }
+        is MessageBody.MoveRequest -> {
+            put("deviceModel", body.deviceModel)
+            put("deviceOwner", body.deviceOwner)
+        }
+        is MessageBody.MoveState -> {
+            put("moveId", body.moveId.json())
+            put("page", body.page)
+            put("pageCount", body.pageCount)
+            put("appManagement", body.appManagement)
+            put("protection", body.protection)
+            put("pairings", JsonArray(body.pairings.map { it.toJson() }))
+            put(
+                "apps",
+                JsonArray(
+                    body.apps.map { app ->
+                        buildJsonObject {
+                            put("packageName", app.app.packageName)
+                            put("certDigest", app.app.certDigest.json())
+                            put("state", app.state.code)
+                            put("chancesLeft", app.chancesLeft)
+                        }
+                    },
+                ),
+            )
+        }
+        is MessageBody.MoveAnswer -> {
+            put("moveId", body.moveId.json())
+            put("answer", body.answer.code)
+            put("reason", body.reason.code)
+        }
+        is MessageBody.MoveDone -> {
+            put("moveId", body.moveId.json())
+            put("outcome", body.outcome.code)
+        }
     }
 }

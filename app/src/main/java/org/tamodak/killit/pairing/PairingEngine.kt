@@ -128,6 +128,9 @@ class PairingEngine(
             MessageBody.Leave -> peers.onLeave(received)
             is MessageBody.Unpaired -> peers.onUnpaired(received)
             is MessageBody.Notice -> peers.onNotice(received)
+            is MessageBody.ListRequest, is MessageBody.AppList, is MessageBody.Manage, is MessageBody.GuardianUnblock,
+            is MessageBody.Handover, is MessageBody.MoveRequest, is MessageBody.MoveState, is MessageBody.MoveAnswer,
+            is MessageBody.MoveDone -> Unit
         }
     }
 

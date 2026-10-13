@@ -132,6 +132,7 @@ class PeerList(
                 event(EventType.PROTECTION_CHANGED, pairing, value = notice.option.code, flag = notice.enabled)
             is NoticeBody.ManagementChanged -> event(EventType.MANAGEMENT_CHANGED, pairing, flag = notice.enabled)
             is NoticeBody.Unknown -> event(EventType.UNKNOWN_NOTICE, pairing, value = notice.code)
+            is NoticeBody.AppManaged, is NoticeBody.GuardianMoved -> return
         }
         dao.insertEvent(event)
         if (event.type == EventType.UNKNOWN_NOTICE) notifier.updateNeeded() else notifier.noticeArrived(pairing, event)
