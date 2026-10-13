@@ -12,6 +12,7 @@ import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.PairingEntity
 import org.tamodak.killit.pairing.store.RequestType
 import org.tamodak.killit.pairing.store.StatusEntries
+import org.tamodak.killit.protocol.AppChange
 import org.tamodak.killit.protocol.ProtectionOption
 import org.tamodak.killit.protocol.RemovedHow
 import org.tamodak.killit.protocol.toHex
@@ -54,14 +55,42 @@ object PairingTexts {
             EventType.REQUEST_APPROVED -> text.getString(R.string.event_request_approved, app)
             EventType.REQUEST_DENIED -> text.getString(R.string.event_request_denied, app)
             EventType.REQUEST_CANCELLED -> text.getString(R.string.event_request_cancelled, app)
+            EventType.APP_MANAGED -> {
+                val mine = event.flag == true
+                when (AppChange.entries.firstOrNull { it.code == event.value }) {
+                    AppChange.BLOCKED -> if (mine) {
+                        text.getString(R.string.event_app_blocked_by_you, app)
+                    } else {
+                        text.getString(R.string.event_app_blocked_by, event.otherName.orEmpty(), app)
+                    }
+                    AppChange.UNBLOCKED -> if (mine) {
+                        text.getString(R.string.event_app_unblocked_by_you, app)
+                    } else {
+                        text.getString(R.string.event_app_unblocked_by, event.otherName.orEmpty(), app)
+                    }
+                    AppChange.REFUSED, null -> text.getString(R.string.event_app_refused, app)
+                }
+            }
             EventType.UNKNOWN_NOTICE -> text.getString(R.string.update_needed)
         }
     }
 
-    /** "Ali wants to unblock TikTok", "…wants to unlock Killit", "…wants to remove Dad / you". */
+    /**
+     * "Ali wants to unblock TikTok", "…wants to unlock Killit", "…wants to remove Dad / you", and
+     * "Mom is unblocking TikTok for Ali" when a guardian's unblock needs the others (G2).
+     */
     fun request(text: Context, request: IncomingRequestEntity, from: PairingEntity): String = when (request.type) {
         RequestType.UNBLOCK_APP ->
             text.getString(R.string.request_unblock, from.nickname, request.appLabel?.ifEmpty { null } ?: request.packageName.orEmpty())
+        RequestType.GUARDIAN_UNBLOCK -> {
+            val app = request.appLabel?.ifEmpty { null } ?: request.packageName.orEmpty()
+            if (request.proposedByMe) {
+                text.getString(R.string.request_guardian_unblock_mine, app, from.nickname)
+            } else {
+                // The proposer by its own name, which the guarded phone can't edit (SPEC.md §11.12).
+                text.getString(R.string.request_guardian_unblock, request.proposerName.orEmpty(), app, from.nickname)
+            }
+        }
         RequestType.UNLOCK -> text.getString(R.string.request_unlock, from.nickname)
         RequestType.UNPAIR -> {
             // The guardian to remove is named by the protected phone's STATUS, in its own words.

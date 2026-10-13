@@ -25,6 +25,7 @@ import org.tamodak.killit.ui.components.KillitBody
 import org.tamodak.killit.ui.components.KillitDangerButton
 import org.tamodak.killit.ui.components.KillitDialog
 import org.tamodak.killit.ui.components.KillitGutter
+import org.tamodak.killit.ui.components.KillitRow
 import org.tamodak.killit.ui.components.KillitScreen
 import org.tamodak.killit.ui.components.KillitSectionTitle
 import org.tamodak.killit.ui.components.KillitTextButton
@@ -32,13 +33,14 @@ import org.tamodak.killit.ui.components.formatWhen
 import org.tamodak.killit.ui.myphone.PeerHeader
 import org.tamodak.killit.ui.myphone.RenameDialog
 import org.tamodak.killit.ui.theme.KillitForeground
+import org.tamodak.killit.ui.theme.KillitIcons
 import org.tamodak.killit.ui.theme.KillitRed
 import org.tamodak.killit.ui.theme.KillitTextFaint
 
 /**
- * One guarded phone (PLAN.md §15.6): its name on this phone, its requests, its history (I10), and
- * Stop guarding — immediate and needing nobody's approval, so it is confirmed with Cancel the
- * wider button.
+ * One guarded phone (PLAN.md §15.6): its name on this phone, its apps when it lets its guardians
+ * manage them (§3.8), its requests, its history (I10), and Stop guarding — immediate and needing
+ * nobody's approval, so it is confirmed with Cancel the wider button.
  */
 @Composable
 fun PhoneScreen(
@@ -48,6 +50,7 @@ fun PhoneScreen(
     onOpenRequest: (String, String) -> Unit,
     onRename: (String, String) -> Unit,
     onLeave: (String) -> Unit,
+    onManageApps: () -> Unit,
 ) {
     BackHandler(onBack = onBack)
     val ward = pairing.pairing(pairIdHex)
@@ -65,6 +68,17 @@ fun PhoneScreen(
             }
             PeerHeader(ward)
             KillitTextButton(text = stringResource(R.string.rename), onClick = { renaming = true })
+
+            if (ward.appManagement) {
+                KillitRow(
+                    title = stringResource(R.string.phone_manage_apps),
+                    subtitle = stringResource(R.string.phone_manage_apps_desc),
+                    icon = KillitIcons.Package,
+                    onClick = onManageApps,
+                )
+            } else {
+                KillitBody(stringResource(R.string.phone_manage_off, ward.nickname))
+            }
 
             val requests = pairing.incoming.filter { it.pairId.contentEquals(ward.pairId) }
             if (requests.isNotEmpty()) {

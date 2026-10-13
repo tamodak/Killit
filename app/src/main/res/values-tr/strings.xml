@@ -476,4 +476,45 @@
     <string name="onboarding_next">İleri</string>
     <string name="onboarding_skip">Geç</string>
     <string name="onboarding_start">Başla</string>
+
+    <!-- ============================== Guardians managing apps (PLAN.md §3.8) ============================== -->
+    <string name="management_title">Koruyucular uygulamalarımı yönetebilsin</string>
+    <string name="management_on_desc">Açık. Koruyucuların uygulamalarını görür ve herhangi biri bir uygulamayı engelleyebilir. Engeli kaldırmak hepsinin onayını gerektirir.</string>
+    <string name="management_off_desc">Kapalı. Koruyucuların yalnızca engelini kaldırmalarını istediğin uygulamaları görür.</string>
+    <string name="management_on_confirm_title">Koruyucuların uygulamalarını yönetebilsin mi?</string>
+    <string name="management_on_confirm_body">Koruyucuların bu telefonda hangi uygulamaların olduğunu görecek. Herhangi biri bir uygulamayı hemen engelleyebilir; engeli kaldırmak hepsinin onayını gerektirir. Her değişiklikten haberin olacak ve bunu ancak kilidi açık bir Killit yeniden kapatabilir.</string>
+    <string name="management_on_confirm">Aç</string>
+    <string name="management_off_confirm_title">Koruyucuların artık uygulamalarını yönetmesin mi?</string>
+    <string name="management_off_confirm_body">Koruyucuların bilgilendirilecek ve artık uygulamalarını göremeyecekler.</string>
+    <string name="management_off_confirm">Kapat</string>
+    <string name="wizard_management_on">Koruyucuların uygulamalarını yönetebilir: bu telefonda hangi uygulamaların olduğunu görürler ve herhangi biri bir uygulamayı engelleyebilir.</string>
+    <string name="wizard_management_off">Koruyucuların uygulamalarını yönetemez. Killit\'in kilidi açıkken Ayarlar\'dan buna izin verebilirsin.</string>
+    <string name="wizard_paired_management">%1$s uygulamalarını yönetmene izin veriyor.</string>
+    <string name="phone_manage_apps">Uygulamaları yönet</string>
+    <string name="phone_manage_apps_desc">Bu telefondaki uygulamaları gör ve engelle</string>
+    <string name="phone_manage_off">%1$s, koruyucuların uygulamaları yönetmesine izin vermedi.</string>
+    <string name="manage_intro">İşaretli uygulamalar engellidir. Engelleme hemen olur; engeli kaldırmak her koruyucunun onayını gerektirir.</string>
+    <string name="manage_asking">Telefondan uygulama listesi isteniyor…</string>
+    <string name="manage_no_answer">Henüz yanıt yok. Liste, telefon çevrimiçi olduğunda gelir.</string>
+    <string name="manage_failed">Liste eksiksiz gelmedi. Yeniden iste.</string>
+    <string name="manage_ask_again">Yeniden iste</string>
+    <string name="manage_asked">Engelin kaldırılması istendi</string>
+    <string name="manage_blocking">Engelleniyor…</string>
+    <string name="manage_unblocking">Engel kaldırılıyor…</string>
+    <plurals name="manage_send">
+        <item quantity="one">%1$d değişikliği gönder</item>
+        <item quantity="other">%1$d değişikliği gönder</item>
+    </plurals>
+    <string name="manage_sent">Gönderildi. Telefon çevrimiçi olduğunda uygular.</string>
+    <string name="manage_none">Henüz gösterilecek uygulama yok.</string>
+    <string name="request_guardian_unblock">%1$s, %3$s için %2$s uygulamasının engelini kaldırıyor</string>
+    <string name="request_guardian_unblock_body">Senin onayın da gerekiyor.</string>
+    <string name="request_guardian_unblock_mine">%2$s için %1$s uygulamasının engelini kaldırıyorsun</string>
+    <string name="request_guardian_unblock_mine_body">Diğer koruyucular bekleniyor.</string>
+    <string name="event_app_blocked_by">%1$s, %2$s uygulamasını engelledi</string>
+    <string name="event_app_unblocked_by">%1$s, %2$s uygulamasının engelini kaldırdı</string>
+    <string name="event_app_blocked_by_you">%1$s uygulamasını engelledin</string>
+    <string name="event_app_unblocked_by_you">%1$s uygulamasının engelini kaldırdın</string>
+    <string name="event_app_refused">Android, %1$s uygulamasını engellemedi</string>
+    <string name="notif_app_unblocked_by_guardians">Koruyucuların engelini kaldırdı.</string>
 </resources>

@@ -175,6 +175,12 @@ sealed interface Screen {
         override val parent: Screen get() = Guard
     }
 
+    /** A guarded phone's apps, which its guardians may block when it lets them (PLAN.md §3.8). */
+    data class ManageApps(val pairId: String) : Screen {
+        override val access get() = Access.PASSKEY
+        override val parent: Screen get() = Phone(pairId)
+    }
+
     /** The guardian side's settings: the passkey explanation, language, passkey. */
     data object GuardSettings : Screen {
         override val access get() = Access.PASSKEY
@@ -268,6 +274,7 @@ sealed interface ShizukuOutcome {
  * @param unlockedByGuardians whether the full control came from a live unlock, for the banner
  *   that says it ends on leaving.
  * @param gateForGuardian whether the gate leads into Phones I guard, which it explains differently.
+ * @param appManagement whether this phone lets its guardians manage its apps; null until read.
  */
 data class KillitUiState(
     val screen: Screen = Screen.Loading,
@@ -290,6 +297,7 @@ data class KillitUiState(
     val fullControl: Boolean = false,
     val unlockedByGuardians: Boolean = false,
     val gateForGuardian: Boolean = false,
+    val appManagement: Boolean? = null,
 ) {
     /** How many checkboxes differ from what is applied: newly ticked plus newly cleared. */
     val pendingChanges: Int
@@ -502,6 +510,7 @@ class KillitViewModel(
             if (reconcile) repository.reconcile()
             // Brings guardians back after a "Clear data", before anything reads how many there are.
             pairing.store.reconcile()
+            refreshAppManagement()
             // Opening Killit is one of the moments protection checks every package.
             protection.ensureRunning()
         }
@@ -799,7 +808,7 @@ class KillitViewModel(
 
     /** True for the screens of Phones I guard, where the passkey is a guardian's key. */
     private fun Screen.isGuardSide(): Boolean = when (this) {
-        Screen.Guard, Screen.GuardSettings, is Screen.Request, is Screen.Phone -> true
+        Screen.Guard, Screen.GuardSettings, is Screen.Request, is Screen.Phone, is Screen.ManageApps -> true
         is Screen.Wizard -> role == PairRole.GUARDIAN
         else -> false
     }
@@ -921,6 +930,26 @@ class KillitViewModel(
             for ((option, enabled) in protectionChanges(before, applied)) {
                 pairing.notifyGuardians(NoticeBody.ProtectionChanged(option, enabled))
             }
+        }
+    }
+
+    /** Reads whether this phone lets its guardians manage its apps, for Settings and the wizard. */
+    fun refreshAppManagement() {
+        viewModelScope.launch { _state.update { it.copy(appManagement = pairing.appManagementEnabled()) } }
+    }
+
+    /**
+     * Lets this phone's guardians manage its apps, or stops them (PLAN.md §3.8). Either way it
+     * changes what the guardians may do, so only full control may (G3), checked against storage.
+     */
+    fun setAppManagement(enabled: Boolean) {
+        viewModelScope.launch {
+            if (!hasFullControl()) {
+                KillitLog.w(KillitLog.VM, "setAppManagement refused: the session has no full control")
+                return@launch
+            }
+            pairing.setAppManagement(enabled)
+            _state.update { it.copy(appManagement = pairing.appManagementEnabled()) }
         }
     }
 

@@ -39,26 +39,8 @@ class PairingEngineTest {
     private val ali = EnginePhone("B", "Ali", server, clock)
     private val dad = EnginePhone("C", "Dad", server, clock)
 
-    /** Runs a whole ceremony: [creator] shows the code, [joiner] types it. */
-    private suspend fun pair(creator: EnginePhone, creatorRole: PairRole, joiner: EnginePhone, joinerRole: PairRole) {
-        creator.engine.ceremony.create(creatorRole, creator.name)
-        val code = creator.ceremony()!!.code!!
-        assertEquals(CeremonyEngine.JoinResult.JOINED, joiner.engine.ceremony.join(code.lowercase(), joinerRole, joiner.name))
-        creator.engine.followCeremony(0)
-        joiner.engine.followCeremony(0)
-        creator.engine.followCeremony(0)
-        val a = creator.ceremony()!!
-        val b = joiner.ceremony()!!
-        assertEquals(CeremonyStage.COMPARING, a.stage)
-        assertEquals(CeremonyStage.COMPARING, b.stage)
-        assertEquals(a.safetyCode, b.safetyCode)
-        assertArrayEquals(a.pairId, b.pairId)
-        creator.engine.ceremony.confirm()
-        joiner.engine.ceremony.confirm()
-        creator.engine.followCeremony(0)
-        joiner.engine.sync()
-        creator.engine.sync()
-    }
+    private suspend fun pair(creator: EnginePhone, creatorRole: PairRole, joiner: EnginePhone, joinerRole: PairRole) =
+        pairPhones(creator, creatorRole, joiner, joinerRole)
 
     /** Mom and Dad both guard Ali. */
     private suspend fun guardAli() {

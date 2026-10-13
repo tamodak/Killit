@@ -476,4 +476,45 @@
     <string name="onboarding_next">Weiter</string>
     <string name="onboarding_skip">Überspringen</string>
     <string name="onboarding_start">Los geht\'s</string>
+
+    <!-- ============================== Guardians managing apps (PLAN.md §3.8) ============================== -->
+    <string name="management_title">Wächter dürfen meine Apps verwalten</string>
+    <string name="management_on_desc">An. Deine Wächter sehen deine Apps, und jeder von ihnen kann eine blockieren. Zum Freigeben braucht es alle.</string>
+    <string name="management_off_desc">Aus. Deine Wächter sehen nur die Apps, um deren Freigabe du sie bittest.</string>
+    <string name="management_on_confirm_title">Sollen deine Wächter deine Apps verwalten dürfen?</string>
+    <string name="management_on_confirm_body">Deine Wächter sehen, welche Apps auf diesem Handy sind. Jeder von ihnen kann eine App sofort blockieren; zum Freigeben braucht es alle. Du erfährst von jeder Änderung, und nur ein entsperrtes Killit kann das wieder ausschalten.</string>
+    <string name="management_on_confirm">Einschalten</string>
+    <string name="management_off_confirm_title">Sollen deine Wächter deine Apps nicht mehr verwalten?</string>
+    <string name="management_off_confirm_body">Deine Wächter werden benachrichtigt und sehen deine Apps danach nicht mehr.</string>
+    <string name="management_off_confirm">Ausschalten</string>
+    <string name="wizard_management_on">Deine Wächter dürfen deine Apps verwalten: Sie sehen, welche Apps auf diesem Handy sind, und jeder von ihnen kann eine blockieren.</string>
+    <string name="wizard_management_off">Deine Wächter dürfen deine Apps nicht verwalten. Du kannst es in den Einstellungen erlauben, während Killit entsperrt ist.</string>
+    <string name="wizard_paired_management">%1$s lässt dich die Apps verwalten.</string>
+    <string name="phone_manage_apps">Apps verwalten</string>
+    <string name="phone_manage_apps_desc">Sehen, welche Apps auf diesem Handy sind, und sie blockieren</string>
+    <string name="phone_manage_off">%1$s lässt die Wächter keine Apps verwalten.</string>
+    <string name="manage_intro">Angehakte Apps sind blockiert. Blockieren wirkt sofort; zum Freigeben müssen alle Wächter zustimmen.</string>
+    <string name="manage_asking">Das Handy wird nach seinen Apps gefragt…</string>
+    <string name="manage_no_answer">Noch keine Antwort. Die Liste kommt, sobald das Handy online ist.</string>
+    <string name="manage_failed">Die Liste ist nicht vollständig angekommen. Frag noch einmal.</string>
+    <string name="manage_ask_again">Noch einmal fragen</string>
+    <string name="manage_asked">Freigabe angefragt</string>
+    <string name="manage_blocking">Wird blockiert…</string>
+    <string name="manage_unblocking">Wird freigegeben…</string>
+    <plurals name="manage_send">
+        <item quantity="one">%1$d Änderung senden</item>
+        <item quantity="other">%1$d Änderungen senden</item>
+    </plurals>
+    <string name="manage_sent">Gesendet. Das Handy übernimmt es, sobald es online ist.</string>
+    <string name="manage_none">Noch keine Apps zum Anzeigen.</string>
+    <string name="request_guardian_unblock">%1$s gibt %2$s für %3$s frei</string>
+    <string name="request_guardian_unblock_body">Dafür braucht es auch deine Zustimmung.</string>
+    <string name="request_guardian_unblock_mine">Du gibst %1$s für %2$s frei</string>
+    <string name="request_guardian_unblock_mine_body">Warten auf die anderen Wächter.</string>
+    <string name="event_app_blocked_by">%1$s hat %2$s blockiert</string>
+    <string name="event_app_unblocked_by">%1$s hat %2$s freigegeben</string>
+    <string name="event_app_blocked_by_you">Du hast %1$s blockiert</string>
+    <string name="event_app_unblocked_by_you">Du hast %1$s freigegeben</string>
+    <string name="event_app_refused">Android hat %1$s nicht blockiert</string>
+    <string name="notif_app_unblocked_by_guardians">Deine Wächter haben es freigegeben.</string>
 </resources>

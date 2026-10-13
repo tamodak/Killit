@@ -8,17 +8,46 @@ import org.tamodak.killit.data.DurableGuardian
 import org.tamodak.killit.data.DurablePairingStore
 import org.tamodak.killit.data.UnlockLimits
 import org.tamodak.killit.data.db.KillitDatabase
+import org.junit.Assert.assertArrayEquals
+import org.junit.Assert.assertEquals
 import org.tamodak.killit.pairing.store.CeremonyEntity
+import org.tamodak.killit.pairing.store.CeremonyStage
 import org.tamodak.killit.pairing.store.EventEntity
 import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.OutgoingRequestEntity
+import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.pairing.store.PairingEntity
+import org.tamodak.killit.protection.RemoteBlock
+import org.tamodak.killit.protocol.AppChange
 import org.tamodak.killit.protocol.AppInfo
+import org.tamodak.killit.protocol.AppState
+import org.tamodak.killit.protocol.ListedApp
 import org.tamodak.killit.protocol.Vectors
 
 /** A shared, hand-driven clock. */
 class TestClock(var millis: Long = 1_790_000_000_000L) {
     val now: () -> Long = { millis }
+}
+
+/** Runs a whole ceremony: [creator] shows the code, [joiner] types it, and both confirm the safety code. */
+suspend fun pairPhones(creator: EnginePhone, creatorRole: PairRole, joiner: EnginePhone, joinerRole: PairRole) {
+    creator.engine.ceremony.create(creatorRole, creator.name)
+    val code = creator.ceremony()!!.code!!
+    assertEquals(CeremonyEngine.JoinResult.JOINED, joiner.engine.ceremony.join(code.lowercase(), joinerRole, joiner.name))
+    creator.engine.followCeremony(0)
+    joiner.engine.followCeremony(0)
+    creator.engine.followCeremony(0)
+    val a = creator.ceremony()!!
+    val b = joiner.ceremony()!!
+    assertEquals(CeremonyStage.COMPARING, a.stage)
+    assertEquals(CeremonyStage.COMPARING, b.stage)
+    assertEquals(a.safetyCode, b.safetyCode)
+    assertArrayEquals(a.pairId, b.pairId)
+    creator.engine.ceremony.confirm()
+    joiner.engine.ceremony.confirm()
+    creator.engine.followCeremony(0)
+    joiner.engine.sync()
+    creator.engine.sync()
 }
 
 /**
@@ -58,6 +87,7 @@ class EnginePhone(
             unlockCooldownMillis = 5 * 60 * 1000,
             unlocksPerDay = 6,
             silenceAlertMillis = 7L * 24 * 60 * 60 * 1000,
+            listAnswersPerHour = 4,
         ),
         canBeProtected = { true },
         onGuarded = { guarded += it },
@@ -78,10 +108,30 @@ class FakeApps : AppBlocker {
     val digests = mutableMapOf<String, ByteArray>()
     val unblocked = mutableListOf<String>()
 
+    /** Packages Android would refuse to suspend. */
+    val unblockable = mutableSetOf<String>()
+
     /** Installs and blocks an app. */
     fun install(packageName: String, digest: ByteArray = ByteArray(32) { packageName.length.toByte() }) {
         digests[packageName] = digest
         blocked += packageName
+    }
+
+    /** Installs an app that stays allowed. */
+    fun installAllowed(packageName: String, digest: ByteArray = ByteArray(32) { packageName.length.toByte() }) {
+        digests[packageName] = digest
+    }
+
+    override suspend fun blockRemotely(packageName: String, certDigest: ByteArray): RemoteBlock = when {
+        packageName in unblockable -> RemoteBlock.REFUSED
+        packageName !in digests -> RemoteBlock.NOT_INSTALLED
+        !blocked.add(packageName) -> RemoteBlock.ALREADY_BLOCKED
+        else -> RemoteBlock.BLOCKED
+    }
+
+    override suspend fun listForGuardians(): List<ListedApp> = digests.map { (name, digest) ->
+        ListedApp(name, digest, "App ${name.substringAfterLast('.')}", "com.android.vending", 1_789_000_000_000L,
+            if (name in blocked) AppState.BLOCKED else AppState.ALLOWED, null)
     }
 
     override suspend fun describe(packageName: String): AppInfo? = digests[packageName]?.let {
@@ -103,8 +153,16 @@ class FakeDurable(var available: Boolean = true) : DurablePairingStore {
     var guardians: List<DurableGuardian> = emptyList()
     var chances: List<DurableAppChances> = emptyList()
     var limits: UnlockLimits? = null
+    var appManagement = false
 
     override suspend fun isAvailable() = available
+
+    override suspend fun readAppManagement() = if (available) appManagement else null
+
+    override suspend fun writeAppManagement(enabled: Boolean): Boolean {
+        appManagement = enabled
+        return true
+    }
 
     override suspend fun readGuardians() = guardians
 
@@ -131,6 +189,7 @@ class FakeDurable(var available: Boolean = true) : DurablePairingStore {
         guardians = emptyList()
         chances = emptyList()
         limits = null
+        appManagement = false
         return true
     }
 }
@@ -153,6 +212,10 @@ class RecordingNotifier : PairingNotifier {
 
     override suspend fun guardianAnswered(guardian: PairingEntity, request: OutgoingRequestEntity, approved: Boolean, note: String) {
         events += "answered ${request.type} $approved"
+    }
+
+    override suspend fun appManaged(guardian: PairingEntity, label: String, change: AppChange) {
+        events += "managed $change"
     }
 
     override suspend fun pairingEnded(pairing: PairingEntity, event: EventEntity) {

@@ -64,6 +64,8 @@ import org.tamodak.killit.protocol.verifyBundle
  * @param deviceModel `Build.MANUFACTURER` and `Build.MODEL`, sent in the offer and answer.
  * @param canBeProtected whether this phone can take the protected role now: only a device owner
  *   can (PLAN.md §4).
+ * @param appManagement this phone's management setting, which it states when it is the side to be
+ *   guarded (SPEC.md §11.1), so both sides know what they agree to (G3).
  */
 class CeremonyEngine(
     private val store: PairingStore,
@@ -74,6 +76,7 @@ class CeremonyEngine(
     private val lock: Mutex,
     private val deviceModel: String,
     private val canBeProtected: suspend () -> Boolean,
+    private val appManagement: suspend () -> Boolean,
     private val now: () -> Long = System::currentTimeMillis,
 ) {
     private val dao = store.dao
@@ -279,7 +282,13 @@ class CeremonyEngine(
             pairIdBytes,
             peerFp,
             peer.encPk,
-            MessageBody.PairAnswer(Answer.ACCEPT, DeclineReason.NONE, current.selfName, deviceModel, appManagement = false),
+            MessageBody.PairAnswer(
+                Answer.ACCEPT,
+                DeclineReason.NONE,
+                current.selfName,
+                deviceModel,
+                appManagement = current.myRole == PairRole.PROTECTED && appManagement(),
+            ),
         )
         dao.updateCeremony(current.copy(stage = CeremonyStage.PAIRED, peerName = offer.selfName, peerModel = offer.deviceModel, nickname = offer.selfName))
         KillitLog.i(KillitLog.PAIR, "Paired as ${current.myRole}")
@@ -363,7 +372,7 @@ class CeremonyEngine(
                 current.pairId ?: return,
                 fingerprint(peer.signPk),
                 peer.encPk,
-                MessageBody.PairOffer(role, current.selfName, deviceModel, appManagement = false),
+                MessageBody.PairOffer(role, current.selfName, deviceModel, appManagement = current.myRole == PairRole.PROTECTED && appManagement()),
             )
         }
         dao.updateCeremony(current.copy(stage = CeremonyStage.LINKED))
@@ -423,8 +432,8 @@ class CeremonyEngine(
             peerName = peerName,
             nickname = peerName,
             peerModel = peerModel,
-            // The protected side's setting: the peer's when the peer is protected. Phase 5b, where
-            // this phone could turn its own on, doesn't exist yet.
+            // The protected side's setting, kept on the guardian's side: this phone's own lives in
+            // the durable store, where an unlocked session changes it.
             appManagement = current.myRole == PairRole.GUARDIAN && peerAppManagement,
             createdAt = now(),
             unpairChances = PairingStore.MAX_CHANCES,

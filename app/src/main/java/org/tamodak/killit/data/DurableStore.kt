@@ -10,8 +10,8 @@ import kotlinx.coroutines.sync.withLock
 /**
  * The clear-data-proof copies of Killit's state, kept in the device owner's own application
  * restrictions: the passkey record, the pending release request, the known-package list, and what
- * pairing must not lose — this phone's guardians, the chances left to ask them, and the limits on
- * unlock requests.
+ * pairing must not lose — this phone's guardians, the chances left to ask them, the limits on
+ * unlock requests, and whether its guardians may manage its apps.
  *
  * ### Why application restrictions, of all places
  *
@@ -322,6 +322,19 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
     }
 
     /**
+     * Reads whether this phone's guardians may manage its apps (PLAN.md §3.8).
+     *
+     * Kept here rather than locally because turning it off weakens the guardians' hold, which only
+     * an unlocked session may do (G3): a Clear data that turned it off would be a way around that.
+     *
+     * @return the setting, false when never written; null when Killit is not device owner.
+     */
+    override suspend fun readAppManagement(): Boolean? = dpc.readSelfRestrictions()?.getBoolean(KEY_APP_MANAGEMENT, false)
+
+    /** Writes whether this phone's guardians may manage its apps. */
+    override suspend fun writeAppManagement(enabled: Boolean): Boolean = update { putBoolean(KEY_APP_MANAGEMENT, enabled) }
+
+    /**
      * Forgets everything pairing kept here. Called once this phone has no guardians and device
      * owner is being released.
      */
@@ -331,6 +344,7 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
         remove(KEY_UNLOCK_COOLDOWN_UNTIL)
         remove(KEY_UNLOCK_DAY)
         remove(KEY_UNLOCK_COUNT)
+        remove(KEY_APP_MANAGEMENT)
     }
 
     /**
@@ -448,6 +462,7 @@ class DurableStore(private val dpc: DevicePolicyController) : DurablePairingStor
         const val KEY_UNLOCK_COOLDOWN_UNTIL = "killit_unlock_cooldown_until"
         const val KEY_UNLOCK_DAY = "killit_unlock_day"
         const val KEY_UNLOCK_COUNT = "killit_unlock_count"
+        const val KEY_APP_MANAGEMENT = "killit_app_management"
     }
 }
 
@@ -470,6 +485,11 @@ interface DurablePairingStore {
     suspend fun readUnlockLimits(): UnlockLimits?
 
     suspend fun writeUnlockLimits(limits: UnlockLimits): Boolean
+
+    /** @return whether guardians may manage this phone's apps; null when the copy is unavailable. */
+    suspend fun readAppManagement(): Boolean?
+
+    suspend fun writeAppManagement(enabled: Boolean): Boolean
 
     suspend fun clearPairing(): Boolean
 }

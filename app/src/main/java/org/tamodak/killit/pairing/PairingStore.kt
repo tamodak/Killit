@@ -75,7 +75,8 @@ class PairingStore(
     }
 
     /**
-     * Removes a pairing and what only it used: requests from it and messages kept for it.
+     * Removes a pairing and what only it used: requests from it, messages kept for it, and what
+     * managing apps kept for it.
      *
      * @param pairId the pairing to remove.
      * @return the removed pairing, or null when there was none.
@@ -85,6 +86,8 @@ class PairingStore(
         dao.deletePairing(pairId)
         dao.deleteIncomingFor(pairId)
         dao.deleteUnknownFor(pairId)
+        dao.deleteManageSeqsFor(pairId)
+        dao.forgetWardApps(pairId)
         if (pairing.myRole == PairRole.PROTECTED) writeGuardians()
         KillitLog.i(KillitLog.PAIR, "Pairing removed (${pairId.short()})")
         pairing

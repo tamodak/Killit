@@ -487,4 +487,53 @@
     <string name="onboarding_next">Next</string>
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_start">Start</string>
+
+    <!-- ============================== Guardians managing apps (PLAN.md §3.8) ============================== -->
+
+    <!-- The setting, on the protected phone (D5, G3) -->
+    <string name="management_title">Let guardians manage my apps</string>
+    <string name="management_on_desc">On. Your guardians see your apps, and any of them can block one. Unblocking needs all of them.</string>
+    <string name="management_off_desc">Off. Your guardians only see the apps you ask them to unblock.</string>
+    <string name="management_on_confirm_title">Let your guardians manage your apps?</string>
+    <string name="management_on_confirm_body">Your guardians will see which apps are on this phone. Any one of them can block an app at once; unblocking one needs all of them. You\'ll be told about every change, and only an unlocked Killit can turn this off again.</string>
+    <string name="management_on_confirm">Turn on</string>
+    <string name="management_off_confirm_title">Stop your guardians managing your apps?</string>
+    <string name="management_off_confirm_body">Your guardians will be told, and they will no longer see your apps.</string>
+    <string name="management_off_confirm">Turn off</string>
+    <string name="wizard_management_on">Your guardians can manage your apps: they see which apps are on this phone, and any of them can block one.</string>
+    <string name="wizard_management_off">Your guardians can\'t manage your apps. You can let them in Settings while Killit is unlocked.</string>
+    <string name="wizard_paired_management">%1$s lets you manage their apps.</string>
+
+    <!-- Managing a guarded phone's apps (§15.6) -->
+    <string name="phone_manage_apps">Manage apps</string>
+    <string name="phone_manage_apps_desc">See which apps are on this phone, and block them</string>
+    <string name="phone_manage_off">%1$s hasn\'t let guardians manage apps.</string>
+    <string name="manage_intro">Ticked apps are blocked. Blocking happens at once; unblocking needs every guardian to agree.</string>
+    <string name="manage_asking">Asking the phone for its apps…</string>
+    <string name="manage_no_answer">No answer yet. The list arrives when the phone is online.</string>
+    <string name="manage_failed">The list didn\'t arrive whole. Ask again.</string>
+    <string name="manage_ask_again">Ask again</string>
+    <string name="manage_asked">Asked to unblock</string>
+    <string name="manage_blocking">Blocking…</string>
+    <string name="manage_unblocking">Unblocking…</string>
+    <plurals name="manage_send">
+        <item quantity="one">Send %1$d change</item>
+        <item quantity="other">Send %1$d changes</item>
+    </plurals>
+    <string name="manage_sent">Sent. The phone applies it when it\'s online.</string>
+    <string name="manage_none">No apps to show yet.</string>
+
+    <!-- A guardian's unblock, relayed to the other guardians (G2) -->
+    <string name="request_guardian_unblock">%1$s is unblocking %2$s for %3$s</string>
+    <string name="request_guardian_unblock_body">It needs your approval too.</string>
+    <string name="request_guardian_unblock_mine">You\'re unblocking %1$s for %2$s</string>
+    <string name="request_guardian_unblock_mine_body">Waiting for the other guardians.</string>
+
+    <!-- History lines and notifications about managed apps (G4) -->
+    <string name="event_app_blocked_by">%1$s blocked %2$s</string>
+    <string name="event_app_unblocked_by">%1$s unblocked %2$s</string>
+    <string name="event_app_blocked_by_you">You blocked %1$s</string>
+    <string name="event_app_unblocked_by_you">You unblocked %1$s</string>
+    <string name="event_app_refused">Android wouldn\'t block %1$s</string>
+    <string name="notif_app_unblocked_by_guardians">Your guardians unblocked it.</string>
 </resources>

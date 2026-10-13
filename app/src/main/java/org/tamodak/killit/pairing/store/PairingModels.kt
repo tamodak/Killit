@@ -18,8 +18,11 @@ enum class PairRole {
     PROTECTED,
 }
 
-/** The requests a protected phone sends its guardians. */
-enum class RequestType { UNBLOCK_APP, UNLOCK, UNPAIR }
+/**
+ * The requests a protected phone sends its guardians. [GUARDIAN_UNBLOCK] is the one it relays
+ * when a guardian unblocks an app and the others must approve too (G2).
+ */
+enum class RequestType { UNBLOCK_APP, UNLOCK, UNPAIR, GUARDIAN_UNBLOCK }
 
 /** Where a request stands. */
 enum class RequestState {
@@ -125,6 +128,21 @@ enum class EventType {
     REQUEST_DENIED,
     REQUEST_CANCELLED,
 
+    /**
+     * A guardian's MANAGE changed an app (SPEC.md §11.11): `otherName` is the guardian, `value` an
+     * [org.tamodak.killit.protocol.AppChange] code, `flag` true when this phone was that guardian.
+     */
+    APP_MANAGED,
+
     /** A NOTICE with a code this version doesn't know (E-F1). */
     UNKNOWN_NOTICE,
+}
+
+/** An app of a guarded phone, as its last list or notice showed it. */
+enum class WardAppState {
+    ALLOWED,
+    BLOCKED,
+
+    /** Blocked by default-blocking; nobody has decided about it yet. */
+    NEW,
 }

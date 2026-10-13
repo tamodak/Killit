@@ -81,6 +81,9 @@ android {
         buildConfigField("long", "UNLOCK_COOLDOWN_MILLIS", "3_000L")
         // Unlock requests allowed per day (C4); unlimited while developing.
         buildConfigField("int", "UNLOCKS_PER_DAY", "Integer.MAX_VALUE")
+        // App lists a protected phone answers per guardian per hour (SPEC.md §11.10); unlimited
+        // while developing, where a list is asked for again and again.
+        buildConfigField("int", "LIST_ANSWERS_PER_HOUR", "Integer.MAX_VALUE")
         // A guardian's reminder about waiting requests (D9): once, this long after a request
         // arrives, in debug builds; a daily daytime digest in release builds (0 here).
         buildConfigField("long", "REMINDER_DELAY_MILLIS", "3_000L")
@@ -112,6 +115,7 @@ android {
             buildConfigField("long", "UNPAIR_TIMER_MILLIS", "2_592_000_000L")
             buildConfigField("long", "UNLOCK_COOLDOWN_MILLIS", "300_000L")
             buildConfigField("int", "UNLOCKS_PER_DAY", "6")
+            buildConfigField("int", "LIST_ANSWERS_PER_HOUR", "4")
             buildConfigField("long", "REMINDER_DELAY_MILLIS", "0L")
             buildConfigField("long", "SILENCE_ALERT_MILLIS", "604_800_000L")
             buildConfigField("boolean", "BLOCK_DEBUGGING_WHILE_GUARDED", "true")

@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 /*
- * Pairing's tables (Room schema version 2).
+ * Pairing's tables (Room schema version 3).
  *
  * Entities holding byte arrays are plain classes, because a generated `equals` would compare the
  * arrays by identity; the few that are data classes compare their arrays by content. Every byte
@@ -33,6 +33,8 @@ import androidx.room.Relation
  *   meaningful only when [myRole] is [PairRole.PROTECTED].
  * @param lastSeenDaysAgo whole days since the peer last talked to the server, when known.
  * @param silenceAlerted whether the current silence has already been announced (H8).
+ * @param manageSeq the `seq` of the last MANAGE this phone sent the peer it guards (SPEC.md
+ *   §11.11); the next one is higher.
  */
 @Entity(tableName = "pairings", indices = [Index("peer_fp")])
 class PairingEntity(
@@ -50,6 +52,7 @@ class PairingEntity(
     @ColumnInfo(name = "unpair_chances") val unpairChances: Int,
     @ColumnInfo(name = "last_seen_days") val lastSeenDaysAgo: Int?,
     @ColumnInfo(name = "silence_alerted") val silenceAlerted: Boolean,
+    @ColumnInfo(name = "manage_seq") val manageSeq: Long = 0L,
 )
 
 /**
@@ -100,12 +103,15 @@ data class CeremonyEntity(
 }
 
 /**
- * A request this phone sent its guardians: UNBLOCK_APP or UNPAIR. A live UNLOCK lives only in
- * memory (PLAN.md §3.4) and never gets a row.
+ * A request this phone sent its guardians: UNBLOCK_APP, UNPAIR, or the GUARDIAN_UNBLOCK it relays
+ * for a guardian who is unblocking an app (G2). A live UNLOCK lives only in memory (PLAN.md §3.4)
+ * and never gets a row.
  *
- * @param chancesLeft the chances the request was sent with, counting itself (D4, G8).
+ * @param chancesLeft the chances the request was sent with, counting itself (D4, G8); 0 for a
+ *   GUARDIAN_UNBLOCK, which uses none.
  * @param timerEndsAt UNPAIR only: when the guardian is removed unless someone denies (B1, B2).
  * @param applied whether an approval has been carried out, so one cut short is carried out later.
+ * @param proposerPairId GUARDIAN_UNBLOCK only: the pairing with the guardian whose MANAGE started it.
  */
 @Entity(tableName = "outgoing_requests")
 class OutgoingRequestEntity(
@@ -128,6 +134,7 @@ class OutgoingRequestEntity(
     @ColumnInfo(name = "cancel_cause") val cancelCause: CancelCause?,
     @ColumnInfo(name = "closed_at") val closedAt: Long?,
     @ColumnInfo(name = "applied") val applied: Boolean,
+    @ColumnInfo(name = "proposer_pair_id", typeAffinity = ColumnInfo.BLOB) val proposerPairId: ByteArray? = null,
 )
 
 /** One guardian's copy of an outgoing request, and that guardian's answer. */
@@ -167,6 +174,10 @@ class OutgoingRequestWithCopies(
  * @param myVote this phone's answer; [Vote.WAITING] until it gives one.
  * @param statusEntries every guardian's answer, from the last STATUS, encoded by [StatusEntries].
  * @param remindedAt when the reminder for it last went out (D9).
+ * @param proposerFp GUARDIAN_UNBLOCK only: the guardian unblocking the app, which may be this phone.
+ * @param proposerName GUARDIAN_UNBLOCK only: that guardian's own name (SPEC.md §11.12).
+ * @param proposedByMe GUARDIAN_UNBLOCK only: this phone proposed it, so it has approved already and
+ *   only follows the others' answers.
  */
 @Entity(tableName = "incoming_requests", primaryKeys = ["pair_id", "request_id"])
 class IncomingRequestEntity(
@@ -195,6 +206,9 @@ class IncomingRequestEntity(
     @ColumnInfo(name = "cancel_cause") val cancelCause: CancelCause?,
     @ColumnInfo(name = "status_entries") val statusEntries: String,
     @ColumnInfo(name = "reminded_at") val remindedAt: Long?,
+    @ColumnInfo(name = "proposer_fp", typeAffinity = ColumnInfo.BLOB) val proposerFp: ByteArray? = null,
+    @ColumnInfo(name = "proposer_name") val proposerName: String? = null,
+    @ColumnInfo(name = "proposed_by_me") val proposedByMe: Boolean = false,
 )
 
 /**
@@ -294,4 +308,63 @@ class PendingUnlockEntity(
     @PrimaryKey
     @ColumnInfo(name = "request_id", typeAffinity = ColumnInfo.BLOB) val requestId: ByteArray,
     @ColumnInfo(name = "created_at") val createdAt: Long,
+)
+
+/**
+ * Protected side: the highest MANAGE `seq` applied from one guardian for one package (SPEC.md
+ * §11.11). A command with a lower or equal one is stale, so a replayed or reordered MANAGE can't
+ * undo a newer one.
+ */
+@Entity(tableName = "manage_seqs", primaryKeys = ["pair_id", "package_name"])
+class ManageSeqEntity(
+    @ColumnInfo(name = "pair_id", typeAffinity = ColumnInfo.BLOB) val pairId: ByteArray,
+    @ColumnInfo(name = "package_name") val packageName: String,
+    @ColumnInfo(name = "seq") val seq: Long,
+)
+
+/**
+ * Guardian side: the app list this phone last asked a guarded phone for (SPEC.md §11.10). Only
+ * pages of that list are kept; any other list is ignored.
+ *
+ * @param completedAt when the whole list arrived; null while pages are missing.
+ * @param failed true when the pages broke a rule, so the list was dropped.
+ */
+@Entity(tableName = "ward_lists")
+class WardListEntity(
+    @PrimaryKey
+    @ColumnInfo(name = "pair_id", typeAffinity = ColumnInfo.BLOB) val pairId: ByteArray,
+    @ColumnInfo(name = "list_id", typeAffinity = ColumnInfo.BLOB) val listId: ByteArray,
+    @ColumnInfo(name = "requested_at") val requestedAt: Long,
+    @ColumnInfo(name = "completed_at") val completedAt: Long?,
+    @ColumnInfo(name = "failed") val failed: Boolean,
+)
+
+/** Guardian side: one page of the list being received, its body kept as it was signed. */
+@Entity(tableName = "ward_list_pages", primaryKeys = ["pair_id", "page"])
+class WardListPageEntity(
+    @ColumnInfo(name = "pair_id", typeAffinity = ColumnInfo.BLOB) val pairId: ByteArray,
+    @ColumnInfo(name = "page") val page: Int,
+    @ColumnInfo(name = "body", typeAffinity = ColumnInfo.BLOB) val body: ByteArray,
+)
+
+/**
+ * Guardian side: one app of a guarded phone, from its last complete list, kept current by the
+ * notices of what guardians changed (SPEC.md §11.9 APP_MANAGED). Dropped when the phone turns
+ * management off: the list was only ever shared for managing.
+ *
+ * @param icon 16 × 16 RGBA8888, or null.
+ * @param pendingBlock what this phone asked for and hasn't seen happen yet: true for a block,
+ *   false for an unblock, null when nothing is pending.
+ */
+@Entity(tableName = "ward_apps", primaryKeys = ["pair_id", "package_name"])
+class WardAppEntity(
+    @ColumnInfo(name = "pair_id", typeAffinity = ColumnInfo.BLOB) val pairId: ByteArray,
+    @ColumnInfo(name = "package_name") val packageName: String,
+    @ColumnInfo(name = "cert_digest", typeAffinity = ColumnInfo.BLOB) val certDigest: ByteArray,
+    @ColumnInfo(name = "label") val label: String,
+    @ColumnInfo(name = "installer") val installer: String,
+    @ColumnInfo(name = "first_installed") val firstInstalled: Long,
+    @ColumnInfo(name = "state") val state: WardAppState,
+    @ColumnInfo(name = "icon", typeAffinity = ColumnInfo.BLOB) val icon: ByteArray?,
+    @ColumnInfo(name = "pending_block") val pendingBlock: Boolean?,
 )

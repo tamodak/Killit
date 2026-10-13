@@ -555,4 +555,49 @@
     <string name="onboarding_next">التالي</string>
     <string name="onboarding_skip">تخطَّ</string>
     <string name="onboarding_start">ابدأ</string>
+
+    <!-- ============================== Guardians managing apps (PLAN.md §3.8) ============================== -->
+    <string name="management_title">السماح للحرّاس بإدارة تطبيقاتي</string>
+    <string name="management_on_desc">مفعّل. يرى حرّاسك تطبيقاتك، ويمكن لأي منهم حظر أي تطبيق. رفع الحظر يحتاج إليهم جميعًا.</string>
+    <string name="management_off_desc">متوقّف. لا يرى حرّاسك إلا التطبيقات التي تطلب منهم رفع الحظر عنها.</string>
+    <string name="management_on_confirm_title">السماح لحرّاسك بإدارة تطبيقاتك؟</string>
+    <string name="management_on_confirm_body">سيرى حرّاسك التطبيقات الموجودة على هذا الهاتف. يمكن لأي منهم حظر تطبيق فورًا، ورفع الحظر عن تطبيق يحتاج إليهم جميعًا. ستُبلَّغ بكل تغيير، ولا يمكن إيقاف هذا من جديد إلا من Killit مفتوح.</string>
+    <string name="management_on_confirm">تشغيل</string>
+    <string name="management_off_confirm_title">إيقاف إدارة حرّاسك لتطبيقاتك؟</string>
+    <string name="management_off_confirm_body">سيُبلَّغ حرّاسك، ولن يروا تطبيقاتك بعد ذلك.</string>
+    <string name="management_off_confirm">إيقاف</string>
+    <string name="wizard_management_on">يمكن لحرّاسك إدارة تطبيقاتك: يرون التطبيقات الموجودة على هذا الهاتف، ويمكن لأي منهم حظر أي تطبيق.</string>
+    <string name="wizard_management_off">لا يمكن لحرّاسك إدارة تطبيقاتك. يمكنك السماح بذلك من الإعدادات وKillit مفتوح.</string>
+    <string name="wizard_paired_management">يسمح لك %1$s بإدارة تطبيقاته.</string>
+    <string name="phone_manage_apps">إدارة التطبيقات</string>
+    <string name="phone_manage_apps_desc">رؤية التطبيقات الموجودة على هذا الهاتف وحظرها</string>
+    <string name="phone_manage_off">لم يسمح %1$s للحرّاس بإدارة التطبيقات.</string>
+    <string name="manage_intro">التطبيقات المحدّدة محظورة. الحظر فوري، ورفع الحظر يحتاج إلى موافقة كل الحرّاس.</string>
+    <string name="manage_asking">جارٍ طلب قائمة التطبيقات من الهاتف…</string>
+    <string name="manage_no_answer">لا رد بعد. تصل القائمة عندما يكون الهاتف متصلًا.</string>
+    <string name="manage_failed">لم تصل القائمة كاملة. اطلبها مرة أخرى.</string>
+    <string name="manage_ask_again">اطلب مرة أخرى</string>
+    <string name="manage_asked">طُلب رفع الحظر</string>
+    <string name="manage_blocking">جارٍ الحظر…</string>
+    <string name="manage_unblocking">جارٍ رفع الحظر…</string>
+    <plurals name="manage_send">
+        <item quantity="zero">لا تغييرات لإرسالها</item>
+        <item quantity="one">إرسال تغيير واحد</item>
+        <item quantity="two">إرسال تغييرين</item>
+        <item quantity="few">إرسال %1$d تغييرات</item>
+        <item quantity="many">إرسال %1$d تغييرًا</item>
+        <item quantity="other">إرسال %1$d تغيير</item>
+    </plurals>
+    <string name="manage_sent">أُرسل. يطبّقه الهاتف عندما يكون متصلًا.</string>
+    <string name="manage_none">لا توجد تطبيقات لعرضها بعد.</string>
+    <string name="request_guardian_unblock">%1$s يرفع الحظر عن %2$s لـ %3$s</string>
+    <string name="request_guardian_unblock_body">يحتاج إلى موافقتك أيضًا.</string>
+    <string name="request_guardian_unblock_mine">أنت ترفع الحظر عن %1$s لـ %2$s</string>
+    <string name="request_guardian_unblock_mine_body">بانتظار الحرّاس الآخرين.</string>
+    <string name="event_app_blocked_by">حظر %1$s %2$s</string>
+    <string name="event_app_unblocked_by">رفع %1$s الحظر عن %2$s</string>
+    <string name="event_app_blocked_by_you">حظرتَ %1$s</string>
+    <string name="event_app_unblocked_by_you">رفعتَ الحظر عن %1$s</string>
+    <string name="event_app_refused">لم يقبل Android حظر %1$s</string>
+    <string name="notif_app_unblocked_by_guardians">رفع حرّاسك الحظر عنه.</string>
 </resources>

@@ -56,7 +56,9 @@ import org.tamodak.killit.ui.theme.KillitTextFaint
  * app's name, package and installer, because an app chooses its own name (§5.4); the explanation;
  * the other guardians' answers (G10); an optional note (G9). Deny is the wider button (E1).
  *
- * An unlock request says what approving means: full control until the user leaves Killit.
+ * An unlock request says what approving means: full control until the user leaves Killit. A
+ * guardian's unblock that needs the others too (G2) names that guardian; on its proposer's own
+ * phone it only shows how the others are answering.
  */
 @Composable
 fun RequestScreen(
@@ -91,6 +93,13 @@ fun RequestScreen(
 
             when (request.type) {
                 RequestType.UNBLOCK_APP -> AppDetails(request)
+                RequestType.GUARDIAN_UNBLOCK -> {
+                    AppDetails(request)
+                    KillitPanel(borderColor = KillitBlue, spacing = 6.dp) {
+                        val body = if (request.proposedByMe) R.string.request_guardian_unblock_mine_body else R.string.request_guardian_unblock_body
+                        KillitBody(stringResource(body), color = KillitForeground)
+                    }
+                }
                 RequestType.UNLOCK -> KillitPanel(borderColor = KillitBlue, spacing = 6.dp) {
                     KillitBody(stringResource(R.string.request_unlock_meaning, from.nickname), color = KillitForeground)
                 }
@@ -113,6 +122,7 @@ fun RequestScreen(
 
             when {
                 !request.state.isOpen -> ClosedPanel(request)
+                request.proposedByMe -> Unit
                 request.myVote != Vote.WAITING -> KillitBody(
                     stringResource(if (request.myVote == Vote.APPROVED) R.string.request_you_approved else R.string.request_you_denied),
                     color = KillitForeground,

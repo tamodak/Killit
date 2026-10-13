@@ -39,7 +39,8 @@ import kotlinx.coroutines.withContext
  *
  * Two narrow exceptions come from pairing, and only from it: [approveRemotely] unblocks one app
  * every guardian approved, and [blockMore] lets a guarded phone block more apps without its
- * guardians (D7), which can only make it stricter.
+ * guardians (D7), which can only make it stricter. [blockRemotely] is a guardian blocking an app,
+ * stricter too.
  *
  * ### Concurrency
  *
@@ -181,6 +182,34 @@ class PackageGuard(
         )
         refused
     }
+
+    /**
+     * Blocks one app because a guardian chose to (PLAN.md §6.2 (c)), whatever its certificate:
+     * blocking is the stricter direction. An app that isn't installed is remembered as blocked
+     * under the certificate the guardian saw, so installing it later brings it back blocked.
+     * Killit itself is never blocked.
+     */
+    suspend fun blockRemotely(packageName: String, certDigest: ByteArray): RemoteBlock = lock.withLock {
+        if (packageName == ownPackage || !isActive()) return@withLock RemoteBlock.REFUSED
+        val now = clock()
+        val pkg = scanner.scan(packageName)
+        if (pkg == null) {
+            store.put(listOf(KnownPackage(packageName, certDigest, PackageStatus.USER_BLOCKED, now)))
+            return@withLock RemoteBlock.NOT_INSTALLED
+        }
+        val wasBlocked = packageName in dpc.blockedPackages(listOf(packageName))
+        if (dpc.blockPackages(listOf(packageName)).isNotEmpty()) return@withLock RemoteBlock.REFUSED
+        store.put(listOf(KnownPackage(packageName, pkg.certDigest, PackageStatus.USER_BLOCKED, now)))
+        // A new app a guardian blocked is decided, so it no longer waits.
+        refreshWaitingNotification(store.readAll(), alert = false)
+        if (wasBlocked) RemoteBlock.ALREADY_BLOCKED else RemoteBlock.BLOCKED
+    }
+
+    /** Every decision so far, keyed by package name, the two copies brought in step first. */
+    suspend fun decisions(): Map<String, KnownPackage> = lock.withLock { store.readAll() }
+
+    /** Which of [packageNames] Killit blocks now. */
+    suspend fun blockedAmong(packageNames: Collection<String>): Set<String> = dpc.blockedPackages(packageNames)
 
     /** Tells [listener] about newly blocked apps, outside [lock]. */
     private suspend fun announce(packageNames: List<String>) {
@@ -352,4 +381,19 @@ class PackageGuard(
         } else {
             getApplicationInfo(packageName, 0)
         }
+}
+
+/** What [PackageGuard.blockRemotely] did. */
+enum class RemoteBlock {
+    /** The app was allowed, and is blocked now. */
+    BLOCKED,
+
+    /** The app was blocked already; it stays blocked, now on purpose. */
+    ALREADY_BLOCKED,
+
+    /** The app isn't installed; it will be blocked if it comes back. */
+    NOT_INSTALLED,
+
+    /** Android refused to suspend it, or it is Killit itself. */
+    REFUSED,
 }

@@ -15,6 +15,7 @@ import org.tamodak.killit.pairing.store.RequestType
 import org.tamodak.killit.pairing.store.StatusEntries
 import org.tamodak.killit.pairing.store.StatusEntryRecord
 import org.tamodak.killit.pairing.store.Vote
+import org.tamodak.killit.pairing.store.WardAppState
 import org.tamodak.killit.protocol.AppInfo
 import org.tamodak.killit.protocol.AppRef
 import org.tamodak.killit.protocol.CancelReason
@@ -39,16 +40,21 @@ import org.tamodak.killit.protocol.verifyDecision
 
 /**
  * The asynchronous requests between a protected phone and its guardians: UNBLOCK_APP and UNPAIR
- * (SPEC.md §11.3, §11.5), the DECISIONs on them (§11.6) and the STATUS that keeps every guardian's
- * copy current (§11.7). The live UNLOCK is [LiveUnlock]'s.
+ * (SPEC.md §11.3, §11.5), the GUARDIAN_UNBLOCK this phone relays when one guardian unblocks an app
+ * (§11.12, G2), the DECISIONs on them (§11.6) and the STATUS that keeps every guardian's copy
+ * current (§11.7). The live UNLOCK is [LiveUnlock]'s.
  *
  * ### Protected side
  *
  * Every guardian must approve; one denial closes the request (PLAN.md §3.3). A denial costs the
- * app, or the guardian to be removed, one of its three chances (D4, G8); nothing else does. An
- * unblock that is approved is carried out only through [RemoteEffects], and only for the same app
- * and signing certificate the guardians saw. An UNPAIR that nobody denies within 30 days removes
- * the guardian on this phone's own clock (B2): the escape that needs no server and nobody's answer.
+ * app, or the guardian to be removed, one of its three chances (D4, G8); nothing else does, and a
+ * GUARDIAN_UNBLOCK, which this phone never asked for, costs none. An unblock that is approved is
+ * carried out only through [RemoteEffects], and only for the same app and signing certificate the
+ * guardians saw. An UNPAIR that nobody denies within 30 days removes the guardian on this phone's
+ * own clock (B2): the escape that needs no server and nobody's answer.
+ *
+ * A package has at most one open request to unblock it, of either kind. A guardian's MANAGE for
+ * that package answers it (SPEC.md §11.11, [answerFromManage]).
  *
  * A DECISION counts only after it verifies against this phone's own stored request (§11.6), and
  * only once per guardian and request.
@@ -120,7 +126,7 @@ class RequestEngine(
         val text = explanationOrNull(explanation, TextRule.REQUIRED_EXPLANATION) ?: return AskResult.BadExplanation
         if (!apps.isBlocked(packageName)) return AskResult.NotBlocked
         val app = apps.describe(packageName) ?: return AskResult.NotInstalled
-        if (dao.openUnblockFor(packageName) != null) return AskResult.AlreadyOpen
+        if (dao.openAppRequestFor(packageName) != null) return AskResult.AlreadyOpen
         val chances = store.appChances(packageName, app.certDigest)
         if (chances < 1) return AskResult.NoChancesLeft
 
@@ -226,15 +232,82 @@ class RequestEngine(
 
     /** H11: an app with an open request was uninstalled. The request ends without using a chance. */
     suspend fun onPackageRemoved(packageName: String) {
-        val request = dao.openUnblockFor(packageName) ?: return
+        val request = dao.openAppRequestFor(packageName) ?: return
         close(request, RequestState.CANCELLED, CancelCause.APP_UNINSTALLED)
     }
 
     /** G11: apps were unblocked directly in an unlocked session; their requests are settled. */
     suspend fun onUnblockedLocally(packageNames: Collection<String>) {
         for (name in packageNames) {
-            val request = dao.openUnblockFor(name) ?: continue
+            val request = dao.openAppRequestFor(name) ?: continue
             close(request, RequestState.CANCELLED, CancelCause.RESOLVED_BY_UNLOCK)
+        }
+    }
+
+    /**
+     * G2: a guardian's MANAGE is unblocking an app, and the other guardians must approve too. This
+     * phone asks them for it, with the proposer's copy already approved (SPEC.md §11.12).
+     *
+     * @param proposer the pairing with the guardian unblocking it.
+     * @param app the installed app, which the guardian named by its certificate.
+     * @return the new request's id, or null when the package already has an open request.
+     */
+    suspend fun proposeUnblock(proposer: PairingEntity, app: AppInfo): ByteArray? {
+        if (dao.openAppRequestFor(app.packageName) != null) return null
+        val requestId = randomBytes(REQUEST_ID_BYTES)
+        val request = OutgoingRequestEntity(
+            requestId = requestId,
+            type = RequestType.GUARDIAN_UNBLOCK,
+            packageName = app.packageName,
+            certDigest = app.certDigest,
+            appLabel = app.label,
+            installer = app.installer,
+            firstInstalled = app.firstInstalled,
+            icon = app.icon,
+            targetPairId = null,
+            targetFp = null,
+            explanation = "",
+            chancesLeft = 0,
+            createdAt = now(),
+            timerEndsAt = null,
+            state = RequestState.OPEN,
+            cancelCause = null,
+            closedAt = null,
+            applied = false,
+            proposerPairId = proposer.pairId,
+        )
+        dao.insertOutgoing(request)
+        sendToNewCopies(request, store.guardians())
+        KillitLog.i(KillitLog.REQ, "${proposer.peerFp.short()} is unblocking ${app.packageName}; asking the other guardians")
+        return requestId
+    }
+
+    /**
+     * A guardian's MANAGE for an app that has an open request to unblock it answers that request
+     * (SPEC.md §11.11): ALLOWED approves it, BLOCKED denies it. A guardian who has decided already,
+     * the proposer of a GUARDIAN_UNBLOCK included, can't change its answer, so its BLOCKED cancels
+     * the request instead.
+     *
+     * @return true when there was an open request for [packageName].
+     */
+    suspend fun answerFromManage(guardian: PairingEntity, packageName: String, block: Boolean): Boolean {
+        val request = dao.openAppRequestFor(packageName) ?: return false
+        val copy = dao.outgoing(request.requestId)?.copies?.firstOrNull { it.pairId.contentEquals(guardian.pairId) }
+        when {
+            copy?.vote == Vote.WAITING -> {
+                dao.setVote(request.requestId, guardian.pairId, if (block) Vote.DENIED else Vote.APPROVED, "", now())
+                KillitLog.i(KillitLog.REQ, "${guardian.peerFp.short()} answered a ${request.type} by managing apps")
+                evaluate(request.requestId)
+            }
+            block -> close(request, RequestState.CANCELLED, CancelCause.WITHDRAWN)
+        }
+        return true
+    }
+
+    /** Management was turned off: what the guardians were unblocking for each other is withdrawn. */
+    suspend fun withdrawGuardianUnblocks() {
+        for (open in dao.openOutgoing()) {
+            if (open.request.type == RequestType.GUARDIAN_UNBLOCK) close(open.request, RequestState.CANCELLED, CancelCause.WITHDRAWN)
         }
     }
 
@@ -253,7 +326,10 @@ class RequestEngine(
     suspend fun onGuardianRemoved(guardian: PairingEntity) {
         for (open in dao.openOutgoing()) {
             val request = open.request
-            if (request.type == RequestType.UNPAIR && request.targetPairId?.contentEquals(guardian.pairId) == true) {
+            val aimedAtIt = request.type == RequestType.UNPAIR && request.targetPairId?.contentEquals(guardian.pairId) == true
+            // A guardian's own unblock has no one to speak for it once that guardian is gone.
+            val proposedByIt = request.type == RequestType.GUARDIAN_UNBLOCK && request.proposerPairId?.contentEquals(guardian.pairId) == true
+            if (aimedAtIt || proposedByIt) {
                 close(request, RequestState.CANCELLED, CancelCause.GUARDIAN_REMOVED)
                 continue
             }
@@ -275,7 +351,7 @@ class RequestEngine(
                     KillitLog.i(KillitLog.REQ, "UNPAIR timer ran out; removing ${request.targetFp?.short()}")
                     close(request, RequestState.APPROVED, null, timer = true)
                 }
-                RequestType.UNBLOCK_APP -> if (apps.describe(request.packageName ?: continue) == null) {
+                RequestType.UNBLOCK_APP, RequestType.GUARDIAN_UNBLOCK -> if (apps.describe(request.packageName ?: continue) == null) {
                     close(request, RequestState.CANCELLED, CancelCause.APP_UNINSTALLED)
                 }
                 RequestType.UNLOCK -> Unit
@@ -337,17 +413,22 @@ class RequestEngine(
                 val target = dao.pairing(request.targetPairId ?: return) ?: return
                 store.setUnpairChances(target.pairId, (target.unpairChances - 1).coerceAtLeast(0))
             }
-            RequestType.UNLOCK -> Unit
+            RequestType.UNLOCK, RequestType.GUARDIAN_UNBLOCK -> Unit
         }
     }
 
     /** Carries out an approval, at most once. */
     private suspend fun apply(request: OutgoingRequestEntity, timer: Boolean) {
         when (request.type) {
-            RequestType.UNBLOCK_APP -> {
+            RequestType.UNBLOCK_APP, RequestType.GUARDIAN_UNBLOCK -> {
                 val packageName = request.packageName ?: return
                 val digest = request.certDigest ?: return
-                if (!effects.apply(RemoteEffects.Effect.UnblockApp(packageName, digest))) return
+                val effect = if (request.type == RequestType.UNBLOCK_APP) {
+                    RemoteEffects.Effect.UnblockApp(packageName, digest)
+                } else {
+                    RemoteEffects.Effect.ManagedUnblock(packageName, digest)
+                }
+                if (effects.apply(effect) != RemoteEffects.Outcome.APPLIED) return
                 // G7: an unblocked app starts again with every chance.
                 store.setAppChances(packageName, digest, PairingStore.MAX_CHANCES)
             }
@@ -360,28 +441,43 @@ class RequestEngine(
         dao.markApplied(request.requestId)
     }
 
-    /** Sends a request to guardians that don't have it yet, and records their copies. */
+    /**
+     * Sends a request to guardians that don't have it yet, and records their copies. The proposer
+     * of a GUARDIAN_UNBLOCK approved it by proposing it.
+     */
     private suspend fun sendToNewCopies(request: OutgoingRequestEntity, guardians: List<PairingEntity>) {
         val existing = dao.outgoing(request.requestId)?.copies.orEmpty()
         val fresh = guardians.filter { g -> existing.none { it.pairId.contentEquals(g.pairId) } }
         if (fresh.isEmpty()) return
-        dao.upsertCopies(fresh.map { RequestCopyEntity(request.requestId, it.pairId, it.peerFp, Vote.WAITING, "", null) })
+        val proposer = request.proposerPairId
+        dao.upsertCopies(
+            fresh.map {
+                val proposed = proposer?.contentEquals(it.pairId) == true
+                RequestCopyEntity(request.requestId, it.pairId, it.peerFp, if (proposed) Vote.APPROVED else Vote.WAITING, "", if (proposed) now() else null)
+            },
+        )
         val count = (existing.size + fresh.size).coerceIn(1, MAX_GUARDIANS)
+        val app = AppInfo(
+            packageName = request.packageName.orEmpty(),
+            certDigest = request.certDigest ?: ByteArray(0),
+            label = request.appLabel.orEmpty(),
+            installer = request.installer.orEmpty(),
+            firstInstalled = request.firstInstalled ?: 0L,
+            icon = request.icon,
+        )
         val body = when (request.type) {
             RequestType.UNBLOCK_APP -> MessageBody.UnblockApp(
                 requestId = request.requestId,
-                app = AppInfo(
-                    packageName = request.packageName!!,
-                    certDigest = request.certDigest!!,
-                    label = request.appLabel.orEmpty(),
-                    installer = request.installer.orEmpty(),
-                    firstInstalled = request.firstInstalled ?: 0L,
-                    icon = request.icon,
-                ),
+                app = app,
                 explanation = request.explanation,
                 chancesLeft = request.chancesLeft,
                 guardianCount = count,
             )
+            RequestType.GUARDIAN_UNBLOCK -> {
+                // Closed by onGuardianRemoved before its proposer's pairing could be missing.
+                val by = dao.pairing(proposer ?: return) ?: return
+                MessageBody.GuardianUnblock(request.requestId, app, by.peerFp, by.peerName, count)
+            }
             RequestType.UNPAIR -> MessageBody.Unpair(
                 requestId = request.requestId,
                 targetPairId = request.targetPairId!!,
@@ -473,11 +569,22 @@ class RequestEngine(
                 chancesLeft = body.chancesLeft,
                 guardianCount = body.guardianCount,
             )
+            is MessageBody.GuardianUnblock -> base.entity(
+                requestId = body.requestId,
+                type = RequestType.GUARDIAN_UNBLOCK,
+                app = body.app,
+                explanation = "",
+                guardianCount = body.guardianCount,
+                proposerFp = body.proposerFp,
+                proposerName = body.proposerName,
+                // This phone's own unblock: it approved by proposing it, and has nothing to answer.
+                proposedByMe = body.proposerFp.contentEquals(received.header.recipientFp),
+            )
             else -> return
         }
         if (dao.insertIncoming(entity) == -1L) return
         KillitLog.i(KillitLog.REQ, "${entity.type} arrived from ${from.peerFp.short()}")
-        notifier.requestArrived(from, entity)
+        if (entity.myVote == Vote.WAITING) notifier.requestArrived(from, entity)
     }
 
     /**
@@ -493,7 +600,8 @@ class RequestEngine(
         if (!request.state.isOpen || request.myVote != Vote.WAITING) return false
         val text = explanationOrNull(note, TextRule.NOTE) ?: return false
         val target = when (request.type) {
-            RequestType.UNBLOCK_APP -> DecisionTarget.App(AppRef(request.packageName ?: return false, request.certDigest ?: return false))
+            RequestType.UNBLOCK_APP, RequestType.GUARDIAN_UNBLOCK ->
+                DecisionTarget.App(AppRef(request.packageName ?: return false, request.certDigest ?: return false), request.type.toRequestKind())
             RequestType.UNLOCK -> DecisionTarget.Session(request.sessionNonce ?: return false)
             RequestType.UNPAIR -> DecisionTarget.Pairing(request.targetPairId ?: return false)
         }
@@ -514,8 +622,22 @@ class RequestEngine(
         val entries = status.guardians.map { StatusEntryRecord(it.guardianFp.toHex(), it.guardianName, it.state.toVote()) }
         val state = status.outcome.toState()
         dao.setIncomingStatus(from.pairId, status.requestId, state, status.reason.toCause(), StatusEntries.encode(entries))
+        // A MANAGE of this phone's answered the request (SPEC.md §11.7): the answer is its own.
+        val mine = status.guardians.firstOrNull { it.guardianFp.contentEquals(received.header.recipientFp) }?.state?.toVote()
+        if (mine != null && mine != Vote.WAITING && request.myVote == Vote.WAITING) {
+            dao.setMyVote(from.pairId, status.requestId, mine, "", now())
+        }
         if (request.state.isOpen && !state.isOpen) {
             dao.incoming(from.pairId, status.requestId)?.let { notifier.requestSettled(from, it) }
+            // An app request that ended also settles what this phone shows of that app.
+            val packageName = request.packageName
+            if (packageName != null && (request.type == RequestType.UNBLOCK_APP || request.type == RequestType.GUARDIAN_UNBLOCK)) {
+                if (state == RequestState.APPROVED) {
+                    dao.setWardAppState(from.pairId, packageName, WardAppState.ALLOWED)
+                } else {
+                    dao.setWardAppPending(from.pairId, packageName, null)
+                }
+            }
         }
     }
 
@@ -535,6 +657,9 @@ class RequestEngine(
             targetFp: ByteArray? = null,
             timerEndsAt: Long? = null,
             chancesLeft: Int? = null,
+            proposerFp: ByteArray? = null,
+            proposerName: String? = null,
+            proposedByMe: Boolean = false,
         ) = IncomingRequestEntity(
             pairId = pairId,
             requestId = requestId,
@@ -554,13 +679,16 @@ class RequestEngine(
             guardianCount = guardianCount,
             senderCreatedAt = senderCreatedAt,
             receivedAt = now(),
-            myVote = Vote.WAITING,
+            myVote = if (proposedByMe) Vote.APPROVED else Vote.WAITING,
             myNote = "",
-            decidedAt = null,
+            decidedAt = if (proposedByMe) now() else null,
             state = RequestState.OPEN,
             cancelCause = null,
             statusEntries = StatusEntries.encode(emptyList()),
             remindedAt = null,
+            proposerFp = proposerFp,
+            proposerName = proposerName,
+            proposedByMe = proposedByMe,
         )
     }
 
@@ -577,7 +705,8 @@ class RequestEngine(
 
         /** What a DECISION on [request] must bind (§11.6). */
         internal fun targetOf(request: OutgoingRequestEntity): DecisionTarget = when (request.type) {
-            RequestType.UNBLOCK_APP -> DecisionTarget.App(AppRef(request.packageName!!, request.certDigest!!))
+            RequestType.UNBLOCK_APP, RequestType.GUARDIAN_UNBLOCK ->
+                DecisionTarget.App(AppRef(request.packageName!!, request.certDigest!!), request.type.toRequestKind())
             RequestType.UNPAIR -> DecisionTarget.Pairing(request.targetPairId!!)
             RequestType.UNLOCK -> error("a live unlock binds its in-memory session")
         }
@@ -588,6 +717,7 @@ internal fun RequestType.toRequestKind(): RequestKind = when (this) {
     RequestType.UNBLOCK_APP -> RequestKind.UNBLOCK_APP
     RequestType.UNLOCK -> RequestKind.UNLOCK
     RequestType.UNPAIR -> RequestKind.UNPAIR
+    RequestType.GUARDIAN_UNBLOCK -> RequestKind.GUARDIAN_UNBLOCK
 }
 
 internal fun RequestState.toOutcome(): Outcome = when (this) {

@@ -1,0 +1,1096 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "9f563707a593e9770e6f20fa4f58541e",
+    "entities": [
+      {
+        "tableName": "known_packages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`package_name` TEXT NOT NULL, `cert_sha256` BLOB NOT NULL, `status` TEXT NOT NULL, `since_millis` INTEGER NOT NULL, PRIMARY KEY(`package_name`))",
+        "fields": [
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "certSha256",
+            "columnName": "cert_sha256",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sinceMillis",
+            "columnName": "since_millis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "package_name"
+          ]
+        }
+      },
+      {
+        "tableName": "pairings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pair_id` BLOB NOT NULL, `peer_fp` BLOB NOT NULL, `peer_sign_pk` BLOB NOT NULL, `peer_enc_pk` BLOB NOT NULL, `my_role` TEXT NOT NULL, `peer_name` TEXT NOT NULL, `nickname` TEXT NOT NULL, `peer_model` TEXT NOT NULL, `app_management` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `unpair_chances` INTEGER NOT NULL, `last_seen_days` INTEGER, `silence_alerted` INTEGER NOT NULL, `manage_seq` INTEGER NOT NULL, PRIMARY KEY(`pair_id`))",
+        "fields": [
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "peerFp",
+            "columnName": "peer_fp",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "peerSignPk",
+            "columnName": "peer_sign_pk",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "peerEncPk",
+            "columnName": "peer_enc_pk",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "myRole",
+            "columnName": "my_role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "peerName",
+            "columnName": "peer_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nickname",
+            "columnName": "nickname",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "peerModel",
+            "columnName": "peer_model",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "appManagement",
+            "columnName": "app_management",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unpairChances",
+            "columnName": "unpair_chances",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastSeenDaysAgo",
+            "columnName": "last_seen_days",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "silenceAlerted",
+            "columnName": "silence_alerted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "manageSeq",
+            "columnName": "manage_seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pair_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pairings_peer_fp",
+            "unique": false,
+            "columnNames": [
+              "peer_fp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pairings_peer_fp` ON `${TABLE_NAME}` (`peer_fp`)"
+          }
+        ]
+      },
+      {
+        "tableName": "ceremony",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`invite_id` TEXT NOT NULL, `side` TEXT NOT NULL, `my_role` TEXT NOT NULL, `self_name` TEXT NOT NULL, `code` TEXT, `expires_at` INTEGER NOT NULL, `my_nonce` BLOB NOT NULL, `my_reveal` BLOB NOT NULL, `commit` BLOB, `peer_reveal` BLOB, `pair_id` BLOB, `safety_code` TEXT, `stage` TEXT NOT NULL, `failure` TEXT, `invite_version` TEXT, `peer_name` TEXT, `peer_model` TEXT, `nickname` TEXT, `created_at` INTEGER NOT NULL, PRIMARY KEY(`invite_id`))",
+        "fields": [
+          {
+            "fieldPath": "inviteId",
+            "columnName": "invite_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "side",
+            "columnName": "side",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "myRole",
+            "columnName": "my_role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selfName",
+            "columnName": "self_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "expiresAt",
+            "columnName": "expires_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "myNonce",
+            "columnName": "my_nonce",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "myReveal",
+            "columnName": "my_reveal",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "commit",
+            "columnName": "commit",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "peerReveal",
+            "columnName": "peer_reveal",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "safetyCode",
+            "columnName": "safety_code",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stage",
+            "columnName": "stage",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "failure",
+            "columnName": "failure",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "inviteVersion",
+            "columnName": "invite_version",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "peerName",
+            "columnName": "peer_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "peerModel",
+            "columnName": "peer_model",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nickname",
+            "columnName": "nickname",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "invite_id"
+          ]
+        }
+      },
+      {
+        "tableName": "outgoing_requests",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`request_id` BLOB NOT NULL, `type` TEXT NOT NULL, `package_name` TEXT, `cert_digest` BLOB, `app_label` TEXT, `installer` TEXT, `first_installed` INTEGER, `icon` BLOB, `target_pair_id` BLOB, `target_fp` BLOB, `explanation` TEXT NOT NULL, `chances_left` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `timer_ends_at` INTEGER, `state` TEXT NOT NULL, `cancel_cause` TEXT, `closed_at` INTEGER, `applied` INTEGER NOT NULL, `proposer_pair_id` BLOB, PRIMARY KEY(`request_id`))",
+        "fields": [
+          {
+            "fieldPath": "requestId",
+            "columnName": "request_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "certDigest",
+            "columnName": "cert_digest",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "appLabel",
+            "columnName": "app_label",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "installer",
+            "columnName": "installer",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "firstInstalled",
+            "columnName": "first_installed",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "targetPairId",
+            "columnName": "target_pair_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "targetFp",
+            "columnName": "target_fp",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "explanation",
+            "columnName": "explanation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chancesLeft",
+            "columnName": "chances_left",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timerEndsAt",
+            "columnName": "timer_ends_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cancelCause",
+            "columnName": "cancel_cause",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "closedAt",
+            "columnName": "closed_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "applied",
+            "columnName": "applied",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "proposerPairId",
+            "columnName": "proposer_pair_id",
+            "affinity": "BLOB"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "request_id"
+          ]
+        }
+      },
+      {
+        "tableName": "request_copies",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`request_id` BLOB NOT NULL, `pair_id` BLOB NOT NULL, `guardian_fp` BLOB NOT NULL, `vote` TEXT NOT NULL, `note` TEXT NOT NULL, `decided_at` INTEGER, PRIMARY KEY(`request_id`, `pair_id`), FOREIGN KEY(`request_id`) REFERENCES `outgoing_requests`(`request_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "requestId",
+            "columnName": "request_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "guardianFp",
+            "columnName": "guardian_fp",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vote",
+            "columnName": "vote",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "note",
+            "columnName": "note",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "decidedAt",
+            "columnName": "decided_at",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "request_id",
+            "pair_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_request_copies_pair_id",
+            "unique": false,
+            "columnNames": [
+              "pair_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_request_copies_pair_id` ON `${TABLE_NAME}` (`pair_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "outgoing_requests",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "request_id"
+            ],
+            "referencedColumns": [
+              "request_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "incoming_requests",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pair_id` BLOB NOT NULL, `request_id` BLOB NOT NULL, `type` TEXT NOT NULL, `package_name` TEXT, `cert_digest` BLOB, `app_label` TEXT, `installer` TEXT, `first_installed` INTEGER, `icon` BLOB, `session_nonce` BLOB, `target_pair_id` BLOB, `target_fp` BLOB, `timer_ends_at` INTEGER, `explanation` TEXT NOT NULL, `chances_left` INTEGER, `guardian_count` INTEGER NOT NULL, `sender_created_at` INTEGER NOT NULL, `received_at` INTEGER NOT NULL, `my_vote` TEXT NOT NULL, `my_note` TEXT NOT NULL, `decided_at` INTEGER, `state` TEXT NOT NULL, `cancel_cause` TEXT, `status_entries` TEXT NOT NULL, `reminded_at` INTEGER, `proposer_fp` BLOB, `proposer_name` TEXT, `proposed_by_me` INTEGER NOT NULL, PRIMARY KEY(`pair_id`, `request_id`))",
+        "fields": [
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "requestId",
+            "columnName": "request_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "certDigest",
+            "columnName": "cert_digest",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "appLabel",
+            "columnName": "app_label",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "installer",
+            "columnName": "installer",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "firstInstalled",
+            "columnName": "first_installed",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "sessionNonce",
+            "columnName": "session_nonce",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "targetPairId",
+            "columnName": "target_pair_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "targetFp",
+            "columnName": "target_fp",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "timerEndsAt",
+            "columnName": "timer_ends_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "explanation",
+            "columnName": "explanation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chancesLeft",
+            "columnName": "chances_left",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "guardianCount",
+            "columnName": "guardian_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderCreatedAt",
+            "columnName": "sender_created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedAt",
+            "columnName": "received_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "myVote",
+            "columnName": "my_vote",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "myNote",
+            "columnName": "my_note",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "decidedAt",
+            "columnName": "decided_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cancelCause",
+            "columnName": "cancel_cause",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "statusEntries",
+            "columnName": "status_entries",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remindedAt",
+            "columnName": "reminded_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "proposerFp",
+            "columnName": "proposer_fp",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "proposerName",
+            "columnName": "proposer_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "proposedByMe",
+            "columnName": "proposed_by_me",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pair_id",
+            "request_id"
+          ]
+        }
+      },
+      {
+        "tableName": "app_chances",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`package_name` TEXT NOT NULL, `cert_digest` BLOB NOT NULL, `chances_left` INTEGER NOT NULL, PRIMARY KEY(`package_name`, `cert_digest`))",
+        "fields": [
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "certDigest",
+            "columnName": "cert_digest",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chancesLeft",
+            "columnName": "chances_left",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "package_name",
+            "cert_digest"
+          ]
+        }
+      },
+      {
+        "tableName": "seen_messages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sender_fp` BLOB NOT NULL, `message_id` BLOB NOT NULL, `seen_at` INTEGER NOT NULL, PRIMARY KEY(`sender_fp`, `message_id`))",
+        "fields": [
+          {
+            "fieldPath": "senderFp",
+            "columnName": "sender_fp",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageId",
+            "columnName": "message_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seenAt",
+            "columnName": "seen_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sender_fp",
+            "message_id"
+          ]
+        }
+      },
+      {
+        "tableName": "outbox",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `recipient_fp` BLOB NOT NULL, `envelope` BLOB NOT NULL, `kind` INTEGER NOT NULL, `created_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipientFp",
+            "columnName": "recipient_fp",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "envelope",
+            "columnName": "envelope",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_outbox_recipient_fp",
+            "unique": false,
+            "columnNames": [
+              "recipient_fp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_outbox_recipient_fp` ON `${TABLE_NAME}` (`recipient_fp`)"
+          }
+        ]
+      },
+      {
+        "tableName": "link_deletions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`peer_fp` BLOB NOT NULL, `requested_at` INTEGER NOT NULL, PRIMARY KEY(`peer_fp`))",
+        "fields": [
+          {
+            "fieldPath": "peerFp",
+            "columnName": "peer_fp",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "requestedAt",
+            "columnName": "requested_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "peer_fp"
+          ]
+        }
+      },
+      {
+        "tableName": "unknown_messages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pair_id` BLOB, `sender_fp` BLOB NOT NULL, `version` INTEGER NOT NULL, `kind` INTEGER NOT NULL, `inner` BLOB NOT NULL, `received_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "senderFp",
+            "columnName": "sender_fp",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "kind",
+            "columnName": "kind",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "inner",
+            "columnName": "inner",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receivedAt",
+            "columnName": "received_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "events",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `pair_id` BLOB, `at` INTEGER NOT NULL, `type` TEXT NOT NULL, `peer_name` TEXT, `app_label` TEXT, `package_name` TEXT, `other_name` TEXT, `value` INTEGER, `flag` INTEGER, `time` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "at",
+            "columnName": "at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "peerName",
+            "columnName": "peer_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "appLabel",
+            "columnName": "app_label",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "otherName",
+            "columnName": "other_name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "flag",
+            "columnName": "flag",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_events_pair_id",
+            "unique": false,
+            "columnNames": [
+              "pair_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_pair_id` ON `${TABLE_NAME}` (`pair_id`)"
+          },
+          {
+            "name": "index_events_at",
+            "unique": false,
+            "columnNames": [
+              "at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_events_at` ON `${TABLE_NAME}` (`at`)"
+          }
+        ]
+      },
+      {
+        "tableName": "pending_unlocks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`request_id` BLOB NOT NULL, `created_at` INTEGER NOT NULL, PRIMARY KEY(`request_id`))",
+        "fields": [
+          {
+            "fieldPath": "requestId",
+            "columnName": "request_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "request_id"
+          ]
+        }
+      },
+      {
+        "tableName": "manage_seqs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pair_id` BLOB NOT NULL, `package_name` TEXT NOT NULL, `seq` INTEGER NOT NULL, PRIMARY KEY(`pair_id`, `package_name`))",
+        "fields": [
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seq",
+            "columnName": "seq",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pair_id",
+            "package_name"
+          ]
+        }
+      },
+      {
+        "tableName": "ward_lists",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pair_id` BLOB NOT NULL, `list_id` BLOB NOT NULL, `requested_at` INTEGER NOT NULL, `completed_at` INTEGER, `failed` INTEGER NOT NULL, PRIMARY KEY(`pair_id`))",
+        "fields": [
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listId",
+            "columnName": "list_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "requestedAt",
+            "columnName": "requested_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completedAt",
+            "columnName": "completed_at",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "failed",
+            "columnName": "failed",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pair_id"
+          ]
+        }
+      },
+      {
+        "tableName": "ward_list_pages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pair_id` BLOB NOT NULL, `page` INTEGER NOT NULL, `body` BLOB NOT NULL, PRIMARY KEY(`pair_id`, `page`))",
+        "fields": [
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "page",
+            "columnName": "page",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "body",
+            "columnName": "body",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pair_id",
+            "page"
+          ]
+        }
+      },
+      {
+        "tableName": "ward_apps",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pair_id` BLOB NOT NULL, `package_name` TEXT NOT NULL, `cert_digest` BLOB NOT NULL, `label` TEXT NOT NULL, `installer` TEXT NOT NULL, `first_installed` INTEGER NOT NULL, `state` TEXT NOT NULL, `icon` BLOB, `pending_block` INTEGER, PRIMARY KEY(`pair_id`, `package_name`))",
+        "fields": [
+          {
+            "fieldPath": "pairId",
+            "columnName": "pair_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageName",
+            "columnName": "package_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "certDigest",
+            "columnName": "cert_digest",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "label",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "installer",
+            "columnName": "installer",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "firstInstalled",
+            "columnName": "first_installed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "icon",
+            "columnName": "icon",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "pendingBlock",
+            "columnName": "pending_block",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "pair_id",
+            "package_name"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9f563707a593e9770e6f20fa4f58541e')"
+    ]
+  }
+}

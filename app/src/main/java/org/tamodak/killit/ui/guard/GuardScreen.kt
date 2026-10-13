@@ -128,10 +128,11 @@ fun GuardScreen(
 @Composable
 internal fun RequestCard(request: IncomingRequestEntity, from: PairingEntity, onClick: () -> Unit) {
     val live = request.type == RequestType.UNLOCK && request.state.isOpen
-    val standing = closedText(request) ?: when (request.myVote) {
-        Vote.APPROVED -> stringResource(R.string.request_you_approved)
-        Vote.DENIED -> stringResource(R.string.request_you_denied)
-        Vote.WAITING -> null
+    val standing = closedText(request) ?: when {
+        request.proposedByMe -> stringResource(R.string.request_guardian_unblock_mine_body)
+        request.myVote == Vote.APPROVED -> stringResource(R.string.request_you_approved)
+        request.myVote == Vote.DENIED -> stringResource(R.string.request_you_denied)
+        else -> null
     }
     Row(
         modifier = Modifier
@@ -145,7 +146,7 @@ internal fun RequestCard(request: IncomingRequestEntity, from: PairingEntity, on
         PeerBadge(fp = from.peerFp, size = 36.dp)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = requestSummary(request, from), style = MaterialTheme.typography.titleSmall, color = KillitForeground)
-            if (request.type == RequestType.UNBLOCK_APP) {
+            if (request.isAboutApp()) {
                 Text(text = request.packageName.orEmpty(), style = MaterialTheme.typography.bodySmall, color = KillitTextFaint)
             }
             if (request.explanation.isNotEmpty()) {
@@ -164,9 +165,12 @@ internal fun RequestCard(request: IncomingRequestEntity, from: PairingEntity, on
             )
             if (standing != null) Text(text = standing, style = MaterialTheme.typography.bodySmall, color = KillitTextMuted)
         }
-        if (request.type == RequestType.UNBLOCK_APP) RemoteAppIcon(rgba = request.icon, size = 36.dp)
+        if (request.isAboutApp()) RemoteAppIcon(rgba = request.icon, size = 36.dp)
     }
 }
+
+/** True for the requests about one app: the guarded phone's own, and a guardian's relayed one. */
+internal fun IncomingRequestEntity.isAboutApp(): Boolean = type == RequestType.UNBLOCK_APP || type == RequestType.GUARDIAN_UNBLOCK
 
 /** "Ali wants to unblock TikTok", "…wants to unlock Killit", "…wants to remove Dad / you". */
 @Composable

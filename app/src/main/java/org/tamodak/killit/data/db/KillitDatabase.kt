@@ -9,6 +9,7 @@ import org.tamodak.killit.pairing.store.CeremonyEntity
 import org.tamodak.killit.pairing.store.EventEntity
 import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.LinkDeletionEntity
+import org.tamodak.killit.pairing.store.ManageSeqEntity
 import org.tamodak.killit.pairing.store.OutboxEntity
 import org.tamodak.killit.pairing.store.OutgoingRequestEntity
 import org.tamodak.killit.pairing.store.PairingDao
@@ -17,6 +18,9 @@ import org.tamodak.killit.pairing.store.PendingUnlockEntity
 import org.tamodak.killit.pairing.store.RequestCopyEntity
 import org.tamodak.killit.pairing.store.SeenMessageEntity
 import org.tamodak.killit.pairing.store.UnknownMessageEntity
+import org.tamodak.killit.pairing.store.WardAppEntity
+import org.tamodak.killit.pairing.store.WardListEntity
+import org.tamodak.killit.pairing.store.WardListPageEntity
 
 /**
  * Killit's local database.
@@ -25,8 +29,9 @@ import org.tamodak.killit.pairing.store.UnknownMessageEntity
  * matters has a durable copy in the device owner's application restrictions as well. The schema of
  * every version is exported to `app/schemas`.
  *
- * Version 2 adds pairing. Killit has no users yet (PLAN.md K5), so a version-1 database is simply
- * dropped: the known-package list comes back from its durable copy on the next check.
+ * Version 2 added pairing, and version 3 guardians managing apps and moving to a new phone.
+ * Killit has no users yet (PLAN.md K5), so an older database is simply dropped: the known-package
+ * list and a protected phone's guardians come back from their durable copies.
  */
 @Database(
     entities = [
@@ -43,8 +48,12 @@ import org.tamodak.killit.pairing.store.UnknownMessageEntity
         UnknownMessageEntity::class,
         EventEntity::class,
         PendingUnlockEntity::class,
+        ManageSeqEntity::class,
+        WardListEntity::class,
+        WardListPageEntity::class,
+        WardAppEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class KillitDatabase : RoomDatabase() {
@@ -68,7 +77,7 @@ abstract class KillitDatabase : RoomDatabase() {
          */
         fun create(context: Context): KillitDatabase =
             Room.databaseBuilder(context.applicationContext, KillitDatabase::class.java, FILE_NAME)
-                .fallbackToDestructiveMigrationFrom(dropAllTables = true, 1)
+                .fallbackToDestructiveMigrationFrom(dropAllTables = true, 1, 2)
                 .build()
     }
 }

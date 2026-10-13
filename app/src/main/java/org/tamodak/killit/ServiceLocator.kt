@@ -174,6 +174,7 @@ object ServiceLocator {
                 unlockCooldownMillis = BuildConfig.UNLOCK_COOLDOWN_MILLIS,
                 unlocksPerDay = BuildConfig.UNLOCKS_PER_DAY,
                 silenceAlertMillis = BuildConfig.SILENCE_ALERT_MILLIS,
+                listAnswersPerHour = BuildConfig.LIST_ANSWERS_PER_HOUR,
             ),
             canBeProtected = { devicePolicyController.isDeviceOwner() },
             scheduler = object : PairingEngine.Scheduler {

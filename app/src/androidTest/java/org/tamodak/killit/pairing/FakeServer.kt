@@ -76,6 +76,14 @@ class FakeServer(private val now: () -> Long) {
     @Synchronized
     fun linked(a: ByteArray, b: ByteArray): Boolean = setOf(deviceId(a), deviceId(b)) in links
 
+    /** Reverses the order of the messages waiting for [to], as a reordering server would. */
+    @Synchronized
+    fun reverseMailbox(to: ByteArray) {
+        val mine = messages.filter { it.to == deviceId(to) }
+        messages.removeAll(mine)
+        messages.addAll(mine.reversed())
+    }
+
     private inner class Client(private val me: String) : PairingServer {
         override suspend fun createInvite(): InviteCreated = synchronized(this@FakeServer) {
             invites.filter { it.creator == me && it.live }.forEach { it.state = "cancelled"; it.version++ }

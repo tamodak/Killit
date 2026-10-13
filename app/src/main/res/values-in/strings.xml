@@ -460,4 +460,44 @@
     <string name="onboarding_next">Berikutnya</string>
     <string name="onboarding_skip">Lewati</string>
     <string name="onboarding_start">Mulai</string>
+
+    <!-- ============================== Guardians managing apps (PLAN.md §3.8) ============================== -->
+    <string name="management_title">Izinkan penjaga mengelola aplikasiku</string>
+    <string name="management_on_desc">Nyala. Penjagamu melihat aplikasimu, dan siapa pun dari mereka bisa memblokir satu. Membuka blokir butuh semuanya.</string>
+    <string name="management_off_desc">Mati. Penjagamu hanya melihat aplikasi yang kamu minta dibuka blokirnya.</string>
+    <string name="management_on_confirm_title">Izinkan penjagamu mengelola aplikasimu?</string>
+    <string name="management_on_confirm_body">Penjagamu akan melihat aplikasi apa saja yang ada di ponsel ini. Siapa pun dari mereka bisa langsung memblokir aplikasi; membuka blokir butuh semuanya. Kamu akan diberi tahu setiap perubahan, dan hanya Killit yang tidak terkunci yang bisa mematikannya lagi.</string>
+    <string name="management_on_confirm">Nyalakan</string>
+    <string name="management_off_confirm_title">Hentikan penjagamu mengelola aplikasimu?</string>
+    <string name="management_off_confirm_body">Penjagamu akan diberi tahu, dan mereka tidak lagi melihat aplikasimu.</string>
+    <string name="management_off_confirm">Matikan</string>
+    <string name="wizard_management_on">Penjagamu bisa mengelola aplikasimu: mereka melihat aplikasi apa saja yang ada di ponsel ini, dan siapa pun dari mereka bisa memblokir satu.</string>
+    <string name="wizard_management_off">Penjagamu tidak bisa mengelola aplikasimu. Kamu bisa mengizinkannya di Setelan saat Killit tidak terkunci.</string>
+    <string name="wizard_paired_management">%1$s mengizinkanmu mengelola aplikasinya.</string>
+    <string name="phone_manage_apps">Kelola aplikasi</string>
+    <string name="phone_manage_apps_desc">Lihat aplikasi apa saja di ponsel ini, dan blokir</string>
+    <string name="phone_manage_off">%1$s belum mengizinkan penjaga mengelola aplikasi.</string>
+    <string name="manage_intro">Aplikasi yang dicentang diblokir. Memblokir langsung berlaku; membuka blokir butuh persetujuan setiap penjaga.</string>
+    <string name="manage_asking">Meminta daftar aplikasi dari ponsel…</string>
+    <string name="manage_no_answer">Belum ada jawaban. Daftar datang saat ponsel online.</string>
+    <string name="manage_failed">Daftar tidak tiba utuh. Minta lagi.</string>
+    <string name="manage_ask_again">Minta lagi</string>
+    <string name="manage_asked">Diminta dibuka blokirnya</string>
+    <string name="manage_blocking">Memblokir…</string>
+    <string name="manage_unblocking">Membuka blokir…</string>
+    <plurals name="manage_send">
+        <item quantity="other">Kirim %1$d perubahan</item>
+    </plurals>
+    <string name="manage_sent">Terkirim. Ponsel menerapkannya saat online.</string>
+    <string name="manage_none">Belum ada aplikasi untuk ditampilkan.</string>
+    <string name="request_guardian_unblock">%1$s membuka blokir %2$s untuk %3$s</string>
+    <string name="request_guardian_unblock_body">Juga butuh persetujuanmu.</string>
+    <string name="request_guardian_unblock_mine">Kamu membuka blokir %1$s untuk %2$s</string>
+    <string name="request_guardian_unblock_mine_body">Menunggu penjaga yang lain.</string>
+    <string name="event_app_blocked_by">%1$s memblokir %2$s</string>
+    <string name="event_app_unblocked_by">%1$s membuka blokir %2$s</string>
+    <string name="event_app_blocked_by_you">Kamu memblokir %1$s</string>
+    <string name="event_app_unblocked_by_you">Kamu membuka blokir %1$s</string>
+    <string name="event_app_refused">Android tidak mau memblokir %1$s</string>
+    <string name="notif_app_unblocked_by_guardians">Penjagamu membuka blokirnya.</string>
 </resources>

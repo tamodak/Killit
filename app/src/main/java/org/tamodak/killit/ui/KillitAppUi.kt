@@ -25,6 +25,7 @@ import org.tamodak.killit.ui.apps.AppListScreen
 import org.tamodak.killit.ui.gate.AuthGateScreen
 import org.tamodak.killit.ui.guard.GuardScreen
 import org.tamodak.killit.ui.guard.GuardSettingsScreen
+import org.tamodak.killit.ui.guard.ManageAppsScreen
 import org.tamodak.killit.ui.guard.PhoneScreen
 import org.tamodak.killit.ui.guard.RequestScreen
 import org.tamodak.killit.ui.hub.HubScreen
@@ -237,6 +238,7 @@ private fun Screens(
             onCancelRelease = viewModel::cancelRelease,
             onReleaseDeviceOwner = viewModel::releaseDeviceOwner,
             onLanguageChange = viewModel::setLanguage,
+            onAppManagementChange = viewModel::setAppManagement,
         )
 
         Screen.Apps -> AppListScreen(
@@ -333,6 +335,16 @@ private fun Screens(
             onOpenRequest = { pairId, requestId -> viewModel.navigateTo(Screen.Request(pairId, requestId, parent = screen)) },
             onRename = pairingViewModel::rename,
             onLeave = { pairId -> pairingViewModel.leave(pairId) { viewModel.back() } },
+            onManageApps = { viewModel.navigateTo(Screen.ManageApps(screen.pairId)) },
+        )
+
+        is Screen.ManageApps -> ManageAppsScreen(
+            pairIdHex = screen.pairId,
+            pairing = pairing,
+            onBack = viewModel::back,
+            onRequest = { pairingViewModel.requestAppList(screen.pairId) },
+            onSend = { changes -> pairingViewModel.manageApps(screen.pairId, changes) },
+            follow = { pairingViewModel.followAppList(screen.pairId) },
         )
 
         Screen.GuardSettings -> GuardSettingsScreen(
@@ -345,6 +357,7 @@ private fun Screens(
         is Screen.Wizard -> WizardScreen(
             role = screen.role,
             isDeviceOwner = state.isDeviceOwner,
+            appManagement = state.appManagement == true,
             pairing = pairing,
             onBack = viewModel::back,
             onStart = { name, code -> pairingViewModel.startCeremony(screen.role, name, code) },
@@ -362,7 +375,7 @@ private fun Screens(
 /** True for the screens whose content comes from pairing, which sync when they open. */
 private fun Screen.showsPairing(): Boolean = when (this) {
     Screen.Hub, Screen.MyPhone, Screen.Guardians, Screen.AskUnblock, is Screen.AskUnblockApp,
-    Screen.Guard, is Screen.Request, is Screen.Phone -> true
+    Screen.Guard, is Screen.Request, is Screen.Phone, is Screen.ManageApps -> true
     else -> false
 }
 
@@ -375,6 +388,7 @@ private fun pairingMessageText(message: PairingMessage): String = when (message)
     PairingMessage.CodeNotFound -> stringResource(R.string.wizard_failed_code)
     PairingMessage.RateLimited -> stringResource(R.string.msg_rate_limited)
     PairingMessage.Sent -> stringResource(R.string.msg_sent)
+    PairingMessage.ManageSent -> stringResource(R.string.manage_sent)
     is PairingMessage.NotSent -> stringResource(
         when (message.result) {
             RequestEngine.AskResult.NoGuardians -> R.string.msg_no_guardians

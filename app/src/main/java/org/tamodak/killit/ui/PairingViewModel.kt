@@ -32,7 +32,10 @@ import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.OutgoingRequestWithCopies
 import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.pairing.store.PairingEntity
+import org.tamodak.killit.pairing.store.WardAppEntity
+import org.tamodak.killit.pairing.store.WardListEntity
 import org.tamodak.killit.protection.PackageGuard
+import org.tamodak.killit.protocol.AppRef
 import org.tamodak.killit.protocol.TextRule
 import org.tamodak.killit.protocol.fitText
 import org.tamodak.killit.protocol.fromHex
@@ -60,6 +63,9 @@ sealed interface PairingMessage {
 
     /** A request was sent to every guardian. */
     data object Sent : PairingMessage
+
+    /** Changes to a guarded phone's apps were sent; it applies them once it is online. */
+    data object ManageSent : PairingMessage
 }
 
 /**
@@ -76,6 +82,8 @@ sealed interface PairingMessage {
  * @param chances UNBLOCK_APP chances left, keyed by [chancesKey].
  * @param selfName the name this phone last called itself, offered again.
  * @param guardianNoticeSeen whether the guardian passkey explanation was acknowledged (§15.11).
+ * @param wardApps the guarded phones' apps, from their last lists (PLAN.md §3.8).
+ * @param wardLists the app list asked for last from each guarded phone.
  */
 data class PairingUiState(
     val pairings: List<PairingEntity> = emptyList(),
@@ -90,6 +98,8 @@ data class PairingUiState(
     val chances: Map<String, Int> = emptyMap(),
     val selfName: String = "",
     val guardianNoticeSeen: Boolean = true,
+    val wardApps: List<WardAppEntity> = emptyList(),
+    val wardLists: List<WardListEntity> = emptyList(),
     val busy: Boolean = false,
     val message: PairingMessage? = null,
 ) {
@@ -143,6 +153,8 @@ class PairingViewModel(
             }
         }
         viewModelScope.launch { prefs.guardianNoticeAcknowledged.collect { seen -> _state.update { it.copy(guardianNoticeSeen = seen) } } }
+        viewModelScope.launch { engine.wardApps.collect { apps -> _state.update { it.copy(wardApps = apps) } } }
+        viewModelScope.launch { engine.wardLists.collect { lists -> _state.update { it.copy(wardLists = lists) } } }
         viewModelScope.launch { _state.update { it.copy(selfName = prefs.selfName() ?: defaultName) } }
     }
 
@@ -243,6 +255,25 @@ class PairingViewModel(
     fun rename(pairIdHex: String, nickname: String) = act { engine.rename(pairIdHex.fromHex(), nickname.trim()) }
 
     fun acknowledgeGuardianNotice() = act { prefs.acknowledgeGuardianNotice() }
+
+    /** Asks a guarded phone for its app list (SPEC.md §11.10). */
+    fun requestAppList(pairIdHex: String) = act { engine.requestAppList(pairIdHex.fromHex()) }
+
+    /** Sends a guarded phone the changes to its apps: each with true to block it, false to unblock it. */
+    fun manageApps(pairIdHex: String, changes: List<Pair<AppRef, Boolean>>) = act {
+        if (engine.manageApps(pairIdHex.fromHex(), changes)) say(PairingMessage.ManageSent)
+    }
+
+    /**
+     * Follows a guarded phone's answer while its app list is on screen: its pages and the notices
+     * of what changed arrive through a long poll.
+     */
+    suspend fun followAppList(pairIdHex: String) = followWhile {
+        val list = _state.value.wardLists.firstOrNull { it.pairId.toHex() == pairIdHex }
+        val waiting = list != null && list.completedAt == null && !list.failed
+        val pending = _state.value.wardApps.any { it.pairId.toHex() == pairIdHex && it.pendingBlock != null }
+        if (waiting || pending) engine.sync(LONG_POLL_SECONDS) else delay(IDLE_MILLIS)
+    }
 
     // ---------------------------------------------------------------- either side
 

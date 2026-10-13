@@ -35,6 +35,8 @@ import org.tamodak.killit.R
 import org.tamodak.killit.pairing.PairingTexts
 import org.tamodak.killit.protocol.ICON_BYTES
 import org.tamodak.killit.protocol.ICON_SIDE
+import org.tamodak.killit.protocol.LIST_ICON_BYTES
+import org.tamodak.killit.protocol.LIST_ICON_SIDE
 import org.tamodak.killit.protocol.TextRule
 import org.tamodak.killit.protocol.codePointCount
 import org.tamodak.killit.protocol.encodeText
@@ -109,8 +111,8 @@ private fun badgeOf(fp: ByteArray): Pair<Color, BooleanArray> {
 }
 
 /**
- * An app's icon as a request carried it: 32 × 32 RGBA pixels, turned into a bitmap without any
- * image decoder (SPEC.md §11.2).
+ * An app's icon as a message carried it: RGBA pixels, 32 × 32 in a request and 16 × 16 in an app
+ * list, turned into a bitmap without any image decoder (SPEC.md §11.2, §11.10).
  *
  * @param rgba the pixels, or null for an app without one.
  */
@@ -125,15 +127,19 @@ fun RemoteAppIcon(rgba: ByteArray?, modifier: Modifier = Modifier, size: Dp = 42
 }
 
 private fun bitmapOf(rgba: ByteArray): ImageBitmap? {
-    if (rgba.size != ICON_BYTES) return null
-    val pixels = IntArray(ICON_SIDE * ICON_SIDE) { i ->
+    val side = when (rgba.size) {
+        ICON_BYTES -> ICON_SIDE
+        LIST_ICON_BYTES -> LIST_ICON_SIDE
+        else -> return null
+    }
+    val pixels = IntArray(side * side) { i ->
         val r = rgba[4 * i].toInt() and 0xff
         val g = rgba[4 * i + 1].toInt() and 0xff
         val b = rgba[4 * i + 2].toInt() and 0xff
         val a = rgba[4 * i + 3].toInt() and 0xff
         (a shl 24) or (r shl 16) or (g shl 8) or b
     }
-    return Bitmap.createBitmap(pixels, ICON_SIDE, ICON_SIDE, Bitmap.Config.ARGB_8888).asImageBitmap()
+    return Bitmap.createBitmap(pixels, side, side, Bitmap.Config.ARGB_8888).asImageBitmap()
 }
 
 /**

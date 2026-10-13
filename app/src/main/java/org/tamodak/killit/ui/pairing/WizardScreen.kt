@@ -71,6 +71,8 @@ import org.tamodak.killit.ui.theme.KillitTextFaint
  * where it was when the user comes back from the call that compares the codes.
  *
  * @param isDeviceOwner whether this phone may be guarded; the protected side needs device owner.
+ * @param appManagement whether this phone lets its guardians manage its apps, which the protected
+ *   side states before pairing so it knows what the guardian will be able to do (G3).
  * @param follow keeps up with the other phone while the wizard is shown.
  * @param onOpenSetup goes to My phone, to set up device owner first.
  */
@@ -78,6 +80,7 @@ import org.tamodak.killit.ui.theme.KillitTextFaint
 fun WizardScreen(
     role: PairRole,
     isDeviceOwner: Boolean,
+    appManagement: Boolean,
     pairing: PairingUiState,
     onBack: () -> Unit,
     onStart: (String, String?) -> Unit,
@@ -106,7 +109,7 @@ fun WizardScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             when {
-                ceremony == null -> Intro(role, isDeviceOwner, pairing, onStart, onOpenSetup)
+                ceremony == null -> Intro(role, isDeviceOwner, appManagement, pairing, onStart, onOpenSetup)
                 else -> Step(ceremony, pairing, onConfirm, onReject, onCancel, onNickname, onDismiss, onBack)
             }
         }
@@ -118,6 +121,7 @@ fun WizardScreen(
 private fun Intro(
     role: PairRole,
     isDeviceOwner: Boolean,
+    appManagement: Boolean,
     pairing: PairingUiState,
     onStart: (String, String?) -> Unit,
     onOpenSetup: () -> Unit,
@@ -139,6 +143,10 @@ private fun Intro(
             KillitButton(text = stringResource(R.string.wizard_set_up), onClick = onOpenSetup)
         }
         return
+    }
+
+    if (protectedSide) {
+        KillitBody(stringResource(if (appManagement) R.string.wizard_management_on else R.string.wizard_management_off))
     }
 
     if (protectedSide) {
@@ -214,7 +222,7 @@ private fun Step(
         CeremonyStage.COMPARING -> Compare(ceremony, pairing.busy, onConfirm, onReject)
         CeremonyStage.CONFIRMED -> Waiting(stringResource(R.string.wizard_waiting_confirm), onCancel)
         CeremonyStage.LINKED -> Waiting(stringResource(R.string.wizard_finishing), onCancel)
-        CeremonyStage.PAIRED -> Paired(ceremony, onNickname, onDismiss, onBack)
+        CeremonyStage.PAIRED -> Paired(ceremony, pairing, onNickname, onDismiss, onBack)
         CeremonyStage.FAILED -> Failed(ceremony.failure, onDismiss)
     }
 }
@@ -267,9 +275,12 @@ private fun Compare(ceremony: CeremonyEntity, busy: Boolean, onConfirm: () -> Un
     )
 }
 
-/** Step 4 and 5: paired. The nickname is this phone's alone (A5), starting as the peer's own name. */
+/**
+ * Step 4 and 5: paired. The nickname is this phone's alone (A5), starting as the peer's own name.
+ * A guardian also learns whether the phone lets it manage its apps (G3).
+ */
 @Composable
-private fun Paired(ceremony: CeremonyEntity, onNickname: (String) -> Unit, onDismiss: () -> Unit, onBack: () -> Unit) {
+private fun Paired(ceremony: CeremonyEntity, pairing: PairingUiState, onNickname: (String) -> Unit, onDismiss: () -> Unit, onBack: () -> Unit) {
     val peerName = ceremony.peerName.orEmpty()
     var nickname by rememberSaveable(ceremony.inviteId) { mutableStateOf(ceremony.nickname ?: peerName) }
     val peerFp = remember(ceremony.inviteId) { ceremony.peerReveal?.let { decodeReveal(it).valueOrNull() }?.let { fingerprint(it.bundle.signPk) } }
@@ -279,6 +290,9 @@ private fun Paired(ceremony: CeremonyEntity, onNickname: (String) -> Unit, onDis
             stringResource(if (ceremony.myRole == PairRole.GUARDIAN) R.string.wizard_paired_guardian else R.string.wizard_paired_protected, peerName),
             color = KillitForeground,
         )
+        val manages = ceremony.myRole == PairRole.GUARDIAN &&
+            pairing.pairings.firstOrNull { it.pairId.contentEquals(ceremony.pairId ?: ByteArray(0)) }?.appManagement == true
+        if (manages) KillitBody(stringResource(R.string.wizard_paired_management, peerName), color = KillitForeground)
     }
     Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
         if (peerFp != null) PeerBadge(fp = peerFp)

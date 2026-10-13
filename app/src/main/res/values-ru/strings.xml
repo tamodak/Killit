@@ -514,4 +514,47 @@
     <string name="onboarding_next">Далее</string>
     <string name="onboarding_skip">Пропустить</string>
     <string name="onboarding_start">Начать</string>
+
+    <!-- ============================== Guardians managing apps (PLAN.md §3.8) ============================== -->
+    <string name="management_title">Разрешить опекунам управлять моими приложениями</string>
+    <string name="management_on_desc">Включено. Опекуны видят ваши приложения, и любой из них может заблокировать приложение. Для разблокировки нужны все.</string>
+    <string name="management_off_desc">Выключено. Опекуны видят только приложения, которые вы просите разблокировать.</string>
+    <string name="management_on_confirm_title">Разрешить опекунам управлять вашими приложениями?</string>
+    <string name="management_on_confirm_body">Опекуны увидят, какие приложения есть на этом телефоне. Любой из них может сразу заблокировать приложение; для разблокировки нужно согласие всех. Вы будете узнавать о каждом изменении, а выключить это снова можно только в разблокированном Killit.</string>
+    <string name="management_on_confirm">Включить</string>
+    <string name="management_off_confirm_title">Запретить опекунам управлять вашими приложениями?</string>
+    <string name="management_off_confirm_body">Опекуны получат уведомление и больше не будут видеть ваши приложения.</string>
+    <string name="management_off_confirm">Выключить</string>
+    <string name="wizard_management_on">Опекуны могут управлять вашими приложениями: они видят, какие приложения есть на этом телефоне, и любой из них может заблокировать приложение.</string>
+    <string name="wizard_management_off">Опекуны не могут управлять вашими приложениями. Это можно разрешить в настройках, пока Killit разблокирован.</string>
+    <string name="wizard_paired_management">%1$s разрешает вам управлять приложениями.</string>
+    <string name="phone_manage_apps">Управлять приложениями</string>
+    <string name="phone_manage_apps_desc">Смотреть, какие приложения есть на этом телефоне, и блокировать их</string>
+    <string name="phone_manage_off">%1$s не разрешает опекунам управлять приложениями.</string>
+    <string name="manage_intro">Отмеченные приложения заблокированы. Блокировка срабатывает сразу; для разблокировки нужно согласие всех опекунов.</string>
+    <string name="manage_asking">Запрашиваем у телефона список приложений…</string>
+    <string name="manage_no_answer">Ответа пока нет. Список придёт, когда телефон будет в сети.</string>
+    <string name="manage_failed">Список пришёл не полностью. Запросите ещё раз.</string>
+    <string name="manage_ask_again">Запросить ещё раз</string>
+    <string name="manage_asked">Просит разблокировать</string>
+    <string name="manage_blocking">Блокируется…</string>
+    <string name="manage_unblocking">Разблокируется…</string>
+    <plurals name="manage_send">
+        <item quantity="one">Отправить %1$d изменение</item>
+        <item quantity="few">Отправить %1$d изменения</item>
+        <item quantity="many">Отправить %1$d изменений</item>
+        <item quantity="other">Отправить %1$d изменения</item>
+    </plurals>
+    <string name="manage_sent">Отправлено. Телефон применит изменения, когда будет в сети.</string>
+    <string name="manage_none">Пока нет приложений для показа.</string>
+    <string name="request_guardian_unblock">%1$s разблокирует %2$s для %3$s</string>
+    <string name="request_guardian_unblock_body">Нужно и ваше одобрение.</string>
+    <string name="request_guardian_unblock_mine">Вы разблокируете %1$s для %2$s</string>
+    <string name="request_guardian_unblock_mine_body">Ждём других опекунов.</string>
+    <string name="event_app_blocked_by">%1$s заблокировал(а) %2$s</string>
+    <string name="event_app_unblocked_by">%1$s разблокировал(а) %2$s</string>
+    <string name="event_app_blocked_by_you">Вы заблокировали %1$s</string>
+    <string name="event_app_unblocked_by_you">Вы разблокировали %1$s</string>
+    <string name="event_app_refused">Android не стал блокировать %1$s</string>
+    <string name="notif_app_unblocked_by_guardians">Опекуны его разблокировали.</string>
 </resources>

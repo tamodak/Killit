@@ -61,7 +61,7 @@ class RealServerPairingTest {
             apps = apps,
             durable = FakeDurable(),
             notifier = RecordingNotifier(),
-            config = PairingEngine.Config("Test $name", 30L * 24 * 60 * 60 * 1000, 300_000, 6, 7L * 24 * 60 * 60 * 1000),
+            config = PairingEngine.Config("Test $name", 30L * 24 * 60 * 60 * 1000, 300_000, 6, 7L * 24 * 60 * 60 * 1000, listAnswersPerHour = 4),
             canBeProtected = { true },
         )
 

@@ -20,6 +20,7 @@ import org.tamodak.killit.pairing.store.PairingEntity
 import org.tamodak.killit.pairing.store.RequestState
 import org.tamodak.killit.pairing.store.RequestType
 import org.tamodak.killit.pairing.store.Vote
+import org.tamodak.killit.protocol.AppChange
 import org.tamodak.killit.protocol.UnpairedHow
 import org.tamodak.killit.protocol.toHex
 
@@ -58,7 +59,11 @@ class PairingNotifications(
     override suspend fun requestArrived(from: PairingEntity, request: IncomingRequestEntity) {
         val text = localised()
         val live = request.type == RequestType.UNLOCK
-        val body = if (live) text.getString(R.string.request_waiting_now) else "“${request.explanation}”"
+        val body = when {
+            live -> text.getString(R.string.request_waiting_now)
+            request.type == RequestType.GUARDIAN_UNBLOCK -> text.getString(R.string.request_guardian_unblock_body)
+            else -> "“${request.explanation}”"
+        }
         post(requestTag(request.pairId, request.requestId), NotificationChannels.GUARD_REQUESTS, text) {
             setContentTitle(PairingTexts.request(text, request, from))
             setContentText(body)
@@ -148,7 +153,35 @@ class PairingNotifications(
         when (request.type) {
             RequestType.UNBLOCK_APP -> appClosed(request)
             RequestType.UNPAIR -> unpairClosed(request)
+            RequestType.GUARDIAN_UNBLOCK -> guardiansUnblocked(request)
             RequestType.UNLOCK -> Unit
+        }
+    }
+
+    /**
+     * G4: every guardian agreed to unblock an app one of them started unblocking. This phone never
+     * asked, so only the outcome that changed something is worth a word.
+     */
+    private suspend fun guardiansUnblocked(request: OutgoingRequestEntity) {
+        if (request.state != RequestState.APPROVED) return
+        val text = localised()
+        post(outcomeTag(request), NotificationChannels.MY_PHONE, text) {
+            setContentTitle(text.getString(R.string.notif_app_allowed_title, appName(request)))
+            setContentText(text.getString(R.string.notif_app_unblocked_by_guardians))
+            setContentIntent(open(Destination.MyPhone))
+        }
+    }
+
+    override suspend fun appManaged(guardian: PairingEntity, label: String, change: AppChange) {
+        val title = when (change) {
+            AppChange.BLOCKED -> R.string.event_app_blocked_by
+            AppChange.UNBLOCKED -> R.string.event_app_unblocked_by
+            AppChange.REFUSED -> return
+        }
+        val text = localised()
+        post("managed:${guardian.pairId.toHex()}:$label:$change:${now()}", NotificationChannels.MY_PHONE, text) {
+            setContentTitle(text.getString(title, guardian.nickname, label))
+            setContentIntent(open(Destination.MyPhone))
         }
     }
 

@@ -4,6 +4,7 @@ import org.tamodak.killit.pairing.store.EventEntity
 import org.tamodak.killit.pairing.store.IncomingRequestEntity
 import org.tamodak.killit.pairing.store.OutgoingRequestEntity
 import org.tamodak.killit.pairing.store.PairingEntity
+import org.tamodak.killit.protocol.AppChange
 
 /**
  * What the pairing engine tells the person holding the phone (PLAN.md §15.8). Texts are built on
@@ -24,6 +25,9 @@ interface PairingNotifier {
 
     /** Protected side: one guardian answered one of this phone's requests. */
     suspend fun guardianAnswered(guardian: PairingEntity, request: OutgoingRequestEntity, approved: Boolean, note: String) {}
+
+    /** Protected side: a guardian blocked or unblocked one of this phone's apps by itself (G4). */
+    suspend fun appManaged(guardian: PairingEntity, label: String, change: AppChange) {}
 
     /** A pairing ended: a guardian left, this phone was removed as a guardian, or an UNPAIR completed. */
     suspend fun pairingEnded(pairing: PairingEntity, event: EventEntity) {}

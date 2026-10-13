@@ -52,6 +52,13 @@ interface PairingDao {
     @Query("UPDATE pairings SET silence_alerted = :alerted WHERE pair_id = :pairId")
     suspend fun setSilenceAlerted(pairId: ByteArray, alerted: Boolean)
 
+    /** Guardian side: the guarded phone's management setting, as it last said (SPEC.md §11.9). */
+    @Query("UPDATE pairings SET app_management = :enabled WHERE pair_id = :pairId")
+    suspend fun setAppManagement(pairId: ByteArray, enabled: Boolean)
+
+    @Query("UPDATE pairings SET manage_seq = :seq WHERE pair_id = :pairId")
+    suspend fun setManageSeqSent(pairId: ByteArray, seq: Long)
+
     // ---------------------------------------------------------------- ceremony
 
     @Query("SELECT * FROM ceremony LIMIT 1")
@@ -90,8 +97,15 @@ interface PairingDao {
     @Query("SELECT * FROM outgoing_requests WHERE state = 'OPEN' ORDER BY created_at")
     suspend fun openOutgoing(): List<OutgoingRequestWithCopies>
 
-    @Query("SELECT * FROM outgoing_requests WHERE state = 'OPEN' AND type = 'UNBLOCK_APP' AND package_name = :packageName")
-    suspend fun openUnblockFor(packageName: String): OutgoingRequestEntity?
+    /**
+     * The open request to unblock [packageName], whichever kind: this phone's own UNBLOCK_APP, or a
+     * GUARDIAN_UNBLOCK it relays. A package has at most one (SPEC.md §11.12).
+     */
+    @Query(
+        "SELECT * FROM outgoing_requests WHERE state = 'OPEN' AND type IN ('UNBLOCK_APP', 'GUARDIAN_UNBLOCK') " +
+            "AND package_name = :packageName",
+    )
+    suspend fun openAppRequestFor(packageName: String): OutgoingRequestEntity?
 
     @Query("SELECT * FROM outgoing_requests WHERE state = 'OPEN' AND type = 'UNPAIR' AND target_pair_id = :targetPairId")
     suspend fun openUnpairFor(targetPairId: ByteArray): OutgoingRequestEntity?
@@ -137,6 +151,13 @@ interface PairingDao {
 
     @Query("SELECT * FROM incoming_requests WHERE state = 'OPEN' AND my_vote = 'WAITING'")
     suspend fun waitingForMe(): List<IncomingRequestEntity>
+
+    /** Open requests about an app from one guarded phone that still wait for this phone's answer. */
+    @Query(
+        "SELECT * FROM incoming_requests WHERE pair_id = :pairId AND state = 'OPEN' AND my_vote = 'WAITING' " +
+            "AND type IN ('UNBLOCK_APP', 'GUARDIAN_UNBLOCK')",
+    )
+    suspend fun openAppRequestsFrom(pairId: ByteArray): List<IncomingRequestEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIncoming(request: IncomingRequestEntity): Long
@@ -257,6 +278,74 @@ interface PairingDao {
     @Query("DELETE FROM pending_unlocks WHERE request_id = :requestId")
     suspend fun deletePendingUnlock(requestId: ByteArray)
 
+    // ---------------------------------------------------------------- app management
+
+    @Query("SELECT seq FROM manage_seqs WHERE pair_id = :pairId AND package_name = :packageName")
+    suspend fun manageSeq(pairId: ByteArray, packageName: String): Long?
+
+    @Upsert
+    suspend fun upsertManageSeq(seq: ManageSeqEntity)
+
+    @Query("DELETE FROM manage_seqs WHERE pair_id = :pairId")
+    suspend fun deleteManageSeqsFor(pairId: ByteArray)
+
+    @Query("SELECT * FROM ward_lists WHERE pair_id = :pairId")
+    suspend fun wardList(pairId: ByteArray): WardListEntity?
+
+    @Query("SELECT * FROM ward_lists")
+    fun observeWardLists(): Flow<List<WardListEntity>>
+
+    @Upsert
+    suspend fun upsertWardList(list: WardListEntity)
+
+    @Query("SELECT * FROM ward_list_pages WHERE pair_id = :pairId ORDER BY page")
+    suspend fun wardListPages(pairId: ByteArray): List<WardListPageEntity>
+
+    @Query("SELECT * FROM ward_list_pages WHERE pair_id = :pairId AND page = :page")
+    suspend fun wardListPage(pairId: ByteArray, page: Int): WardListPageEntity?
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertWardListPage(page: WardListPageEntity)
+
+    @Query("DELETE FROM ward_list_pages WHERE pair_id = :pairId")
+    suspend fun deleteWardListPages(pairId: ByteArray)
+
+    @Query("SELECT * FROM ward_apps ORDER BY label COLLATE NOCASE, package_name")
+    fun observeWardApps(): Flow<List<WardAppEntity>>
+
+    @Query("SELECT * FROM ward_apps WHERE pair_id = :pairId AND package_name = :packageName")
+    suspend fun wardApp(pairId: ByteArray, packageName: String): WardAppEntity?
+
+    /** Replaces a guarded phone's whole list with a newer one. */
+    @Transaction
+    suspend fun replaceWardApps(pairId: ByteArray, apps: List<WardAppEntity>) {
+        deleteWardApps(pairId)
+        insertWardApps(apps)
+    }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWardApps(apps: List<WardAppEntity>)
+
+    @Query("UPDATE ward_apps SET state = :state, pending_block = NULL WHERE pair_id = :pairId AND package_name = :packageName")
+    suspend fun setWardAppState(pairId: ByteArray, packageName: String, state: WardAppState)
+
+    @Query("UPDATE ward_apps SET pending_block = :pendingBlock WHERE pair_id = :pairId AND package_name = :packageName")
+    suspend fun setWardAppPending(pairId: ByteArray, packageName: String, pendingBlock: Boolean?)
+
+    /** Forgets what this phone knew of a guarded phone's apps: its list, and any list on its way. */
+    @Transaction
+    suspend fun forgetWardApps(pairId: ByteArray) {
+        deleteWardApps(pairId)
+        deleteWardListPages(pairId)
+        deleteWardList(pairId)
+    }
+
+    @Query("DELETE FROM ward_apps WHERE pair_id = :pairId")
+    suspend fun deleteWardApps(pairId: ByteArray)
+
+    @Query("DELETE FROM ward_lists WHERE pair_id = :pairId")
+    suspend fun deleteWardList(pairId: ByteArray)
+
     // ---------------------------------------------------------------- everything
 
     /** Forgets every pairing and everything that hangs off one: used when device owner is released. */
@@ -268,7 +357,23 @@ interface PairingDao {
         clearIncoming()
         deleteAppChances()
         clearPendingUnlocks()
+        clearManageSeqs()
+        clearWardApps()
+        clearWardLists()
+        clearWardListPages()
     }
+
+    @Query("DELETE FROM manage_seqs")
+    suspend fun clearManageSeqs()
+
+    @Query("DELETE FROM ward_apps")
+    suspend fun clearWardApps()
+
+    @Query("DELETE FROM ward_lists")
+    suspend fun clearWardLists()
+
+    @Query("DELETE FROM ward_list_pages")
+    suspend fun clearWardListPages()
 
     @Query("DELETE FROM pairings")
     suspend fun clearPairings()

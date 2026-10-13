@@ -46,6 +46,9 @@ class PeerList(
     /** Told when a guardian goes, so a live unlock is counted again (B4). */
     lateinit var unlock: LiveUnlock
 
+    /** Keeps a guardian's view of a guarded phone's apps current (SPEC.md §11.9). */
+    lateinit var management: AppManagement
+
     /**
      * Records a pairing the ceremony just completed. On a protected phone, its other guardians are
      * told (A4), and the new guardian receives the requests still waiting (G6, E-C2).
@@ -112,7 +115,10 @@ class PeerList(
         notifier.pairingEnded(pairing, event)
     }
 
-    /** Guardian side: a NOTICE from a phone this phone guards. It informs and changes nothing. */
+    /**
+     * Guardian side: a NOTICE from a phone this phone guards. It informs, and changes nothing but
+     * this phone's picture of the guarded phone: its management setting and its apps.
+     */
     suspend fun onNotice(received: Mailbox.Received) {
         val pairing = received.pairing ?: return
         val event = when (val notice = (received.body as MessageBody.Notice).notice) {
@@ -130,12 +136,32 @@ class PeerList(
             NoticeBody.ReleaseCancelled -> event(EventType.RELEASE_CANCELLED, pairing)
             is NoticeBody.ProtectionChanged ->
                 event(EventType.PROTECTION_CHANGED, pairing, value = notice.option.code, flag = notice.enabled)
-            is NoticeBody.ManagementChanged -> event(EventType.MANAGEMENT_CHANGED, pairing, flag = notice.enabled)
+            is NoticeBody.ManagementChanged -> {
+                management.onManagementChanged(pairing, notice.enabled)
+                event(EventType.MANAGEMENT_CHANGED, pairing, flag = notice.enabled)
+            }
+            is NoticeBody.AppManaged -> {
+                management.onAppManaged(pairing, notice)
+                event(
+                    EventType.APP_MANAGED,
+                    pairing,
+                    appLabel = notice.label,
+                    packageName = notice.app.packageName,
+                    otherName = notice.guardianName,
+                    value = notice.change.code,
+                    flag = notice.guardianFp.contentEquals(received.header.recipientFp),
+                )
+            }
             is NoticeBody.Unknown -> event(EventType.UNKNOWN_NOTICE, pairing, value = notice.code)
-            is NoticeBody.AppManaged, is NoticeBody.GuardianMoved -> return
+            is NoticeBody.GuardianMoved -> return
         }
         dao.insertEvent(event)
-        if (event.type == EventType.UNKNOWN_NOTICE) notifier.updateNeeded() else notifier.noticeArrived(pairing, event)
+        when {
+            event.type == EventType.UNKNOWN_NOTICE -> notifier.updateNeeded()
+            // This phone's own change, confirmed: it needs no telling.
+            event.type == EventType.APP_MANAGED && event.flag == true -> Unit
+            else -> notifier.noticeArrived(pairing, event)
+        }
     }
 
     /**

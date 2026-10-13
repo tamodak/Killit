@@ -42,13 +42,15 @@ import org.tamodak.killit.ui.theme.KillitRed
 import org.tamodak.killit.ui.theme.KillitRowDivider
 
 /**
- * My phone's settings (PLAN.md §15.5): the protection options, the language, the passkey, and,
- * last and in red, giving up device owner. Only a session with full control gets here.
+ * My phone's settings (PLAN.md §15.5): the protection options, letting guardians manage the apps
+ * (D5), the language, the passkey, and, last and in red, giving up device owner. Only a session
+ * with full control gets here.
  *
  * @param onHardeningChange called with the full config whenever one toggle moves.
  * @param onRequestRelease starts the wait before device owner can be given up.
  * @param onCancelRelease abandons that wait.
  * @param onReleaseDeviceOwner carries out the release, once the wait has elapsed.
+ * @param onAppManagementChange lets the guardians manage this phone's apps, or stops them.
  */
 @Composable
 fun SettingsScreen(
@@ -60,12 +62,15 @@ fun SettingsScreen(
     onCancelRelease: () -> Unit,
     onReleaseDeviceOwner: () -> Unit,
     onLanguageChange: (AppLanguage) -> Unit,
+    onAppManagementChange: (Boolean) -> Unit,
 ) {
     // Two separate confirmations: one to start the wait, another to actually release once it is
     // over. The second is the irreversible one.
     var confirmRelease by remember { mutableStateOf(false) }
     var confirmReleaseNow by remember { mutableStateOf(false) }
     var pickingLanguage by remember { mutableStateOf(false) }
+    // The management switch asks first either way: on shows the guardians the apps, off is told.
+    var confirmManagement by remember { mutableStateOf<Boolean?>(null) }
     val guarded = (state.guardianCount ?: 0) > 0
 
     BackHandler(onBack = onBack)
@@ -75,6 +80,17 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(28.dp),
         ) {
             HardeningPanel(config = state.hardening, guarded = guarded, onChange = onHardeningChange)
+
+            if (state.isDeviceOwner) {
+                val on = state.appManagement == true
+                KillitToggleRow(
+                    title = stringResource(R.string.management_title),
+                    checked = on,
+                    onCheckedChange = { confirmManagement = it },
+                    description = stringResource(if (on) R.string.management_on_desc else R.string.management_off_desc),
+                    enabled = state.appManagement != null,
+                )
+            }
 
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 KillitRow(
@@ -101,6 +117,21 @@ fun SettingsScreen(
                 )
             }
         }
+    }
+
+    confirmManagement?.let { enable ->
+        KillitDialog(
+            title = stringResource(if (enable) R.string.management_on_confirm_title else R.string.management_off_confirm_title),
+            body = stringResource(if (enable) R.string.management_on_confirm_body else R.string.management_off_confirm_body),
+            accent = KillitBlue,
+            onDismiss = { confirmManagement = null },
+            confirmText = stringResource(if (enable) R.string.management_on_confirm else R.string.management_off_confirm),
+            onConfirm = {
+                confirmManagement = null
+                onAppManagementChange(enable)
+            },
+            dismissText = stringResource(R.string.cancel),
+        )
     }
 
     if (pickingLanguage) {

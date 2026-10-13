@@ -15,6 +15,9 @@ import org.tamodak.killit.pairing.store.PairRole
 import org.tamodak.killit.pairing.store.PairingEntity
 import org.tamodak.killit.pairing.store.RequestType
 import org.tamodak.killit.pairing.store.UnknownMessageEntity
+import org.tamodak.killit.pairing.store.WardAppEntity
+import org.tamodak.killit.pairing.store.WardListEntity
+import org.tamodak.killit.protocol.AppRef
 import org.tamodak.killit.protocol.MessageBody
 import org.tamodak.killit.protocol.NoticeBody
 
@@ -41,7 +44,7 @@ class PairingEngine(
     private val server: PairingServer,
     private val identity: suspend () -> DeviceKeys.Identity,
     private val apps: AppBlocker,
-    durable: DurablePairingStore,
+    private val durable: DurablePairingStore,
     private val notifier: PairingNotifier,
     private val config: Config,
     canBeProtected: suspend () -> Boolean,
@@ -66,9 +69,10 @@ class PairingEngine(
     }
 
     /**
-     * Durations and device facts the engine needs.
+     * Durations, limits and device facts the engine needs.
      *
      * @param deviceModel `Build.MANUFACTURER` and `Build.MODEL`.
+     * @param listAnswersPerHour app lists answered per guardian per hour (SPEC.md §11.10).
      */
     class Config(
         val deviceModel: String,
@@ -76,22 +80,29 @@ class PairingEngine(
         val unlockCooldownMillis: Long,
         val unlocksPerDay: Int,
         val silenceAlertMillis: Long,
+        val listAnswersPerHour: Int,
     )
 
     private val lock = Mutex()
     private val dao = store.dao
 
-    val effects = RemoteEffects(apps)
+    val effects = RemoteEffects(apps, managementEnabled = ::appManagementEnabled)
     val mailbox = Mailbox(dao, server, identity, ::dispatch, lock, now)
     val peers = PeerList(store, mailbox, server, notifier, now)
     val requests = RequestEngine(store, mailbox, effects, apps, notifier, config.unpairTimerMillis, now)
     val unlock = LiveUnlock(store, mailbox, effects, durable, config.unlockCooldownMillis, config.unlocksPerDay, now)
-    val ceremony = CeremonyEngine(store, server, mailbox, peers, identity, lock, config.deviceModel, canBeProtected, now)
+    val management = AppManagement(store, mailbox, effects, apps, durable, notifier, config.listAnswersPerHour, now)
+    val ceremony = CeremonyEngine(
+        store, server, mailbox, peers, identity, lock, config.deviceModel, canBeProtected, ::appManagementEnabled, now,
+    )
 
     init {
         peers.requests = requests
         peers.unlock = unlock
+        peers.management = management
         requests.peers = peers
+        management.requests = requests
+        management.peers = peers
     }
 
     @Volatile
@@ -117,18 +128,27 @@ class PairingEngine(
     val history: Flow<List<EventEntity>> = dao.observeEvents()
     val unknownMessages: Flow<List<UnknownMessageEntity>> = dao.observeUnknown()
 
+    /** Guardian side: the apps of the phones this phone guards, from their last lists. */
+    val wardApps: Flow<List<WardAppEntity>> = dao.observeWardApps()
+
+    /** Guardian side: the app list asked for last from each guarded phone, and how it went. */
+    val wardLists: Flow<List<WardListEntity>> = dao.observeWardLists()
+
     /** Routes a message that passed every check to what handles its kind. Called under the lock. */
     private suspend fun dispatch(received: Mailbox.Received) {
         when (received.body) {
             is MessageBody.PairOffer -> ceremony.onOffer(received)
             is MessageBody.PairAnswer -> ceremony.onAnswer(received)
-            is MessageBody.UnblockApp, is MessageBody.Unlock, is MessageBody.Unpair -> requests.onIncoming(received)
+            is MessageBody.UnblockApp, is MessageBody.Unlock, is MessageBody.Unpair, is MessageBody.GuardianUnblock ->
+                requests.onIncoming(received)
             is MessageBody.Decision -> if (!unlock.onDecision(received)) requests.onDecision(received)
             is MessageBody.Status -> requests.onStatus(received)
             MessageBody.Leave -> peers.onLeave(received)
             is MessageBody.Unpaired -> peers.onUnpaired(received)
             is MessageBody.Notice -> peers.onNotice(received)
-            is MessageBody.ListRequest, is MessageBody.AppList, is MessageBody.Manage, is MessageBody.GuardianUnblock,
+            is MessageBody.ListRequest -> management.onListRequest(received)
+            is MessageBody.AppList -> management.onAppList(received)
+            is MessageBody.Manage -> management.onManage(received)
             is MessageBody.Handover, is MessageBody.MoveRequest, is MessageBody.MoveState, is MessageBody.MoveAnswer,
             is MessageBody.MoveDone -> Unit
         }
@@ -252,6 +272,17 @@ class PairingEngine(
 
     suspend fun cancelUnlock() = locked { unlock.cancel() }
 
+    /** Whether this phone lets its guardians manage its apps (PLAN.md §3.8). */
+    suspend fun appManagementEnabled(): Boolean = management.isEnabled()
+
+    /**
+     * Turns app management on or off and tells every guardian (H6). Only an unlocked session may
+     * call this (G3); the caller checks.
+     *
+     * @return false when the setting couldn't be stored.
+     */
+    suspend fun setAppManagement(enabled: Boolean): Boolean = locked { management.setEnabled(enabled) }
+
     /** Tells every guardian something (SPEC.md §11.9): an app was installed, a setting changed. */
     suspend fun notifyGuardians(notice: NoticeBody) {
         if (store.guardians().isEmpty()) return
@@ -290,6 +321,17 @@ class PairingEngine(
         locked { requests.decide(pairId, requestId, approve, note) }
 
     suspend fun leave(pairId: ByteArray) = locked { peers.leave(pairId) }
+
+    /** Asks a guarded phone for its app list (SPEC.md §11.10). */
+    suspend fun requestAppList(pairId: ByteArray): Boolean = locked { management.requestList(pairId) }
+
+    /**
+     * Sends a guarded phone this guardian's changes to its apps (SPEC.md §11.11).
+     *
+     * @param changes each app with the state wanted: true to block it, false to unblock it.
+     */
+    suspend fun manageApps(pairId: ByteArray, changes: List<Pair<AppRef, Boolean>>): Boolean =
+        locked { management.send(pairId, changes) }
 
     /**
      * The requests a reminder names (D9): waiting for this phone's answer, other than live

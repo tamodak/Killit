@@ -495,4 +495,46 @@
     <string name="onboarding_next">Suivant</string>
     <string name="onboarding_skip">Passer</string>
     <string name="onboarding_start">Commencer</string>
+
+    <!-- ============================== Guardians managing apps (PLAN.md §3.8) ============================== -->
+    <string name="management_title">Laisser mes gardiens gérer mes applis</string>
+    <string name="management_on_desc">Activé. Tes gardiens voient tes applis, et chacun d\'eux peut en bloquer une. Pour débloquer, il faut l\'accord de tous.</string>
+    <string name="management_off_desc">Désactivé. Tes gardiens ne voient que les applis que tu leur demandes de débloquer.</string>
+    <string name="management_on_confirm_title">Laisser tes gardiens gérer tes applis ?</string>
+    <string name="management_on_confirm_body">Tes gardiens verront quelles applis sont sur ce téléphone. Chacun d\'eux peut bloquer une appli tout de suite ; pour en débloquer une, il faut l\'accord de tous. Tu seras prévenu de chaque changement, et seul un Killit déverrouillé peut désactiver ça.</string>
+    <string name="management_on_confirm">Activer</string>
+    <string name="management_off_confirm_title">Empêcher tes gardiens de gérer tes applis ?</string>
+    <string name="management_off_confirm_body">Tes gardiens seront prévenus et ne verront plus tes applis.</string>
+    <string name="management_off_confirm">Désactiver</string>
+    <string name="wizard_management_on">Tes gardiens peuvent gérer tes applis : ils voient quelles applis sont sur ce téléphone, et chacun d\'eux peut en bloquer une.</string>
+    <string name="wizard_management_off">Tes gardiens ne peuvent pas gérer tes applis. Tu peux le permettre dans les Réglages quand Killit est déverrouillé.</string>
+    <string name="wizard_paired_management">%1$s te laisse gérer ses applis.</string>
+    <string name="phone_manage_apps">Gérer les applis</string>
+    <string name="phone_manage_apps_desc">Voir quelles applis sont sur ce téléphone, et les bloquer</string>
+    <string name="phone_manage_off">%1$s n\'a pas laissé ses gardiens gérer ses applis.</string>
+    <string name="manage_intro">Les applis cochées sont bloquées. Le blocage est immédiat ; pour débloquer, tous les gardiens doivent être d\'accord.</string>
+    <string name="manage_asking">Demande de la liste des applis au téléphone…</string>
+    <string name="manage_no_answer">Pas encore de réponse. La liste arrive quand le téléphone est en ligne.</string>
+    <string name="manage_failed">La liste n\'est pas arrivée en entier. Redemande-la.</string>
+    <string name="manage_ask_again">Redemander</string>
+    <string name="manage_asked">Déblocage demandé</string>
+    <string name="manage_blocking">Blocage…</string>
+    <string name="manage_unblocking">Déblocage…</string>
+    <plurals name="manage_send">
+        <item quantity="one">Envoyer %1$d modification</item>
+        <item quantity="many">Envoyer %1$d modifications</item>
+        <item quantity="other">Envoyer %1$d modifications</item>
+    </plurals>
+    <string name="manage_sent">Envoyé. Le téléphone l\'applique dès qu\'il est en ligne.</string>
+    <string name="manage_none">Aucune appli à afficher pour l\'instant.</string>
+    <string name="request_guardian_unblock">%1$s débloque %2$s pour %3$s</string>
+    <string name="request_guardian_unblock_body">Il faut aussi ton accord.</string>
+    <string name="request_guardian_unblock_mine">Tu débloques %1$s pour %2$s</string>
+    <string name="request_guardian_unblock_mine_body">En attente des autres gardiens.</string>
+    <string name="event_app_blocked_by">%1$s a bloqué %2$s</string>
+    <string name="event_app_unblocked_by">%1$s a débloqué %2$s</string>
+    <string name="event_app_blocked_by_you">Tu as bloqué %1$s</string>
+    <string name="event_app_unblocked_by_you">Tu as débloqué %1$s</string>
+    <string name="event_app_refused">Android a refusé de bloquer %1$s</string>
+    <string name="notif_app_unblocked_by_guardians">Tes gardiens l\'ont débloquée.</string>
 </resources>
